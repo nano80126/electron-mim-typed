@@ -1,0 +1,45 @@
+{
+	"message": "こんにちわ.",
+
+	"search": "検索",
+	"list": "リスト",
+	"player": "プレーヤー",
+	"settings": "設定",
+	"language": "言語",
+	"imageDir": "画像ディレクトリ",
+	"clearData": "データをクリア",
+	"clearDone": "データを削除した",
+	"exit": "終了",
+
+	"singer": "歌手名",
+	"song": "曲名",
+	"keyWord": "キーワード",
+	"link": "リンク",
+	"doSearchLyrics": "歌詞を探しましょう！",
+
+	"addListToAccess": "リストに追加しないと操作できず",
+	"addList": "リストに追加",
+	"inList": "追加済み",
+	"noLyricsExist": "歌詞が存在しない。",
+
+	"youtubeUrl": "YouTubeのリンク",
+	"total": "合計",
+	"externalBrowser": "外部ブラウザでサーチ",
+	"getYouTubeCover": "YouTubeサムネイルをゲット",
+	"selectImage": "画像選択",
+	"avatarImage": "アバターキャプチャ",
+	"removeImage": "画像を削除する",
+	"save": "保存",
+	"dragAndDrop": "ドラッグ & ドロップ",
+	"cover": "カバー",
+	"noImage" : "クリップボードに画像がない",
+	"invalidImage": "無効なイメージ",
+
+	"search_alt": "サーチ",
+	"delete": "削除",
+
+	"end": "終わり",
+
+	"loop": "ループ再生",
+	"shuffle": "シャッフル再生"
+}

@@ -1,0 +1,7 @@
+"es-abstract": "^1.17.7",
+
+"mongodb": "^3.6.2",
+
+"sharp": "^0.27.0",
+
+"vuedraggable": "^2.24.2",

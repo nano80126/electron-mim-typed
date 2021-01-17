@@ -1,0 +1,274 @@
+$body-font-family: 'consolas', '微軟正黑體';
+$title-font: 'consolas', '微軟正黑體';
+
+.v-application {
+	font-family: $body-font-family, sans-serif !important;
+	// background: transparent !important;
+
+	.title,
+	.subtitle-1,
+	.subtitle-2 {
+		font-family: $title-font, sans-serif !important;
+	}
+}
+
+html,
+body {
+	font-size: 16px;
+	font-family: 'consolas', '微軟正黑體', 'Helvetica', 'Arial', 'LiHei Pro', '黑體-繁', sans-serif;
+	user-select: none;
+	padding: 0;
+	margin: 0;
+	overflow: hidden !important;
+	// min-width: 960px;
+	// overflow-x: auto;
+	// width: 640px;
+}
+
+.no-select {
+	user-select: none;
+}
+
+.window-drag {
+	-webkit-app-region: drag;
+	position: absolute;
+	// background: rgba($color: red, $alpha: 0.36);
+
+	&.header {
+		width: calc(100% - 4px);
+		height: 28px;
+		bottom: 0;
+	}
+
+	&.left {
+		width: 60px;
+		height: calc(100% - 8px);
+		top: 4px;
+		right: 0;
+	}
+}
+
+.no-drag {
+	-webkit-app-region: no-drag;
+}
+
+.w-25 {
+	width: 25%;
+}
+
+.w-50 {
+	width: 50%;
+}
+
+.w-75 {
+	width: 75%;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.opa-25 {
+	opacity: 0.25;
+}
+
+.opa-50 {
+	opacity: 0.5;
+}
+
+.opa-75 {
+	opacity: 0.75;
+}
+
+.min-scroll {
+	&.x {
+		overflow-x: auto;
+		overflow-y: hidden;
+	}
+
+	&.y {
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	&::-webkit-scrollbar {
+		width: 0.2rem;
+		height: 0.2rem;
+	}
+
+	&::-webkit-scrollbar-track {
+		border-radius: 0.2rem;
+		background: rgba(75, 150, 75, 0.06);
+		box-shadow: inset 0 0 5px rgba(75, 150, 75, 0.3);
+	}
+
+	&::-webkit-scrollbar-thumb {
+		border-radius: 0.2rem;
+		background: rgba(200, 200, 200, 0.32);
+		box-shadow: inset 0 0 10px rgba(100, 100, 100, 0.75);
+	}
+
+	&.scroll-darken::-webkit-scrollbar-thumb {
+		box-shadow: inset 0 0 10px rgba(25, 25, 25, 0.75);
+	}
+
+	&.scroll-lighten::-webkit-scrollbar-thumb {
+		box-shadow: inset 0 0 10px rgba(150, 150, 150, 0.75);
+	}
+
+	&.primary-scroll {
+		&::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(35, 35, 200, 0.75);
+		}
+		&.scroll-darken::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(35, 35, 150, 0.75);
+		}
+	}
+
+	&.info-scroll {
+		&::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(35, 135, 255, 0.75);
+		}
+		&.scroll-darken::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(35, 75, 200, 0.75);
+		}
+	}
+
+	&.warning-scroll {
+		&::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(235, 200, 35, 0.75);
+		}
+		&.scroll-darken::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(180, 150, 187, 0.75);
+		}
+	}
+
+	&.error-scroll {
+		&::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(200, 35, 35, 0.75);
+		}
+		&.scroll-darken::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(150, 35, 35, 0.75);
+		}
+	}
+
+	&.success-scroll {
+		&::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(35, 200, 35, 0.75);
+		}
+
+		&.scroll-darken::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba(35, 150, 35, 0.75);
+		}
+	}
+
+	&.purple-scrol {
+		&::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba($color: purple, $alpha: 0.65);
+		}
+
+		&.scroll-darken::-webkit-scrollbar-thumb {
+			box-shadow: inset 0 0 10px rgba($color: purple, $alpha: 0.85);
+		}
+	}
+}
+
+span.ruby {
+	// font-family: 'メイリオ', 'ヒラギノ角ゴ Pro W3', 'ＭＳ Ｐゴシック', sans-serif;
+	// margin-bottom: 0.55em;
+	display: inline-table;
+	position: relative;
+	vertical-align: bottom;
+}
+
+span.ruby span.rb {
+	display: table-row;
+	position: relative;
+	line-height: 1.2;
+	font-size: 15px;
+	font-weight: 600;
+	// text-decoration: underline;
+	// font-weight: 700;
+	// letter-spacing: 1px;
+}
+
+span.ruby span.rt {
+	display: table-header-group;
+	line-height: 1.8;
+	font-size: 9px;
+	// color: #5e5e5e;
+	white-space: nowrap;
+	text-align: center;
+	letter-spacing: -0.001em;
+	opacity: 0.75;
+}
+
+.lyric-content.primary--subtext {
+	> span > span.ruby > span.rt {
+		color: #2196f3;
+	}
+}
+
+.lyric-content.cyan--subtext {
+	> span > span.ruby > span.rt {
+		color: #00bcd4;
+	}
+}
+
+.lyric-content.success--subtext {
+	> span > span.ruby > span.rt {
+		color: #4caf50 !important;
+	}
+}
+
+.lyric-content.teal--subtext {
+	> span > span.ruby > span.rt {
+		color: teal;
+	}
+}
+
+.lyric-content.warning--subtext {
+	> span > span.ruby > span.rt {
+		color: #ffc107;
+	}
+}
+
+.lyric-content.yellow--subtext {
+	> span > span.ruby > span.rt {
+		color: #ffeb3b;
+	}
+}
+
+.lyric-content.error--subtext {
+	> span > span.ruby > span.rt {
+		color: #f44336;
+	}
+}
+
+.lyric-content.purple--subtext {
+	> span > span.ruby > span.rt {
+		color: purple;
+	}
+}
+
+.lyric-content.white--subtext {
+	> span > span.ruby > span.rt {
+		color: whitesmoke;
+	}
+}
+
+.lyric-content.grey--subtext {
+	> span > span.ruby > span.rt {
+		color: grey;
+	}
+}
+
+.lyric-content.black--subtext {
+	> span > span.ruby > span.rt {
+		color: black;
+	}
+}
+
+.dummy:empty:before {
+	content: '\00a0';
+}

@@ -1,0 +1,44 @@
+{
+	"message": "hello i18n !!",
+
+	"search": "Search",
+	"list": "List",
+	"player": "Player",
+	"settings": "Settings",
+	"language": "Lauguage",
+	"imageDir": "Image directory",
+	"clearData": "Clear data",
+	"exit": "Exit",
+
+	"singer": "Singer",
+	"song": "Song",
+	"keyWord": "Keywords",
+	"link": "Link",
+	"doSearchLyrics": "Hey, search lyrics!",
+
+	"addListToAccess": "Access this function after adding to list.",
+	"addList": "Add to list",
+	"inList": "Already in the list",
+	"noLyricsExist": "No lyrics exist",
+
+	"youtubeUrl": "YouTube URL",
+	"total": "Total",
+	"externalBrowser": "Search By external browser",
+	"getYouTubeCover": "Get YouTube cover image",
+	"selectImage": "Select image",
+	"avatarImage": "Capture a region for avatar",
+	"removeImage": "Remove image",
+	"save": "Save",
+	"dragAndDrop": "",
+	"cover": "Cover",
+	"noImage" : "No image in clipboard",
+	"invalidImage": "Invalid image",
+
+	"search_alt": "Search",
+	"delete": "Delete",
+
+	"end": "End",
+
+	"loop": "Loop",
+	"shuffle": "Shuffle"
+}

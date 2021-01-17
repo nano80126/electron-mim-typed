@@ -1,0 +1,18 @@
+{
+	"eslint.validate": ["vue", "javascript", "javascriptreact"],
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true // 由 eslint 整理，但為prettier設定
+	},
+	"editor.formatOnSave": false, // 可以會衝突 // prettier & eslint
+	"[scss]": {
+		"editor.formatOnSave": true // 針對 scss
+	},
+	"[json]": {
+		"editor.formatOnSave": true // 針對 json
+	},
+	"[javascript]": {
+		"editor.formatOnSave": true // 針對 .prettierrc.js & .eslintrc.js
+	},
+	"editor.tabSize": 4,
+	"vetur.validation.template": false
+}

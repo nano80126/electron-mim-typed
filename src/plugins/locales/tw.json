@@ -1,0 +1,44 @@
+{
+	"message": "哈囉!!",
+
+	"search": "搜尋",
+	"list": "清單",
+	"player": "播放器",
+	"settings": "設定",
+	"language": "語言",
+	"imageDir": "圖片路徑",
+	"clearData": "資料清除",
+	"exit": "結束",
+
+	"singer": "歌手名",
+	"song": "曲名",
+	"keyWord": "關鑑字",
+	"link": "連結",
+	"doSearchLyrics": "嗨，尋找歌詞吧!!",
+
+	"addListToAccess": "加入清單以開始操作本功能",
+	"addList": "加入清單",
+	"inList": "已在清單",
+	"noLyricsExist": "",
+
+	"youtubeUrl": "YouTube連結",
+	"total": "合計",
+	"externalBrowser": "在外部瀏覽搜尋歌曲",
+	"getYouTubeCover": "取得YouTube預覽圖片",
+	"selectImage": "圖片選擇",
+	"avatarImage": "預覽圖截取",
+	"removeImage": "刪除圖片",
+	"save": "儲存",
+	"dragAndDrop": "拖放圖片於此",
+	"cover": "翻唱",
+	"noImage" : "剪貼簿中沒有圖片",
+	"invalidImage": "無效的圖片",
+
+	"search_alt": "尋找",
+	"delete": "刪除",
+
+	"end": "結束",
+
+	"loop": "循環播放",
+	"shuffle": "隨機播放"
+}
