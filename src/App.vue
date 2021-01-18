@@ -1,7 +1,14 @@
 <template>
 	<div v-show="SHOW">
 		<v-app>
-			<v-app-bar v-if="isElectron" app flat height="32" color="blue-grey darken-4">
+			<v-app-bar
+				v-if="isElectron"
+				app
+				flat
+				height="32"
+				color="blue-grey"
+				:class="isDarkMode ? 'darken-4' : 'lighten-4'"
+			>
 				<!-- :class="isDarkMode ? 'darken-4' : 'lighten-2'" -->
 				<div class="window-drag header ml-n4" />
 

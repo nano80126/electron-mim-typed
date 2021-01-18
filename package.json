@@ -19,6 +19,7 @@
 	"dependencies": {
 		"axios": "^0.21.1",
 		"core-js": "^3.6.5",
+		"cron": "^1.8.2",
 		"lodash": "^4.17.20",
 		"moment": "^2.29.1",
 		"qs": "^6.9.6",
@@ -32,6 +33,7 @@
 	"devDependencies": {
 		"@fortawesome/fontawesome-free": "^5.12.1",
 		"@types/cheerio": "^0.22.21",
+		"@types/cron": "^1.7.2",
 		"@types/lodash": "^4.14.161",
 		"@types/mongodb": "^3.5.27",
 		"@types/node": "^12.12.6",

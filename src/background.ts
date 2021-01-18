@@ -19,7 +19,7 @@ import './api/express';
 // import './api/sharp';
 
 import { registerHotkey, unregisterAllHotKey } from './api/shortcut';
-import { config, saveConfig } from './api/fs';
+// import { config, saveConfig } from './api/fs';
 // import { mongoCLient } from './api/mongo';
 
 // custom types
@@ -66,8 +66,10 @@ function createWindow() {
 		minHeight: 720,
 		height: 900,
 		///
-		x: (config as Iconfig).x || 30,
-		y: (config as Iconfig).y || 40,
+		// x: (config as Iconfig).x || 30,
+		x: 30,
+		// y: (config as Iconfig).y || 40,
+		y: 40,
 		// frame: false,
 		// opacity: 0.5,
 		// autoHideMenuBar: true,
@@ -168,11 +170,11 @@ function createWindow() {
 		win?.show();
 	});
 
-	win.on('close', () => {
-		/**關閉前紀錄現在視窗位置 */
-		const bound = win?.getBounds();
-		saveConfig({ x: bound?.x, y: bound?.y });
-	});
+	// win.on('close', () => {
+	// 	/**關閉前紀錄現在視窗位置 */
+	// 	const bound = win?.getBounds();
+	// 	saveConfig({ x: bound?.x, y: bound?.y });
+	// });
 
 	win.on('closed', () => {
 		win = null;
