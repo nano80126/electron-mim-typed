@@ -5,12 +5,12 @@ import { drop } from 'lodash';
 import moment from 'moment';
 // import { mainWin } from '../background';
 
-/**宣告 client */
-let tcpClient: net.Socket;
+import stepName from '../json/stepName.json';
+import stepState from '../json/stepState.json';
+import { FSocket } from '@/types/main-process';
 
-import workName from '../json/workNowName.json';
-import workState from '../json/workNowState.json';
-import { Socket } from 'dgram';
+/**宣告 client */
+let tcpClient: FSocket = new FSocket();
 
 const furnace = {};
 
@@ -60,6 +60,24 @@ ipcMain.handle('conn', async (e, args) => {
 			// if (tcpClient.furnace.onSample) {
 			//
 			// }
+
+			tcpClient.on('data', str => {
+				const strArr = Array.from(str);
+				console.log(strArr);
+
+				if (strArr[7] == 5) {
+					//
+					console.log('Response of writing coil: ', strArr);
+					return;
+				}
+
+				// 有回應，清除Timeout notify
+				// clearTimeout();
+
+				const arr = drop(strArr, 9);
+
+				// tcpClient
+			});
 		});
 	});
 });
