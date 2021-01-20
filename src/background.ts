@@ -12,6 +12,7 @@ import {
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
+console.log(process.env.NODE_ENV);
 // import crawler
 // import './api/fastify';
 import './api/express';
