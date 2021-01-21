@@ -1,23 +1,63 @@
-import net from 'net';
-import { ipcMain } from 'electron';
+// import net from 'net';
+import { ipcMain, IpcMainEvent } from 'electron';
 import { CronJob } from 'cron';
 import { drop } from 'lodash';
 import moment from 'moment';
-// import { setTimeout, setInterval, clearTimeout, clearInterval } from 'timers';
+import { configure, getLogger } from 'log4js';
 
 // import { mainWin } from '../background';
 
+// 設備工序狀態 & 工序名稱
 import stepName from '../json/stepName.json';
 import stepState from '../json/stepState.json';
+
+// 自定義引入
 import { FSocket } from '@/types/main-process';
-import { stringify } from 'qs';
 import { message } from './line';
-import { DH_CHECK_P_NOT_SAFE_PRIME } from 'constants';
+// import {  clearInterval } from 'timers';
+
+//
+// 配置 log
+//
+configure('./logs/filename');
+const logger = getLogger();
+logger.level = 'debug';
+logger.debug('Some debug messages');
+
+configure({
+	appenders: { cheese: { type: 'file', filename: 'cheese.log' } },
+	categories: { default: { appenders: ['cheese'], level: 'error' } }
+});
+
+logger.error('Some error messages');
+// // // // // // // // // // // // // // //
 
 /**宣告 client */
 let tcpClient: FSocket = new FSocket();
 
-const furnace = {};
+new CronJob(
+	'0 30 17,22 * * 0-6',
+	() => {
+		let msg = `\n現在時間: ${moment().format('MM/DD HH:mm:ss')}\n伺服器狀態: 正常`;
+
+		if (tcpClient && tcpClient.connected) {
+			msg += `\n工藝狀態: ${tcpClient.stepState} \n工藝名稱${tcpClient.stepName}`;
+		} else {
+			msg += '\n燒結爐狀態: 未連線';
+		}
+
+		message(msg)
+			.then(res => {
+				// mainWin.send
+			})
+			.catch(err => {
+				// mainWin.send
+				logger.warn(err);
+			});
+	},
+	null,
+	true
+);
 
 ipcMain.on('data', (e, args) => {
 	console.log(args);
@@ -176,23 +216,173 @@ ipcMain.handle('conn', async (e, args) => {
 		});
 
 		// 連線失敗事件
-		tcpClient.on('error', (err: Error) => {
+		tcpClient.on('error', (err: NodeJS.ErrnoException) => {
 			console.log(`${err.name} ${err.message}`);
 
-			const { code } = err as NodeJS.ErrnoException;
+			// const { code } = err as NodeJS.ErrnoException;
 			// 回傳
-			switch (code) {
-				case 'ECONNREFUSED':
-				case 'ETIMEOUT':
-					//
+			switch (err.code) {
+				case 'ECONNREFUSED': // 有IP, port沒開
+				case 'ETIMEOUT': // 沒IP
+					// send to renderer
+					e.sender.send('conn-error', {
+						connected: false,
+						error: { message: err.message, code: err.code, errno: err.errno }
+					});
 					break;
-				case 'ECONNRESET':
+				case 'ECONNRESET': // 被斷線
+					// send to renderer
+					e.sender.send('conn-error', {
+						connected: false,
+						error: { message: err.message, code: err.code, errno: err.errno }
+					});
+
+					// 廣播被斷線
+					// wsServer.
+					if (!tcpClient.handleDisc) {
+						// 發出訊息
+						message(`\n伺服器狀態: 正常\n警告: 燒結爐連線中斷\nCode: ${err.code}`)
+							.then(res => {
+								e.sender.send('notifyRes', res.data);
+								console.log();
+							})
+							.catch((err: NodeJS.ErrnoException) => {
+								e.sender.send('notifyRes', {
+									error: true,
+									code: err.code,
+									message: err.message,
+									errno: err.errno
+								});
+							});
+
+						// 啟動重連機制
+						if (tcpClient.cron) tcpClient.cron.start();
+
+						// 5 秒後重連
+						if (tcpClient.reconnect) {
+							setTimeout(() => {
+								try {
+									tcpClient.connect({ host: ip, port: port, family: 4 });
+								} catch (err) {
+									console.log(err);
+								}
+							}, 5000);
+						}
+					}
 					//
 					break;
 				default:
-					console.error(`${code} ${err}`);
+					console.error(`${err.code} ${err}`);
 					break;
 			}
+
+			resolve({
+				connected: false,
+				error: { message: err.message, code: err.code, errno: err.errno }
+			});
+
+			//
+			// on error event end
+			//
 		});
 	});
+
+	return promise;
 });
+
+// 處理斷線請求
+ipcMain.handle('disc', async () => {
+	tcpClient.handleDisc = true; // 手動斷線
+
+	const promise = await new Promise(resolve => {
+		tcpClient.end(Buffer.from([]), () => {
+			//
+			resolve({ connected: false });
+		});
+	});
+
+	// wsServer
+
+	return promise;
+});
+
+// 執行取樣
+const doSample = function(e: IpcMainEvent) {
+	if (tcpClient.writable) {
+		//
+		tcpClient.samplingTimeoutTimer = setTimeout(() => {
+			tcpClient.samplingTimeoutCount++;
+
+			if (tcpClient.samplingTimeoutCount >= 3) {
+				message(`\n伺服器狀態: 正常\n警告: 燒結爐無回應`)
+					.then(res => {
+						e.sender.send('notifyRes', res.data);
+					})
+					.catch(err => {
+						e.sender.send('notifyRes', {
+							error: true,
+							code: err.code,
+							message: err.message,
+							errno: err.errno
+						});
+					});
+
+				tcpClient.samplingTimeoutCount = 0;
+				clearInterval(tcpClient.sampler as NodeJS.Timer);
+				tcpClient.sampler = undefined;
+			}
+		}, (tcpClient.interval as number) * 1.5);
+
+		const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x04, 0x00, 0x00, 0x00, 0x22]);
+		tcpClient.write(buf);
+	} else {
+		tcpClient.samplingState = false; // set sample state off
+		clearInterval(tcpClient.sampler as NodeJS.Timer);
+		tcpClient.sampler = undefined;
+	}
+};
+
+/**開始取樣 */
+const startSample = function(e: IpcMainEvent) {
+	tcpClient.samplingState = true;
+	tcpClient.sampler = setInterval(() => doSample(e), tcpClient.interval as number);
+	doSample(e);
+};
+
+// 處理取樣命令
+ipcMain.on('sampling', (e, args) => {
+	const { sampling } = args;
+
+	if (sampling) {
+		// 開始取樣
+		tcpClient.onSample = true;
+		startSample(e);
+	} else {
+		// 停止取樣
+		tcpClient.onSample = false;
+		// 若 sampler 存在
+		if (tcpClient.sampler) {
+			tcpClient.samplingTimeoutCount = 0;
+			clearInterval(tcpClient.sampler); // 停止取樣sampler
+			tcpClient.sampler = undefined;
+		}
+	}
+});
+
+// 處理 notify 發送命令
+ipcMain.on('notifySend', (e, args) => {
+	const { msg } = args;
+	message(msg)
+		.then(res => {
+			e.sender.send('notifyRes', res.data);
+		})
+		.catch((err: NodeJS.ErrnoException) => {
+			e.sender.send('notifyRes', { error: true, code: err.code, message: err.message, errno: err.errno });
+		});
+});
+
+// Number.prototype.toHex = function() {
+// 	return this.toString(16).padStart(2, '0');
+// };
+
+export { tcpClient };
