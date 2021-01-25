@@ -5,7 +5,7 @@ export interface HiperState {
 	connected: boolean;
 	reconnect: boolean;
 	sampling: boolean;
-	connectionErr: {};
+	connectionErr: NodeJS.ErrnoException | null;
 }
 
 @Module({ dynamic: true, store, name: 'hiper' })
@@ -17,7 +17,7 @@ class Hiper extends VuexModule implements HiperState {
 	/**取樣中 */
 	public sampling = false;
 	/**連線錯誤 */
-	public connectionErr = {};
+	public connectionErr: NodeJS.ErrnoException | null = null;
 
 	@Mutation
 	changeConnected(bool: boolean) {
@@ -35,8 +35,8 @@ class Hiper extends VuexModule implements HiperState {
 	}
 
 	@Mutation
-	changeConntionErr() {
-		this.connectionErr = {};
+	changeConntionErr(err: NodeJS.ErrnoException | null) {
+		this.connectionErr = err;
 	}
 }
 

@@ -15,7 +15,9 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 console.log(process.env.NODE_ENV);
 // import crawler
 // import './api/fastify';
+import './api/log4js';
 import './api/express';
+import './api/socket_hiper';
 // import './api/crawler';
 // import './api/sharp';
 

@@ -42,11 +42,11 @@
 				<v-sheet class="d-flex justify-space-between px-3" :color="sheetColor">
 					<v-tooltip bottom>
 						<template v-slot:activator="{ on }">
-							<span v-on="on">{{}}</span>
+							<span v-on="on">{{ connErrorCode }}</span>
 						</template>
-						{{}}
+						{{ connErrorMsg }}
 					</v-tooltip>
-					<span>{{}}</span>
+					<span>{{ connStatus }}</span>
 				</v-sheet>
 			</v-card-text>
 			<v-divider />
@@ -66,7 +66,7 @@
 					連線
 				</v-btn>
 
-				<v-btn color="error darken-2" :disabled="!isConnected" @click="discconnect">斷線</v-btn>
+				<v-btn color="error darken-2" :disabled="!isConnected" @click="disconnect">斷線</v-btn>
 			</v-card-actions>
 		</v-card>
 	</div>
@@ -83,9 +83,9 @@ export default class App extends Vue {
 	/**嘗試連線中 */
 	private connecting = false;
 	/**IP */
-	private ip = '192.168.3.18';
+	private ip = '192.168.50.162';
 	/**port */
-	private port = 502;
+	private port = 3000;
 	/**取樣頻率 */
 	private interval = 3000;
 
@@ -109,15 +109,40 @@ export default class App extends Vue {
 
 	mounted() {
 		if (!this.$ipcRenderer.eventNames().includes('conn-error')) {
+			console.info('%cRegister conn-error', 'color: #2196f3');
 			//
+			this.$ipcRenderer.on('conn-error', (e, args) => {
+				HiperModule.changeConnected(args.connected);
+
+				if (args.error) {
+					console.log(args);
+					//
+					HiperModule.changeConntionErr(args.error);
+				}
+			});
 		}
 
 		if (!this.$ipcRenderer.eventNames().includes('conn-success')) {
+			console.info('%cRegister conn-success', 'color: #2196f3');
 			//
+			this.$ipcRenderer.on('conn-success', (e, args) => {
+				HiperModule.changeConnected(args.connected);
+				console.info(`%cIP: ${args.remoteIP}:${args.remotePort}`, 'color: #4CAF50;');
+
+				if (!args.error) {
+					console.log(args);
+					//
+					HiperModule.changeConntionErr(null);
+				}
+			});
 		}
 
 		if (!this.$ipcRenderer.eventNames().includes('sample-change')) {
+			console.info('%cRegister sample-change', 'color: #2196f3');
 			//
+			this.$ipcRenderer.on('sample-change', (e, args) => {
+				HiperModule.changeSampling(args.sampling);
+			});
 		}
 	}
 
@@ -144,6 +169,28 @@ export default class App extends Vue {
 	set sampling(bool: boolean) {
 		HiperModule.changeSampling(bool);
 	}
+
+	get connErrorCode() {
+		if (HiperModule.connectionErr) {
+			return HiperModule.connectionErr.code;
+		} else return null;
+	}
+
+	get connErrorMsg() {
+		if (HiperModule.connectionErr) {
+			return HiperModule.connectionErr.message;
+		} else return '';
+	}
+
+	get sheetColor() {
+		if (this.connErrorCode) {
+			return 'error';
+		} else {
+			if (!this.isConnected) return 'grey darken-2';
+			else return 'success';
+		}
+	}
+
 	/**與設備連線 */
 	private async connect() {
 		// set for loading

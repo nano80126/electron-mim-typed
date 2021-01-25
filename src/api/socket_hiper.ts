@@ -1,9 +1,9 @@
 // import net from 'net';
-import { ipcMain, IpcMainEvent } from 'electron';
+import { ipcMain, IpcMainEvent, app } from 'electron';
 import { CronJob } from 'cron';
 import { drop } from 'lodash';
 import moment from 'moment';
-import { configure, getLogger } from 'log4js';
+import { getLogger } from 'log4js';
 
 // import { mainWin } from '../background';
 
@@ -19,17 +19,10 @@ import { message } from './line';
 //
 // 配置 log
 //
-configure('./logs/filename');
-const logger = getLogger();
-logger.level = 'debug';
-logger.debug('Some debug messages');
+// const appPath = app.getAppPath();
+const log = getLogger('hiper');
 
-configure({
-	appenders: { cheese: { type: 'file', filename: 'cheese.log' } },
-	categories: { default: { appenders: ['cheese'], level: 'error' } }
-});
-
-logger.error('Some error messages');
+log.info('create new log for test');
 // // // // // // // // // // // // // // //
 
 /**宣告 client */
@@ -52,7 +45,7 @@ new CronJob(
 			})
 			.catch(err => {
 				// mainWin.send
-				logger.warn(err);
+				// logger.warn(err);
 			});
 	},
 	null,
@@ -127,7 +120,7 @@ ipcMain.handle('conn', async (e, args) => {
 			//
 
 			// response connection successful
-			e.sender.send('conn-success', { connected: true, remoteIP: ip, remotePort: port });
+			// e.sender.send('conn-success', { connected: true, remoteIP: ip, remotePort: port });
 
 			//
 			// WsServer
@@ -209,7 +202,7 @@ ipcMain.handle('conn', async (e, args) => {
 				//
 			});
 
-			resolve({ connected: true, remoteIp: ip, remotePort: port });
+			resolve({ connected: true, remoteIP: ip, remotePort: port });
 			//
 			// on connect event end
 			//
