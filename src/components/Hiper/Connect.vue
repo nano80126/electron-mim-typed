@@ -92,9 +92,9 @@ export default class App extends Vue {
 	/**合法 IP 規則 */
 	private ipRules = [
 		(str: string) =>
-			RegExp(/^192\.168\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/).test(
-				str
-			) || 'Valid IP address is required.'
+			RegExp(
+				/^192\.168\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$|^127\.0\.0\.1$/
+			).test(str) || 'A valid IP address is required.'
 	];
 	/**合法 port 規則 */
 	private portRules = [
@@ -104,7 +104,7 @@ export default class App extends Vue {
 	/**合法 interval 規則 */
 	private intervalRules = [
 		(num: string) => RegExp(/^[1-9][0-9]{0,4}$/).test(num) || 'An integer is required.',
-		(num: number) => num > 500 || 'Number should be greater than 500.'
+		(num: number) => num > 500 || 'Interval value should be greater than 500.'
 	];
 
 	mounted() {

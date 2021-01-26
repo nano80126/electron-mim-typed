@@ -36,6 +36,7 @@ let tray: Tray | null = null;
 
 // windows
 let win: BrowserWindow | null = null;
+let mainWin: Electron.webContents | null;
 let child: BrowserWindow | null = null;
 let childCloseTimer: NodeJS.Timeout | null = null;
 //
@@ -93,6 +94,7 @@ function createWindow() {
 	win.webContents.on('new-window', (event, url, frameName, disposition, options) => {
 		event.preventDefault();
 
+		// preserved for line panel
 		if (frameName === 'editPanel') {
 			const { artist, title, lyricsKey, lyricsUrl } = options as IchannelLyricsObj;
 
@@ -170,6 +172,7 @@ function createWindow() {
 	}
 
 	win.on('ready-to-show', () => {
+		if (win?.webContents) mainWin = win.webContents;
 		win?.show();
 	});
 
@@ -335,4 +338,4 @@ if (isDevelopment) {
 	}
 }
 
-export { win, child, tray };
+export { win, mainWin, child, tray };

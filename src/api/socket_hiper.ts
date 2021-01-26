@@ -1,11 +1,12 @@
 // import net from 'net';
-import { ipcMain, IpcMainEvent, app } from 'electron';
+import { ipcMain, IpcMainEvent } from 'electron';
 import { CronJob } from 'cron';
 import { drop } from 'lodash';
 import moment from 'moment';
 import { getLogger } from 'log4js';
 
-// import { mainWin } from '../background';
+// 主視窗 webContents
+import { mainWin } from '../background';
 
 // 設備工序狀態 & 工序名稱
 import stepName from '../json/stepName.json';
@@ -42,10 +43,19 @@ new CronJob(
 		message(msg)
 			.then(res => {
 				// mainWin.send
+				mainWin?.send('notifyRes', res.data);
+				console.log(res);
 			})
 			.catch(err => {
 				// mainWin.send
-				// logger.warn(err);
+				mainWin?.send('notifyRes', {
+					error: true,
+					code: err.code,
+					message: err.message,
+					errno: err.errno
+				});
+				// append to log
+				log.warn(`${err.code} ${err.message}`);
 			});
 	},
 	null,
@@ -69,7 +79,8 @@ const cronReconn = new CronJob(
 					family: 4
 				});
 			} catch (err) {
-				console.error(err);
+				log.info(err.message);
+				// console.error(err);
 			}
 		}
 	},
