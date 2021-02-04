@@ -45,5 +45,15 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class HIPER extends Vue {
 	/**啟用的 tab */
 	private tab = 0;
+
+	mounted() {
+		// this.$root.$on('alarmToggle', () => {
+		// 	const audio = this.$refs.alarmAudio;
+		// });
+	}
+
+	beforeDestroy() {
+		//
+	}
 }
 </script>

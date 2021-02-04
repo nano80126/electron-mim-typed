@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<!-- style="height: 800px;" -->
-		<v-row no-gutters align="stretch" class="mt-3" :style="{ height: `${$root.webHeight - 92}px` }">
+		<v-row no-gutters align="stretch" class="mt-3" :style="{ height: `${$root.webHeight - 140}px` }">
 			<v-col class="d-flex flex-column align-start justify-between">
 				<v-card class="ml-3" flat outlined width="240px">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">
@@ -168,13 +168,38 @@
 					</v-card-text>
 				</v-card>
 			</v-col>
+
+			<!-- <v-col v-if="isElectron" cols="2">
+					<v-btn block class="font-weight-black title" @click="broadcast">廣播</v-btn>
+				</v-col>
+
+				<v-col v-if="isElectron" cols="2">
+					<v-btn block class="font-weight-black title" @click="lineNotify">Line</v-btn>
+				</v-col>
+
+				<v-col v-if="isElectron" cols="2">
+					<v-btn block class="font-weight-black title" @click="alarmToggle">報警鈴警</v-btn>
+				</v-col> -->
 		</v-row>
+		<v-bottom-navigation v-model="bottomNav" class="mt-3" height="48">
+			<v-btn class="font-weight-black title" @click="broadcast">廣播</v-btn>
+
+			<v-btn class="font-weight-black title" @click="lineNotify">Line</v-btn>
+
+			<v-btn class="font-weight-black title" @click="alarmToggle">報警鈴警</v-btn>
+
+			{{ bottomNav }}
+		</v-bottom-navigation>
 	</div>
 </template>
 
 <script lang="ts">
-import { AppModule } from '@/store/modules/app';
+import { AppModule, Colors } from '@/store/modules/app';
 import { Component, Vue } from 'vue-property-decorator';
+
+import stepName from '@/json/stepName.json';
+import stepState from '@/json/stepState.json';
+import { HiperModule } from '@/store/modules/hiper';
 
 @Component({})
 export default class HiperDashboard extends Vue {
@@ -188,11 +213,16 @@ export default class HiperDashboard extends Vue {
 	private flow = 0;
 	private leaveTime = 0;
 	// private workArr = []; no used now
-	private workNowName = null;
-	private workNowState = null;
+	private workNowName: string | null = null;
+	private workNowState: string | null = null;
 	private nowState = null;
 
 	private waitTime = 0;
+
+	/**底部功能 Nav */
+	private bottomNav = 0;
+	/** */
+	private hasResponse = false;
 
 	/**是否為electron */
 	get isElectron() {
@@ -200,31 +230,127 @@ export default class HiperDashboard extends Vue {
 	}
 	/**設備是否連線 */
 	get isConnected() {
-		return false;
+		return HiperModule.connected;
 	}
 	/**websocket是否連線 */
 	get isWebsocket() {
 		return false;
 	}
-	/** */
+	/**是否為 dark mode */
 	get isDarkMode() {
 		return this.$vuetify.theme.dark;
 	}
 
 	mounted() {
-		//
 		if (AppModule.isElectron) {
 			//
+			this.$ipcRenderer.on('serial', (e, args) => {
+				// 移除前 9 位
+				const serial = this.$lodash.drop(args.serial, 9) as number[];
+				this.serialToData(serial);
+				if (args.alarm) {
+					if (!this.hasResponse) this.$root.$emit('alarmOn');
+				} else {
+					this.$root.$emit('alarmOff');
+				}
+			});
 		} else {
-			//
+			// 新增 websocket 事件
 		}
 	}
 
 	beforeDestroy() {
 		if (AppModule.isElectron) {
 			// remove serial event
+			this.$ipcRenderer.removeAllListeners('serial');
 		} else {
-			// nothing to do
+			// nothing to do,
+		}
+	}
+
+	// 16 進位 陣列轉 10進位陣列
+	private HexArrToVal(source: number[], idx: number[]) {
+		if (!Array.isArray(source) || !Array.isArray(idx)) return 0;
+		const a = idx.map(x => source[x] || 0);
+		const val = a.reduce((pre, curr, currIdx) => pre + (curr << ((a.length - currIdx - 1) * 8)), 0);
+		return val;
+	}
+
+	/**序列轉資料 */
+	private serialToData(serial: number[]) {
+		this.setTemp = this.HexArrToVal(serial, [0, 1]) / 10;
+		this.topTemp = this.HexArrToVal(serial, [2, 3]) / 10;
+		this.bottomTemp = this.HexArrToVal(serial, [4, 5]) / 10;
+		//
+		this.vacuum = this.HexArrToVal(serial, [10, 11, 8, 9]) / 100;
+
+		this.flow = this.HexArrToVal(serial, [12, 13]) / 10;
+		this.leaveTime = this.HexArrToVal(serial, [14, 15]) / 10;
+
+		// 狀態號碼轉文字
+		this.workNowState = stepState[this.HexArrToVal(serial, [48, 49])];
+		// 工藝名稱轉文字
+		this.workNowName = stepName[this.HexArrToVal(serial, [66, 67])];
+
+		this.waitTime = this.HexArrToVal(serial, [52, 53, 50, 51]);
+	}
+
+	// 新增 ws 訊息事件
+	private addMsgEvent() {
+		//
+	}
+
+	/**廣播所有客戶端 */
+	private broadcast = this.$lodash.debounce(() => {
+		if (this.isElectron) {
+			this.$ipcRenderer.send('boardcast', { text: 'text', id: 456 });
+		}
+	}, 500);
+
+	/**送出Line通知 */
+	private lineNotify = this.$lodash.debounce(() => {
+		if (this.isElectron) {
+			const message = '\n這是一條測試訊息。';
+			this.$ipcRenderer.send('notifySend', { msg: message });
+		}
+	}, 500);
+
+	/**切換報警鈴 */
+	private alarmToggle() {
+		this.$root.$emit('alarmToggle');
+	}
+
+	private alarmRes() {
+		//
+		this.$root.$emit('alarmOff');
+		if (this.isElectron) {
+			this.$ipcRenderer
+				.invoke('alarm-res')
+				.then((res: { response: boolean; reset: boolean }) => {
+					this.hasResponse = res.response;
+				})
+				.catch((err: Error) => {
+					AppModule.snackbar({ text: err.message, color: Colors.Error });
+				});
+		} else {
+			// websocket response alarm
+		}
+	}
+
+	private alarmReset() {
+		//
+		this.$root.$emit('alarmOff');
+		if (this.isElectron) {
+			this.$ipcRenderer
+				.invoke('alarm-rst')
+				.then((res: { response: boolean; reset: boolean }) => {
+					this.hasResponse = res.response;
+				})
+				.catch((err: Error) => {
+					AppModule.snackbar({ text: err.message, color: Colors.Error });
+				});
+		} else {
+			// websocket reset alarm
 		}
 	}
 }

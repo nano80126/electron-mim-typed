@@ -24,6 +24,9 @@ import { message } from './line';
 const log = getLogger('hiper');
 
 log.info('create new log for test');
+log.warn('create new log for test');
+log.error('create new log for test');
+log.fatal('create new log for test');
 // // // // // // // // // // // // // // //
 
 /**宣告 client */
@@ -191,7 +194,7 @@ ipcMain.handle('conn', async (e, args) => {
 						}, 15 * 60 * 1000);
 					}
 
-					// 回傳 renderer
+					// 回傳 renderer， 有報警
 					e.sender.send('serial', { serial: str, alarm: true });
 
 					// 廣播 web socket clients
@@ -370,6 +373,44 @@ ipcMain.on('sampling', (e, args) => {
 			clearInterval(tcpClient.sampler); // 停止取樣sampler
 			tcpClient.sampler = undefined;
 		}
+	}
+});
+
+ipcMain.handle('alarm-res', () => {
+	// console.log("hande");
+	log.info('handle alarm response');
+	if (tcpClient.writable) {
+		// 報警應答
+		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
+		tcpClient.write(Buffer.from(arrW));
+
+		// 等待 1500 ms
+		setTimeout(() => {
+			// 關閉應答
+			const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
+			tcpClient.write(Buffer.from(arrW));
+		}, 1500);
+		return { response: true, reset: false };
+	} else {
+		return { error: 'Not connected.' };
+	}
+});
+
+ipcMain.handle('alarm-rst', () => {
+	log.info('handle alarm reset.');
+	if (tcpClient.writable) {
+		// 報警重置
+		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
+		tcpClient.write(Buffer.from(arrW));
+
+		setTimeout(() => {
+			// 關閉報警重置
+			const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0x00, 0x00];
+			tcpClient.write(Buffer.from(arrW));
+		}, 1500);
+		return { response: false, reset: true };
+	} else {
+		return { error: 'Not connected.' };
 	}
 });
 

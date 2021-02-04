@@ -10,13 +10,13 @@ Vue.use(Vuex);
 
 import { AppState } from './modules/app';
 import { LyricsState } from './modules/lyrics';
-import { PlayerState } from './modules/player';
+// import { PlayerState } from './modules/player';
 import { HiperState } from './modules/hiper';
 
 export interface RootState {
 	commom: AppState;
 	lyrics: LyricsState;
-	player: PlayerState;
+	// player: PlayerState;
 	hiper: HiperState;
 }
 
