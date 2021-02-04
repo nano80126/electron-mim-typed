@@ -397,7 +397,7 @@ ipcMain.handle('alarm-res', () => {
 });
 
 ipcMain.handle('alarm-rst', () => {
-	log.info('handle alarm reset.');
+	log.info('handle alarm reset');
 	if (tcpClient.writable) {
 		// 報警重置
 		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];

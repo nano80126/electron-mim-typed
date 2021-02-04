@@ -181,14 +181,65 @@
 					<v-btn block class="font-weight-black title" @click="alarmToggle">報警鈴警</v-btn>
 				</v-col> -->
 		</v-row>
-		<v-bottom-navigation v-model="bottomNav" class="mt-3" height="48">
-			<v-btn class="font-weight-black title" @click="broadcast">廣播</v-btn>
+		<v-bottom-navigation v-model="bottomNav" class="mt-3" height="48" @change="resetNav">
+			<v-btn class="d-none1">{{ bottomNav }}</v-btn>
 
-			<v-btn class="font-weight-black title" @click="lineNotify">Line</v-btn>
+			<v-col v-if="isElectron" cols="2" class="text-center">
+				<v-tooltip top color="info">
+					<template v-slot:activator="{ on, attrs }">
+						<v-btn text class="font-weight-black title" @click="broadcast" v-bind="attrs" v-on="on">
+							廣播
+						</v-btn>
+					</template>
+					<span>廣播所有客戶端</span>
+				</v-tooltip>
+			</v-col>
 
-			<v-btn class="font-weight-black title" @click="alarmToggle">報警鈴警</v-btn>
+			<v-col v-if="isElectron" cols="2" class="text-center">
+				<v-tooltip top color="info">
+					<template v-slot:activator="{ on, attrs }">
+						<v-btn text class="font-weight-black title" @click="lineNotify" v-bind="attrs" v-on="on">
+							Line
+						</v-btn>
+					</template>
+					<span>送出測試訊息</span>
+				</v-tooltip>
+			</v-col>
 
-			{{ bottomNav }}
+			<v-col v-if="isElectron" cols="2" class="text-center">
+				<v-tooltip top color="info">
+					<template v-slot:activator="{ on, attrs }">
+						<v-btn class="font-weight-black title" @click="alarmToggle" v-bind="attrs" v-on="on">
+							報警鈴警
+						</v-btn>
+					</template>
+					<span>報警鈴響測試</span>
+				</v-tooltip>
+			</v-col>
+
+			<v-spacer />
+
+			<v-col cols="2" class="text-center">
+				<!-- <v-tooltip top color="info">
+					<template v-slot:activator="{ on, attrs }"> -->
+				<v-btn class="font-weight-black title" @click="alarmRes">
+					報警應答
+				</v-btn>
+				<!-- </template>
+					<span>報警應答</span>
+				</v-tooltip> -->
+			</v-col>
+
+			<v-col cols="2" class="text-center">
+				<!-- <v-tooltip top color="info">
+					<template v-slot:activator="{ on, attrs }"> -->
+				<v-btn class="font-weight-black title" @click="alarmReset">
+					報警解除
+				</v-btn>
+				<!-- </template>
+					<span>報警鈴響測試</span>
+				</v-tooltip> -->
+			</v-col>
 		</v-bottom-navigation>
 	</div>
 </template>
@@ -352,6 +403,13 @@ export default class HiperDashboard extends Vue {
 		} else {
 			// websocket reset alarm
 		}
+	}
+
+	/**重置 Nav */
+	private resetNav() {
+		this.$nextTick(() => {
+			if (this.bottomNav != 0) this.bottomNav = 0;
+		});
 	}
 }
 </script>
