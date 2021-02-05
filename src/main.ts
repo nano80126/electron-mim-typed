@@ -22,6 +22,9 @@ import { LyModule } from '@/store/modules/lyrics';
 import { IdisplayTxt, IlyricsDisplayObj, IlyricsObj, IsongList } from '@/types/renderer';
 import '@/style.scss';
 
+const { VUE_APP_ADDRESS, VUE_APP_PORT } = process.env;
+const wsUrl = `ws://${VUE_APP_ADDRESS}:${VUE_APP_PORT}`;
+
 /// ///
 Object.defineProperties(Vue.prototype, {
 	$moment: {
@@ -41,6 +44,14 @@ Object.defineProperties(Vue.prototype, {
 	},
 	$ipcRenderer: {
 		value: process.env.IS_ELECTRON ? window.require('electron').ipcRenderer : undefined
+	},
+	$ws: {
+		value: process.env.IS_ELECTRON ? undefined : new WebSocket(wsUrl),
+		writable: process.env.IS_ELECTRON ? false : true
+	},
+	$ws: {
+		value: process.env.IS_ELECTRON ? undefined : WritableStreamDefaultController,
+		writable: process.env.IS_ELECTRON ? false : true
 	}
 });
 
@@ -64,6 +75,7 @@ declare module 'vue/types/vue' {
 		$ipcRenderer: IpcRenderer;
 		// $shell: Shell;
 		// $picPath: string;
+		$ws: WebSocket;
 	}
 }
 
