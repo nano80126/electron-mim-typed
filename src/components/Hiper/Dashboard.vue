@@ -307,6 +307,9 @@ export default class HiperDashboard extends Vue {
 			});
 		} else {
 			// 新增 websocket 事件
+			if (this.$root.$ws.readyState == WebSocket.OPEN) {
+				//
+			}
 		}
 	}
 
