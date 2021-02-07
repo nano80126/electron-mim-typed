@@ -30,7 +30,7 @@ log.fatal('create new log for test');
 // // // // // // // // // // // // // // //
 
 /**宣告 client */
-let tcpClient: FSocket = new FSocket();
+let tcpClient: FSocket;
 
 new CronJob(
 	'0 30 17,22 * * 0-6',
@@ -430,4 +430,4 @@ ipcMain.on('notifySend', (e, args) => {
 // 	return this.toString(16).padStart(2, '0');
 // };
 
-export { tcpClient };
+export { tcpClient as hiperClient };

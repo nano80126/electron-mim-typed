@@ -31,3 +31,15 @@ Token post https://notify-bot.line.me/oauth/token
 Status GET https://notify-api.line.me/api/status
  
 Revoke POST https://notify-api.line.me/api/revoke
+
+### To do list 
+
+* vtech farnace 
+* connected test 
+* reconnected test
+* disconnected test
+* error respoen test
+* error reset test
+* websocket test
+* websocket error response test
+* websocket error reset test

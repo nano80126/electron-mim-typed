@@ -14,12 +14,13 @@ import { IpcRenderer, Shell } from 'electron';
 // const { /*remote,*/ /*IpcRenderer,*/ ipcRenderer, shell } = window.require('electron');
 
 import moment, { Moment, MomentInput } from 'moment';
-import lodash, { LoDashStatic } from 'lodash';
+import lodash, { LoDashStatic, once } from 'lodash';
 import axios, { AxiosStatic } from 'axios';
 import qs, { stringify } from 'qs';
 
-import { LyModule } from '@/store/modules/lyrics';
 import { IdisplayTxt, IlyricsDisplayObj, IlyricsObj, IsongList } from '@/types/renderer';
+
+import { HiperModule } from './store/modules/hiper';
 import '@/style.scss';
 
 const { VUE_APP_ADDRESS, VUE_APP_PORT } = process.env;
@@ -49,8 +50,8 @@ Object.defineProperties(Vue.prototype, {
 		value: process.env.IS_ELECTRON ? undefined : new WebSocket(wsUrl),
 		writable: process.env.IS_ELECTRON ? false : true
 	},
-	$ws: {
-		value: process.env.IS_ELECTRON ? undefined : WritableStreamDefaultController,
+	$wsUrl: {
+		value: process.env.IS_ELECTRON ? undefined : wsUrl,
 		writable: process.env.IS_ELECTRON ? false : true
 	}
 });
@@ -76,6 +77,7 @@ declare module 'vue/types/vue' {
 		// $shell: Shell;
 		// $picPath: string;
 		$ws: WebSocket;
+		$wsUrl: string;
 	}
 }
 
@@ -118,6 +120,10 @@ new Vue({
 	created() {
 		// set theme dark
 		this.$vuetify.theme.dark = true;
+
+		if (process.env.IS_ELECTRON) {
+			//
+		}
 	},
 
 	mounted() {
@@ -130,10 +136,72 @@ new Vue({
 			this.windowIsMax = await this.$ipcRenderer.invoke('isMaxmized');
 		};
 
+		if (process.env.IS_ELECTRON) {
+			//
+		} else {
+			// console.info("");
+
+			/**trigger if line notify failed  */
+			this.$ipcRenderer.on('notifyRes', (e, args) => {
+				if (args.error) {
+					console.error(`%c${JSON.stringify(args)}`, 'color: #F44336');
+					AppModule.snackbar({ text: args.message, color: Colors.Warning });
+				} else {
+					console.info(`%c${JSON.stringify(args)}`, 'color: #4CAF50');
+				}
+			});
+		}
+
 		// this.loadUrlInList();
 	},
 
 	methods: {
+		/**ws 初始化 */
+		wsInitialize() {
+			this.$ws.addEventListener(
+				'open',
+				() => {
+					// HiperModule
+					AppModule.changeWsOpened(true);
+
+					this.$ws.addEventListener('message', e => {
+						const data = JSON.parse(e.data);
+
+						switch (data.eventName) {
+							case 'opened':
+								console.info(`${data.text} ID: ${data.id}`, 'color: #4CAF50');
+								break;
+							case 'hiperConnected':
+								HiperModule.changeConnected(data.state);
+								break;
+							default:
+						}
+					});
+
+					this.$ws.addEventListener('close', e => {
+						AppModule.changeWsOpened(false);
+						AppModule.snackbar({ text: `與伺服器連線中斷。 CODE: ${e.code}`, color: Colors.Warning });
+						//
+						this.wsRetry();
+					});
+				},
+				{ once: true }
+			);
+
+			this.$ws.addEventListener('error', () => {
+				AppModule.snackbar({ text: '與伺服器連線失敗。', color: Colors.Error });
+				this.wsRetry();
+			});
+		},
+
+		/**ws 重新連線 */
+		wsRetry() {
+			setTimeout(() => {
+				this.$ws = new WebSocket(this.$wsUrl);
+				this.wsInitialize();
+			}, 5000);
+		}
+
 		/**建立圖片資料夾 */
 		/**載入Config, text color and align */
 		/**載入Url List, 比對用 */

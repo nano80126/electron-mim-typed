@@ -5,11 +5,14 @@ export interface AppState {
 	overlay: boolean;
 	snackbars: { show: boolean; color: Colors | string; text: string; timeout: number }[];
 	isElectron: boolean;
-	picPath: string;
-	playList: string[];
-	urlList: string[];
-	videoID: string;
-	videoTitle: string;
+	isWsOpend: boolean;
+
+	// 以下無用
+	// picPath: string;
+	// playList: string[];
+	// urlList: string[];
+	// videoID: string;
+	// videoTitle: string;
 }
 
 /**snackbar 顏色 */
@@ -26,18 +29,21 @@ class Common extends VuexModule implements AppState {
 	public overlay = false;
 	//
 	public snackbars: { show: boolean; color: Colors | string; text: string; timeout: number }[] = [];
-	//
+	/**是否為 electron */
 	public isElectron = process.env.IS_ELECTRON ? true : false;
+	/**ws 是否連線 */
+	public isWsOpend = false;
+
 	/**圖片路徑 */
-	public picPath = '';
-	/**播放列表 video ID */
-	public playList: string[] = [];
-	/**播放中之 video ID */
-	public videoID = '';
-	/**播放中之 video 標題 */
-	public videoTitle = '';
-	/**歌詞列表 Lyrics Url */
-	public urlList: string[] = [];
+	// public picPath = '';
+	// /**播放列表 video ID */
+	// public playList: string[] = [];
+	// /**播放中之 video ID */
+	// public videoID = '';
+	// /**播放中之 video 標題 */
+	// public videoTitle = '';
+	// /**歌詞列表 Lyrics Url */
+	// public urlList: string[] = [];
 
 	/// getters
 	get barsHidden(): number {
@@ -69,39 +75,44 @@ class Common extends VuexModule implements AppState {
 	}
 
 	@Mutation
-	savePicPath(path: string) {
-		this.picPath = path;
+	changeWsOpened(bool: boolean) {
+		this.isWsOpend = bool;
 	}
+
+	// @Mutation
+	// savePicPath(path: string) {
+	// 	this.picPath = path;
+	// }
 
 	/**儲存播放列表 */
-	@Mutation
-	setPlayList(list: string[]) {
-		this.playList = list;
-	}
+	// @Mutation
+	// setPlayList(list: string[]) {
+	// 	this.playList = list;
+	// }
 
 	/**更改播放中影片ID */
-	@Mutation
-	setVideoID(id: string) {
-		this.videoID = id;
-	}
+	// @Mutation
+	// setVideoID(id: string) {
+	// 	this.videoID = id;
+	// }
 
 	/**更改播放中標題 */
-	@Mutation
-	setVideoTitle(title: string) {
-		this.videoTitle = title;
-	}
+	// @Mutation
+	// setVideoTitle(title: string) {
+	// 	this.videoTitle = title;
+	// }
 
 	/**儲存歌詞URL列表 */
-	@Mutation
-	setUrlList(list: string[]) {
-		this.urlList = list;
-	}
+	// @Mutation
+	// setUrlList(list: string[]) {
+	// 	this.urlList = list;
+	// }
 
 	/**新增歌詞URL進列表 */
-	@Mutation
-	addUrlList(url: string) {
-		this.urlList.push(url);
-	}
+	// @Mutation
+	// addUrlList(url: string) {
+	// 	this.urlList.push(url);
+	// }
 }
 
 export const AppModule = getModule(Common);

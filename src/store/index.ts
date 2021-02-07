@@ -9,13 +9,13 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 import { AppState } from './modules/app';
-import { LyricsState } from './modules/lyrics';
+// import { LyricsState } from './modules/lyrics';
 // import { PlayerState } from './modules/player';
 import { HiperState } from './modules/hiper';
 
 export interface RootState {
 	commom: AppState;
-	lyrics: LyricsState;
+	// lyrics: LyricsState;
 	// player: PlayerState;
 	hiper: HiperState;
 }

@@ -182,7 +182,7 @@
 				</v-col> -->
 		</v-row>
 		<v-bottom-navigation v-model="bottomNav" class="mt-3" height="48" @change="resetNav">
-			<v-btn class="d-none1">{{ bottomNav }}</v-btn>
+			<v-btn class="d-none">{{ bottomNav }}</v-btn>
 
 			<v-col v-if="isElectron" cols="2" class="text-center">
 				<v-tooltip top color="info">
