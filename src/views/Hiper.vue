@@ -12,7 +12,7 @@
 			</v-tab>
 			<v-spacer></v-spacer>
 
-			<v-tab class="">
+			<v-tab v-if="isElectron">
 				<span class="mr-2 font-weight-bold">連線</span>
 				<v-icon small>fas fa-network-wired</v-icon>
 			</v-tab>
@@ -23,7 +23,7 @@
 				<Dashboard />
 			</v-tab-item>
 			<v-tab-item>456</v-tab-item>
-			<v-tab-item>
+			<v-tab-item v-if="isElectron">
 				<Connect />
 			</v-tab-item>
 		</v-tabs-items>
@@ -31,10 +31,11 @@
 </template>
 
 <script lang="ts">
-import board from '@/components/Hiper/Dashboard.vue';
-import connect from '@/components/Hiper/Connect.vue';
+import board from '@/components/HiperChild/Dashboard.vue';
+import connect from '@/components/HiperChild/Connect.vue';
 
 import { Component, Vue } from 'vue-property-decorator';
+import { AppModule } from '@/store/modules/app';
 
 @Component({
 	components: {
@@ -45,6 +46,11 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class HIPER extends Vue {
 	/**啟用的 tab */
 	private tab = 0;
+
+	/**是否為electron */
+	get isElectron() {
+		return AppModule.isElectron;
+	}
 
 	mounted() {
 		// this.$root.$on('alarmToggle', () => {

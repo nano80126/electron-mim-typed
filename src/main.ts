@@ -137,10 +137,7 @@ new Vue({
 		};
 
 		if (process.env.IS_ELECTRON) {
-			//
-		} else {
-			// console.info("");
-
+			// IN ELECTRON env
 			/**trigger if line notify failed  */
 			this.$ipcRenderer.on('notifyRes', (e, args) => {
 				if (args.error) {
@@ -150,6 +147,8 @@ new Vue({
 					console.info(`%c${JSON.stringify(args)}`, 'color: #4CAF50');
 				}
 			});
+		} else {
+			// IN BROWSER ENV
 		}
 
 		// this.loadUrlInList();

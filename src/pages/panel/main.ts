@@ -64,16 +64,16 @@ new Vue({
 		// set theme dark
 		this.$vuetify.theme.dark = true;
 
-		this.$ipcRenderer
-			.invoke('getPicDir')
-			.then((res: { path: string }) => {
-				console.info(`%c${res.path}`, `color: ${this.$vuetify.theme.themes.dark.success};`);
-				AppModule.savePicPath(res.path);
-			})
-			.catch((err: Error) => {
-				// if not path exists
-				AppModule.snackbar({ text: err.message, color: Colors.Error });
-			});
+		// this.$ipcRenderer
+		// 	.invoke('getPicDir')
+		// 	.then((res: { path: string }) => {
+		// 		console.info(`%c${res.path}`, `color: ${this.$vuetify.theme.themes.dark.success};`);
+		// 		AppModule.savePicPath(res.path);
+		// 	})
+		// 	.catch((err: Error) => {
+		// 		// if not path exists
+		// 		AppModule.snackbar({ text: err.message, color: Colors.Error });
+		// 	});
 	},
 
 	mounted() {

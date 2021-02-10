@@ -1,7 +1,12 @@
 <template>
 	<div>
 		<!-- style="height: 800px;" -->
-		<v-row no-gutters align="stretch" class="mt-3" :style="{ height: `${$root.webHeight - 140}px` }">
+		<v-row
+			no-gutters
+			align="stretch"
+			class="mt-3"
+			:style="{ height: isElectron ? `${$root.webHeight - 140}px` : `${$root.webHeight - 108}px` }"
+		>
 			<v-col class="d-flex flex-column align-start justify-between">
 				<v-card class="ml-3" flat outlined width="240px">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">

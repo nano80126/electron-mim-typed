@@ -386,7 +386,7 @@ export default class App extends Vue {
 	}
 
 	private openPicDir() {
-		this.$shell.openPath(AppModule.picPath);
+		// this.$shell.openPath(AppModule.picPath);
 	}
 
 	private dataEmpty() {

@@ -336,7 +336,8 @@
 				</template>
 			</transition-group>
 
-			<div class="fixed-right-bottom">
+			<!-- 開發環境才顯示 -->
+			<div v-if="isDev" class="fixed-right-bottom">
 				{{ loginUser }}
 				{{ loginPass }}
 
@@ -376,6 +377,11 @@ export default class App extends Vue {
 	private loginUser: string | null = null;
 	/**使用者密碼 */
 	private loginPass: string | null = null;
+
+	/**是否為開發環境 */
+	get isDev() {
+		return process.env.NODE_ENV == 'development';
+	}
 
 	/**是否為electron */
 	get isElectron() {
@@ -451,7 +457,7 @@ export default class App extends Vue {
 		this.$ipcRenderer.send('appClose');
 	}
 
-	private loginCheck(e) {
+	private loginCheck(e: Event) {
 		e.preventDefault();
 
 		console.log(e);
