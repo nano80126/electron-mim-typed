@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<!-- :style="{ height: `${$root.webHeight - 92}px` }" -->
-		<v-card class="mx-auto" max-width="400px">
+		<v-card class="mx-auto mt-10" max-width="400px">
 			<v-card-title class="font-weight-black primary--text">連線設定</v-card-title>
 			<v-divider />
 			<v-card-text>
@@ -62,9 +62,17 @@
 
 				<!-- || loading -->
 				<!-- :loading="loading" -->
-				<v-btn color="success darken-2" :disabled="!valid || isConnected" @click="connect">
+				<v-btn
+					color="success darken-2"
+					:disabled="!valid || isConnected || connecting"
+					:loading="connecting"
+					@click="connect"
+				>
 					連線
 				</v-btn>
+
+				<!-- :disabled="!valid || isConnected || loading"
+						:loading="loading" -->
 
 				<v-btn color="error darken-2" :disabled="!isConnected" @click="disconnect">斷線</v-btn>
 			</v-card-actions>
@@ -73,6 +81,7 @@
 </template>
 
 <script lang="ts">
+import { AppModule } from '@/store/modules/app';
 import { HiperModule } from '@/store/modules/hiper';
 import { Component, Vue } from 'vue-property-decorator';
 
@@ -107,42 +116,57 @@ export default class App extends Vue {
 		(num: number) => num > 500 || 'Interval value should be greater than 500.'
 	];
 
+	created() {
+		if (AppModule.isElectron) {
+			if (HiperModule.ip != '') this.ip = HiperModule.ip;
+			if (HiperModule.port != 0) this.port = HiperModule.port;
+
+			console.log(HiperModule);
+			console.log(HiperModule.ip);
+			console.log(HiperModule.port);
+		}
+	}
+
 	mounted() {
-		if (!this.$ipcRenderer.eventNames().includes('conn-error')) {
-			console.info('%cRegister conn-error', 'color: #2196f3');
-			//
-			this.$ipcRenderer.on('conn-error', (e, args) => {
-				HiperModule.changeConnected(args.connected);
+		if (AppModule.isElectron) {
+			if (!this.$ipcRenderer.eventNames().includes('conn-error')) {
+				console.info('%cRegister conn-error', 'color: #2196f3');
+				//
+				this.$ipcRenderer.on('conn-error', (e, args) => {
+					HiperModule.changeConnected(args.connected);
 
-				if (args.error) {
-					console.log(args);
-					//
-					HiperModule.changeConntionErr(args.error);
-				}
-			});
-		}
+					if (args.error) {
+						//
+						HiperModule.changeConntionErr(args.error);
+					}
+				});
+			}
 
-		if (!this.$ipcRenderer.eventNames().includes('conn-success')) {
-			console.info('%cRegister conn-success', 'color: #2196f3');
-			//
-			this.$ipcRenderer.on('conn-success', (e, args) => {
-				HiperModule.changeConnected(args.connected);
-				console.info(`%cIP: ${args.remoteIP}:${args.remotePort}`, 'color: #4CAF50;');
+			if (!this.$ipcRenderer.eventNames().includes('conn-success')) {
+				console.info('%cRegister conn-success', 'color: #2196f3');
+				//
+				this.$ipcRenderer.on('conn-success', (e, args) => {
+					HiperModule.changeConnected(args.connected);
+					console.info(`%cIP: ${args.remoteIP}:${args.remotePort}`, 'color: #4CAF50;');
 
-				if (!args.error) {
-					console.log(args);
-					//
-					HiperModule.changeConntionErr(null);
-				}
-			});
-		}
+					if (!args.error) {
+						//
+						HiperModule.changeIP(args.remoteIP);
+						HiperModule.changePort(args.remotePort);
+						HiperModule.changeConntionErr(null);
+					}
+				});
+			}
 
-		if (!this.$ipcRenderer.eventNames().includes('sample-change')) {
-			console.info('%cRegister sample-change', 'color: #2196f3');
-			//
-			this.$ipcRenderer.on('sample-change', (e, args) => {
-				HiperModule.changeSampling(args.sampling);
-			});
+			if (!this.$ipcRenderer.eventNames().includes('sample-change')) {
+				console.info('%cRegister sample-change', 'color: #2196f3');
+				// 改變 sampling，自動重連後使用
+				this.$ipcRenderer.on('sample-change', (e, args) => {
+					HiperModule.changeSampling(args.sampling);
+				});
+			}
+
+			console.log(this.$ipcRenderer.eventNames());
 		}
 	}
 
@@ -204,18 +228,32 @@ export default class App extends Vue {
 			reconnect: this.reconnect
 		});
 
-		HiperModule.changeConnected(ret.connected);
+		if (ret.connected) {
+			// 設定燒結爐已連線
+			HiperModule.changeConnected(ret.connected);
+		}
 
 		this.connecting = false;
 	}
 	/**與設備斷線 */
 	private async disconnect() {
 		const ret = await this.$ipcRenderer.invoke('disc');
-		HiperModule.changeConnected(ret.connected);
+
+		if (!ret.connected) {
+			// 設定燒結爐已斷線
+			HiperModule.changeConnected(ret.connected);
+			// 斷線後停止取樣
+			HiperModule.changeSampling(false);
+		}
 	}
 	/**開始取樣 */
 	private sampleChanged(bool: boolean) {
-		this.$ipcRenderer.send('sampling', { sampling: bool });
+		// this.$ipcRenderer.send('sampling', { sampling: bool });
+
+		this.$ipcRenderer.invoke('sampling', { sampling: bool }).then(res => {
+			//
+			console.log('sample', bool == res.sampling);
+		});
 	}
 }
 </script>

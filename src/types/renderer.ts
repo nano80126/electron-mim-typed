@@ -1,5 +1,45 @@
-import { ItextConfig, IlistCrawled, IlyricsObjCrawled } from './main-process';
+import {
+	ItextConfig,
+	IlistCrawled,
+	IlyricsObjCrawled,
+	IwsMessage,
+	IwsConnectedMessasge,
+	IwsOpenMessage,
+	IwsSerialMessage,
+	IwsCommandMessage,
+	IwsCommandResMessage
+} from './main-process';
 
+export enum EwsChannel {
+	OPEN = 0,
+	CONNECT = 1,
+	SERIAL = 2,
+	COMMAND = 3,
+	COMMANDRES = 4
+}
+
+export enum EwsFurnaceType {
+	NONE = 0,
+	HIPER = 1,
+	VTECH = 2
+}
+
+export enum EwsCommand {
+	ALARMRESPONSE = 0,
+	ALARMRESET = 1
+}
+
+export type WsFurnaceType = EwsFurnaceType;
+export type IwsMsg = IwsMessage;
+export type IwsOpenMsg = IwsOpenMessage;
+export type IwsConnMsg = IwsConnectedMessasge;
+export type IwsSerialMsg = IwsSerialMessage;
+export type IwsCmdMsg = IwsCommandMessage;
+export type IwsCmdResMsg = IwsCommandResMessage;
+
+//
+// 以下待刪
+//
 export type IdisplayTxt = ItextConfig;
 
 /**extend from list crawled add exist */

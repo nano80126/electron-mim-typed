@@ -19,7 +19,9 @@ body {
 	user-select: none;
 	padding: 0;
 	margin: 0;
-	overflow: hidden !important;
+	min-width: 960px;
+	overflow-x: auto;
+	overflow-y: hidden !important;
 	// min-width: 960px;
 	// overflow-x: auto;
 	// width: 640px;

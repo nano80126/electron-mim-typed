@@ -81,6 +81,9 @@ module.exports = {
 				// config.target = 'node';
 
 				const exts = {
+					// appenders: "commonjs appenders",
+					bufferutil: "commonjs bufferutil",
+					'utf-8-validate': 'commonjs utf-8-validate',
 					sharp: 'commonjs2 sharp'
 				};
 

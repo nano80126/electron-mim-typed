@@ -246,7 +246,7 @@
 			</v-navigation-drawer>
 
 			<!-- class="grey lighten-3" -->
-			<v-main>
+			<v-main :class="{ error: errorOccured }">
 				<!-- :class="{ error: errorBack }" -->
 				<v-overlay v-model="overlay" opacity="0.3">
 					<v-progress-circular indeterminate color="primary darken-2" />
@@ -434,6 +434,29 @@ export default class App extends Vue {
 	mounted() {
 		//
 		this.SHOW = true;
+		//
+
+		this.$root.$on('alarmToggle', () => {
+			const audio = this.$refs.alarmAudio as HTMLAudioElement;
+			if (audio.paused) audio.play();
+			else audio.pause();
+		});
+
+		this.$root.$on('alarmOn', () => {
+			const audio = this.$refs.alarmAudio as HTMLAudioElement;
+			if (audio.paused) {
+				this.errorOccured = true;
+				audio.play();
+			}
+		});
+
+		this.$root.$on('alarmOff', () => {
+			const audio = this.$refs.alarmAudio as HTMLAudioElement;
+			if (!audio.paused) {
+				this.errorOccured = false;
+				audio.pause();
+			}
+		});
 	}
 
 	/**縮小視窗 */

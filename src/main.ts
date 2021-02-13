@@ -18,10 +18,22 @@ import lodash, { LoDashStatic, once } from 'lodash';
 import axios, { AxiosStatic } from 'axios';
 import qs, { stringify } from 'qs';
 
-import { IdisplayTxt, IlyricsDisplayObj, IlyricsObj, IsongList } from '@/types/renderer';
+import {
+	IdisplayTxt,
+	IlyricsDisplayObj,
+	IlyricsObj,
+	IsongList,
+	IwsMsg,
+	IwsConnMsg,
+	IwsOpenMsg,
+	EwsChannel,
+	EwsFurnaceType,
+	IwsCmdResMsg
+} from '@/types/renderer';
 
 import { HiperModule } from './store/modules/hiper';
 import '@/style.scss';
+import { IwsCommandResMessage } from './types/main-process';
 
 const { VUE_APP_ADDRESS, VUE_APP_PORT } = process.env;
 const wsUrl = `ws://${VUE_APP_ADDRESS}:${VUE_APP_PORT}`;
@@ -133,7 +145,8 @@ new Vue({
 		window.onresize = async () => {
 			this.webWidth = window.innerWidth;
 			this.webHeight = window.innerHeight;
-			this.windowIsMax = await this.$ipcRenderer.invoke('isMaxmized');
+
+			if (process.env.IS_ELECTRON) this.windowIsMax = await this.$ipcRenderer.invoke('isMaxmized');
 		};
 
 		if (process.env.IS_ELECTRON) {
@@ -149,6 +162,7 @@ new Vue({
 			});
 		} else {
 			// IN BROWSER ENV
+			this.wsInitialize();
 		}
 
 		// this.loadUrlInList();
@@ -163,15 +177,32 @@ new Vue({
 					// HiperModule
 					AppModule.changeWsOpened(true);
 
-					this.$ws.addEventListener('message', e => {
-						const data = JSON.parse(e.data);
+					this.$ws.addEventListener('message', msg => {
+						const wsMsg = JSON.parse(msg.data) as IwsMsg;
+						let openMsg;
 
-						switch (data.eventName) {
-							case 'opened':
-								console.info(`${data.text} ID: ${data.id}`, 'color: #4CAF50');
+						console.log(wsMsg);
+
+						switch (wsMsg.channel) {
+							case EwsChannel.OPEN:
+								openMsg = `${(wsMsg as IwsOpenMsg).text} ID: ${(wsMsg as IwsOpenMsg).id}`;
+								console.info(openMsg, 'color: #4CAF50;');
 								break;
-							case 'hiperConnected':
-								HiperModule.changeConnected(data.state);
+							case EwsChannel.CONNECT:
+								if (wsMsg.furnace == EwsFurnaceType.HIPER) {
+									HiperModule.changeConnected((wsMsg as IwsConnMsg).connected);
+								} else if (wsMsg.furnace == EwsFurnaceType.VTECH) {
+									//
+								}
+								break;
+							case EwsChannel.SERIAL:
+								//
+
+								break;
+							case EwsChannel.COMMANDRES:
+								//
+								openMsg = (wsMsg as IwsCmdResMsg).text;
+								AppModule.snackbar({ text: openMsg, color: Colors.Warning });
 								break;
 							default:
 						}
@@ -202,8 +233,11 @@ new Vue({
 		}
 
 		/**建立圖片資料夾 */
+		//
 		/**載入Config, text color and align */
+		//
 		/**載入Url List, 比對用 */
+		//
 		/**註冊 Hotkey  */
 		// registerGlobalHotkey() {
 		// 	this.$ipcRenderer.on('playVideo', () => {

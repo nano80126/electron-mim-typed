@@ -37,6 +37,52 @@ export class FSocket extends net.Socket {
 	samplingTimeoutCount = 0;
 }
 
+export enum EwsChannel {
+	OPEN = 0,
+	CONNECT = 1,
+	SERIAL = 2,
+	COMMAND = 3,
+	COMMANDRES = 4
+}
+
+export enum EwsFurnaceType {
+	NONE = 0,
+	HIPER = 1,
+	VTECH = 2
+}
+
+export enum EwsCommand {
+	ALARMRESPONSE = 0,
+	ALARMRESET = 1
+}
+
+export interface IwsMessage {
+	channel: EwsChannel;
+	furnace: EwsFurnaceType;
+}
+
+export interface IwsOpenMessage extends IwsMessage {
+	text?: string;
+	id?: string;
+}
+
+export interface IwsConnectedMessasge extends IwsMessage {
+	connected: boolean;
+}
+
+export interface IwsSerialMessage extends IwsMessage {
+	serial: number[];
+	alarm: boolean;
+}
+
+export interface IwsCommandMessage extends IwsMessage {
+	command: EwsCommand;
+}
+
+export interface IwsCommandResMessage extends IwsMessage {
+	text: string;
+}
+
 //
 //
 // 以下待刪

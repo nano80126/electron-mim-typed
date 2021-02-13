@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+
 // import net from 'net';
-import { ipcMain, IpcMainEvent } from 'electron';
+import { ipcMain, IpcMainInvokeEvent } from 'electron';
 import { CronJob } from 'cron';
 import { drop } from 'lodash';
 import moment from 'moment';
@@ -13,8 +15,9 @@ import stepName from '../json/stepName.json';
 import stepState from '../json/stepState.json';
 
 // 自定義引入
-import { FSocket } from '@/types/main-process';
+import { EwsChannel, EwsFurnaceType, FSocket, IwsConnectedMessasge, IwsSerialMessage } from '@/types/main-process';
 import { message } from './line';
+import { wsServer } from './express';
 // import {  clearInterval } from 'timers';
 
 //
@@ -23,15 +26,13 @@ import { message } from './line';
 // const appPath = app.getAppPath();
 const log = getLogger('hiper');
 
-log.info('create new log for test');
-log.warn('create new log for test');
-log.error('create new log for test');
-log.fatal('create new log for test');
+// log.info('create new log for test, 測試新log');
 // // // // // // // // // // // // // // //
 
 /**宣告 client */
 let tcpClient: FSocket;
 
+log.info('Start daily notification of Hiper furnace');
 new CronJob(
 	'0 30 17,22 * * 0-6',
 	() => {
@@ -47,15 +48,14 @@ new CronJob(
 			.then(res => {
 				// mainWin.send
 				mainWin?.send('notifyRes', res.data);
-				console.log(res);
+				log.info('每日定期通知。');
 			})
 			.catch(err => {
 				// mainWin.send
 				mainWin?.send('notifyRes', {
 					error: true,
 					code: err.code,
-					message: err.message,
-					errno: err.errno
+					message: err.message
 				});
 				// append to log
 				log.warn(`${err.code} ${err.message}`);
@@ -82,7 +82,7 @@ const cronReconn = new CronJob(
 					family: 4
 				});
 			} catch (err) {
-				log.info(err.message);
+				log.info(`${err.message}, code: ${err.code}`);
 				// console.error(err);
 			}
 		}
@@ -118,9 +118,19 @@ ipcMain.handle('conn', async (e, args) => {
 	tcpClient.connect({ host: ip, port: port, family: 4 });
 
 	const promise = await new Promise(resolve => {
+		/**連驗逾時 */
+		const connTimeout = setTimeout(() => {
+			const err = new Error(`connect ETIMEDOUT ${ip}:${port}`) as NodeJS.ErrnoException;
+			err.code = 'ETIMEDOUT';
+			tcpClient.emit('error', err);
+		}, 3000);
+
 		// 連線成功事件
 		tcpClient.on('connect', () => {
 			console.log(`Connect to ${ip}:${port}`);
+			log.info(`Connect to ${ip}:${port}`);
+
+			clearTimeout(connTimeout); // 清除連線逾時
 			// Object.assign(tcpClient.furnace, {
 			// 	//
 			// });
@@ -134,15 +144,23 @@ ipcMain.handle('conn', async (e, args) => {
 			//
 
 			// response connection successful
-			// e.sender.send('conn-success', { connected: true, remoteIP: ip, remotePort: port });
+			e.sender.send('conn-success', { connected: true, remoteIP: ip, remotePort: port });
+			// 廣播 clients 燒結爐已連線
+			wsServer.clients.forEach(client => {
+				const msg: IwsConnectedMessasge = {
+					channel: EwsChannel.CONNECT,
+					furnace: EwsFurnaceType.HIPER,
+					connected: true
+				};
+				client.send(JSON.stringify(msg));
+			});
 
-			//
-			// WsServer
-			//
-
+			// 已設定 OnSample
 			if (tcpClient.onSample) {
+				// 取樣器不存在
 				if (!tcpClient.sampler) {
-					//
+					startSample(e);
+					e.sender.send('sample-change', { sampling: true });
 				}
 			}
 
@@ -182,10 +200,10 @@ ipcMain.handle('conn', async (e, args) => {
 								e.sender.send('notifyRes', {
 									error: true,
 									code: err.code,
-									message: err.message,
-									errno: err.errno
+									message: err.message
 								});
-								console.warn(err.data);
+								// console.warn();
+								log.warn(`${err.messaage}, code: ${err.code}`);
 							});
 
 						tcpClient.coolState = true;
@@ -198,7 +216,15 @@ ipcMain.handle('conn', async (e, args) => {
 					e.sender.send('serial', { serial: str, alarm: true });
 
 					// 廣播 web socket clients
-					// wsServer
+					wsServer.clients.forEach(client => {
+						const msg: IwsSerialMessage = {
+							channel: EwsChannel.SERIAL,
+							furnace: EwsFurnaceType.HIPER,
+							serial: strArr,
+							alarm: true
+						};
+						client.send(JSON.stringify(msg));
+					});
 				} else {
 					// 正常狀態
 					tcpClient.coolState = false;
@@ -207,9 +233,16 @@ ipcMain.handle('conn', async (e, args) => {
 
 					// 回傳 renderer
 					e.sender.send('serial', { serial: str, alarm: false });
-
 					// 廣播 web socket clients
-					// wsServer
+					wsServer.clients.forEach(client => {
+						const msg: IwsSerialMessage = {
+							channel: EwsChannel.SERIAL,
+							furnace: EwsFurnaceType.HIPER,
+							serial: strArr,
+							alarm: false
+						};
+						client.send(JSON.stringify(msg));
+					});
 				}
 				//
 				// on data event end
@@ -225,44 +258,57 @@ ipcMain.handle('conn', async (e, args) => {
 		// 連線失敗事件
 		tcpClient.on('error', (err: NodeJS.ErrnoException) => {
 			console.log(`${err.name} ${err.message}`);
+			log.error(`${err.name}: ${err.message}`);
+
+			clearTimeout(connTimeout); // 清除連線逾時
 
 			// const { code } = err as NodeJS.ErrnoException;
 			// 回傳
 			switch (err.code) {
 				case 'ECONNREFUSED': // 有IP, port沒開
-				case 'ETIMEOUT': // 沒IP
+				case 'ETIMEDOUT': // 沒IP
 					// send to renderer
 					e.sender.send('conn-error', {
 						connected: false,
-						error: { message: err.message, code: err.code, errno: err.errno }
+						error: { message: err.message, code: err.code }
 					});
+					tcpClient.destroy(); // 確保沒有資料傳輸且關閉連線
 					break;
 				case 'ECONNRESET': // 被斷線
 					// send to renderer
 					e.sender.send('conn-error', {
 						connected: false,
-						error: { message: err.message, code: err.code, errno: err.errno }
+						error: { message: err.message, code: err.code }
 					});
 
 					// 廣播被斷線
-					// wsServer.
+					wsServer.clients.forEach(client => {
+						const msg: IwsConnectedMessasge = {
+							channel: EwsChannel.CONNECT,
+							furnace: EwsFurnaceType.HIPER,
+							connected: false
+						};
+						client.send(JSON.stringify(msg));
+					});
+
 					if (!tcpClient.handleDisc) {
 						// 發出訊息
 						message(`\n伺服器狀態: 正常\n警告: 燒結爐連線中斷\nCode: ${err.code}`)
 							.then(res => {
 								e.sender.send('notifyRes', res.data);
-								console.log();
+								// console.log();
+								log.warn('燒結爐連線中斷。');
 							})
 							.catch((err: NodeJS.ErrnoException) => {
 								e.sender.send('notifyRes', {
 									error: true,
 									code: err.code,
-									message: err.message,
-									errno: err.errno
+									message: err.message
 								});
+								log.warn(`${err.message}, code: ${err.code}`);
 							});
 
-						// 啟動重連機制
+						// 啟動重連機制 (僅被斷線情況啟動)
 						if (tcpClient.cron) tcpClient.cron.start();
 
 						// 5 秒後重連
@@ -271,21 +317,24 @@ ipcMain.handle('conn', async (e, args) => {
 								try {
 									tcpClient.connect({ host: ip, port: port, family: 4 });
 								} catch (err) {
-									console.log(err);
+									// console.log(err);
+									log.error(`${err.message}, code: ${err.code}`);
 								}
 							}, 5000);
 						}
 					}
+					tcpClient.destroy(); // 確保沒有資料傳輸且關閉連線
 					//
 					break;
 				default:
-					console.error(`${err.code} ${err}`);
+					// console.error(`${err.code} ${err}`);
+					log.error(`${err.message}, code: ${err.code}`);
 					break;
 			}
 
 			resolve({
 				connected: false,
-				error: { message: err.message, code: err.code, errno: err.errno }
+				error: { message: err.message, code: err.code }
 			});
 
 			//
@@ -309,16 +358,26 @@ ipcMain.handle('disc', async () => {
 	});
 
 	// wsServer
+	wsServer.clients.forEach(client => {
+		const msg: IwsConnectedMessasge = {
+			channel: EwsChannel.CONNECT,
+			furnace: EwsFurnaceType.HIPER,
+			connected: false
+		};
+		client.send(JSON.stringify(msg));
+	});
 
 	return promise;
 });
 
 // 執行取樣
-const doSample = function(e: IpcMainEvent) {
+const doSample = function(e: IpcMainInvokeEvent) {
 	if (tcpClient.writable) {
 		//
 		tcpClient.samplingTimeoutTimer = setTimeout(() => {
 			tcpClient.samplingTimeoutCount++;
+
+			console.log(tcpClient.samplingTimeoutCount);
 
 			if (tcpClient.samplingTimeoutCount >= 3) {
 				message(`\n伺服器狀態: 正常\n警告: 燒結爐無回應`)
@@ -332,13 +391,14 @@ const doSample = function(e: IpcMainEvent) {
 							message: err.message,
 							errno: err.errno
 						});
+						log.warn('燒結爐無回應。');
 					});
 
 				tcpClient.samplingTimeoutCount = 0;
 				clearInterval(tcpClient.sampler as NodeJS.Timer);
 				tcpClient.sampler = undefined;
 			}
-		}, (tcpClient.interval as number) * 1.5);
+		}, (tcpClient.interval as number) * 0.5);
 
 		const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x04, 0x00, 0x00, 0x00, 0x22]);
 		tcpClient.write(buf);
@@ -346,18 +406,20 @@ const doSample = function(e: IpcMainEvent) {
 		tcpClient.samplingState = false; // set sample state off
 		clearInterval(tcpClient.sampler as NodeJS.Timer);
 		tcpClient.sampler = undefined;
+		// 無法連線，改變取樣狀態
+		e.sender.send('sample-change', { sampling: false });
 	}
 };
 
 /**開始取樣 */
-const startSample = function(e: IpcMainEvent) {
+const startSample = function(e: IpcMainInvokeEvent) {
 	tcpClient.samplingState = true;
 	tcpClient.sampler = setInterval(() => doSample(e), tcpClient.interval as number);
 	doSample(e);
 };
 
 // 處理取樣命令
-ipcMain.on('sampling', (e, args) => {
+ipcMain.handle('sampling', (e, args) => {
 	const { sampling } = args;
 
 	if (sampling) {
@@ -374,12 +436,13 @@ ipcMain.on('sampling', (e, args) => {
 			tcpClient.sampler = undefined;
 		}
 	}
+	return { sampling: sampling };
 });
 
 ipcMain.handle('alarm-res', () => {
-	// console.log("hande");
 	log.info('handle alarm response');
-	if (tcpClient.writable) {
+	console.log('handle alarm response');
+	if (tcpClient && tcpClient.writable) {
 		// 報警應答
 		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
 		tcpClient.write(Buffer.from(arrW));
@@ -392,13 +455,13 @@ ipcMain.handle('alarm-res', () => {
 		}, 1500);
 		return { response: true, reset: false };
 	} else {
-		return { error: 'Not connected.' };
+		return { error: 'Hiper furnace is not connected' };
 	}
 });
 
 ipcMain.handle('alarm-rst', () => {
 	log.info('handle alarm reset');
-	if (tcpClient.writable) {
+	if (tcpClient && tcpClient.writable) {
 		// 報警重置
 		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
 		tcpClient.write(Buffer.from(arrW));
@@ -410,7 +473,7 @@ ipcMain.handle('alarm-rst', () => {
 		}, 1500);
 		return { response: false, reset: true };
 	} else {
-		return { error: 'Not connected.' };
+		return { error: 'Hiper furnace is not connected' };
 	}
 });
 
@@ -422,7 +485,7 @@ ipcMain.on('notifySend', (e, args) => {
 			e.sender.send('notifyRes', res.data);
 		})
 		.catch((err: NodeJS.ErrnoException) => {
-			e.sender.send('notifyRes', { error: true, code: err.code, message: err.message, errno: err.errno });
+			e.sender.send('notifyRes', { error: true, code: err.code, message: err.message });
 		});
 });
 

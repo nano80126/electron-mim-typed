@@ -14,7 +14,7 @@
 					</v-card-subtitle>
 					<v-divider />
 					<v-card-text class="py-1 px-0">
-						<v-row no-gutters align="center" justify="start" class="">
+						<v-row v-if="!isElectron" no-gutters align="center" justify="start" class="">
 							<v-col cols class="ml-3 font-weight-bold subtitle-2">伺服器</v-col>
 							<v-col cols class="mr-3 text-center">
 								<v-chip :color="isWebsocket ? 'success' : 'error'" class="my-2">
@@ -23,10 +23,12 @@
 							</v-col>
 
 							<v-divider class="col-12 grey" />
+						</v-row>
 
+						<v-row no-gutters align="center" justify="start" class="">
 							<v-col cols class="ml-3 font-weight-bold subtitle-2">燒結爐</v-col>
 							<v-col cols class="mr-3 text-center">
-								<v-chip :color="isWebsocket ? 'success' : 'error'" class="my-2">
+								<v-chip :color="isConnected ? 'success' : 'error'" class="my-2">
 									{{ isConnected ? '連線' : '斷線' }}
 								</v-chip>
 							</v-col>
@@ -256,6 +258,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import stepName from '@/json/stepName.json';
 import stepState from '@/json/stepState.json';
 import { HiperModule } from '@/store/modules/hiper';
+import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg } from '@/types/renderer';
 
 @Component({})
 export default class HiperDashboard extends Vue {
@@ -290,7 +293,7 @@ export default class HiperDashboard extends Vue {
 	}
 	/**websocket是否連線 */
 	get isWebsocket() {
-		return false;
+		return AppModule.isWsOpend;
 	}
 	/**是否為 dark mode */
 	get isDarkMode() {
@@ -313,7 +316,7 @@ export default class HiperDashboard extends Vue {
 		} else {
 			// 新增 websocket 事件
 			if (this.$root.$ws.readyState == WebSocket.OPEN) {
-				//
+				this.addMsgEvent();
 			}
 		}
 	}
@@ -357,6 +360,27 @@ export default class HiperDashboard extends Vue {
 	// 新增 ws 訊息事件
 	private addMsgEvent() {
 		//
+		this.$root.$ws.addEventListener('message', e => {
+			const data = JSON.parse(e.data);
+
+			console.log(e);
+			console.log(data);
+
+			switch (data.channel) {
+				case 'serial':
+					this.serialToData(this.$lodash.drop(data.serial.data, 9));
+
+					if (data.alarm) {
+						// 報警且未回覆，開啟警鈴
+						if (!this.hasResponse) this.$root.$emit('alarmOn');
+					} else {
+						// 關閉警鈴
+						this.$root.$emit('alarmOff');
+					}
+					break;
+				default:
+			}
+		});
 	}
 
 	/**廣播所有客戶端 */
@@ -385,14 +409,22 @@ export default class HiperDashboard extends Vue {
 		if (this.isElectron) {
 			this.$ipcRenderer
 				.invoke('alarm-res')
-				.then((res: { response: boolean; reset: boolean }) => {
+				.then((res: { response: boolean; reset: boolean; error?: string }) => {
+					if (res.error) throw Error(res.error);
 					this.hasResponse = res.response;
 				})
 				.catch((err: Error) => {
 					AppModule.snackbar({ text: err.message, color: Colors.Error });
 				});
 		} else {
-			// websocket response alarm
+			// Websocket response alarm
+			const wsMsg: IwsCmdMsg = {
+				channel: EwsChannel.COMMAND,
+				furnace: EwsFurnaceType.HIPER,
+				command: EwsCommand.ALARMRESPONSE
+			};
+			// console.log(wsMsg);
+			this.$root.$ws.send(JSON.stringify(wsMsg));
 		}
 	}
 
@@ -402,14 +434,22 @@ export default class HiperDashboard extends Vue {
 		if (this.isElectron) {
 			this.$ipcRenderer
 				.invoke('alarm-rst')
-				.then((res: { response: boolean; reset: boolean }) => {
+				.then((res: { response: boolean; reset: boolean; error?: string }) => {
+					if (res.error) throw Error(res.error);
 					this.hasResponse = res.response;
 				})
 				.catch((err: Error) => {
 					AppModule.snackbar({ text: err.message, color: Colors.Error });
 				});
 		} else {
-			// websocket reset alarm
+			// WebSocket reset alarm
+			const wsMsg: IwsCmdMsg = {
+				channel: EwsChannel.COMMAND,
+				furnace: EwsFurnaceType.HIPER,
+				command: EwsCommand.ALARMRESET
+			};
+			// console.log(wsMsg);
+			this.$root.$ws.send(JSON.stringify(wsMsg));
 		}
 	}
 
