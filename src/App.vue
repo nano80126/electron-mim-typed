@@ -248,8 +248,8 @@
 			<!-- class="grey lighten-3" -->
 			<v-main :class="{ error: errorOccured }">
 				<!-- :class="{ error: errorBack }" -->
-				<v-overlay v-model="overlay" opacity="0.3">
-					<v-progress-circular indeterminate color="primary darken-2" />
+				<v-overlay v-model="overlay" opacity="0.3" absolute>
+					<v-progress-circular indeterminate color="primary" :class="isDarkMode ? 'lighten-2' : 'darken-2'" />
 				</v-overlay>
 				<!-- <div ref="scrollPage" class="min-scroll primary-scroll" 
                 style="overflow-x:hidden; overflow-y:auto;"> -->
@@ -428,6 +428,7 @@ export default class App extends Vue {
 	created() {
 		if (AppModule.isElectron) {
 			//
+			// AppModule.changeOverlay(true);
 		}
 	}
 
@@ -435,6 +436,8 @@ export default class App extends Vue {
 		//
 		this.SHOW = true;
 		//
+
+		// AppModule.changeOverlay(true);
 
 		this.$root.$on('alarmToggle', () => {
 			const audio = this.$refs.alarmAudio as HTMLAudioElement;
@@ -482,8 +485,7 @@ export default class App extends Vue {
 
 	private loginCheck(e: Event) {
 		e.preventDefault();
-
-		console.log(e);
+		//
 	}
 
 	private logout() {

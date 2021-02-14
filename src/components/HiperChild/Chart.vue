@@ -49,13 +49,17 @@
 				</v-toolbar>
 			</v-col>
 
-			<v-col cols="12" class="mt-3" style="position:relative;">
+			<v-col cols="12" class="mt-3" style="position: relative;">
 				<div id="container" class="mx-0" />
 
 				<!-- this can use xaxis plotlines to replace -->
 				<div
 					class="fixed-crosshair"
-					:style="{ left: `${menuX}px`, height: `${plotH}px`, display: `${showMenu ? 'block' : 'none'}` }"
+					:style="{
+						left: `${menuX - 64}px`,
+						height: `${plotH}px`,
+						display: `${showMenu ? 'block' : 'none'}`
+					}"
 				/>
 			</v-col>
 		</v-row>
@@ -97,10 +101,12 @@
 </template>
 
 <script lang="ts">
-import Highcharts, { Chart, XrangePointOptionsObject } from 'highcharts';
+import Highcharts, { Chart } from 'highcharts';
 
 import { AppModule } from '@/store/modules/app';
 import { Component, Vue } from 'vue-property-decorator';
+import { worker } from 'cluster';
+import { Worker } from 'worker_threads';
 
 @Component({})
 export default class HiperChart extends Vue {
@@ -127,10 +133,6 @@ export default class HiperChart extends Vue {
 	/** */
 	private plotH = 0;
 
-	mounted() {
-		//
-	}
-
 	/**input file change event */
 	private onChange(e: Event) {
 		AppModule.changeOverlay(true);
@@ -138,16 +140,19 @@ export default class HiperChart extends Vue {
 		const files = (e.target as HTMLInputElement).files as FileList;
 		if (files?.length > 0) this.file = files[0];
 
+		// setTimeout(() => {
 		this.$nextTick(() => {
-			(e.target as HTMLInputElement).value = '';
+			// console.log((e.target as HTMLInputElement).value);
+			// (e.target as HTMLInputElement).value = '';
 			this.dragging = false;
 			//
-			this.dataDeal();
+			this.dataDeal(e);
 		});
+		// }, 1500);
 	}
 
 	/**處理資料 */
-	private dataDeal() {
+	private dataDeal(fileEvent: Event) {
 		this.series = [];
 		const reader = new FileReader();
 		reader.onload = e => {
@@ -173,6 +178,7 @@ export default class HiperChart extends Vue {
 						});
 					}
 				}
+				(fileEvent.target as HTMLInputElement).value = '';
 				AppModule.changeOverlay(false);
 			}
 		};
@@ -211,365 +217,350 @@ export default class HiperChart extends Vue {
 			Obj.other.push([ts, item.Other]);
 		}
 
-		this.chart = Highcharts.chart(
-			'container',
-			{
-				boost: {
-					enabled: true
-					// useGPUTranslations: true
-				},
-				chart: {
-					// type: 'line',
-					marginTop: 80,
-					zoomType: 'x',
-					// height / width ratio
-					height: (7 / 16) * 100 + '%',
-					// height: 720,
-					resetZoomButton: {
-						position: { x: 0, y: -40 },
-						theme: {
-							// fill: 'transparent',
-							// stroke: 'transparent',
-							style: {
-								color: '#1976d2',
-								fontSize: '14px',
-								fontWeight: '800'
-								// textDecoration: null
-							},
-							r: 5,
-							states: {
-								hover: {
-									// fill: 'transparent',
-									style: {
-										// color: '#1976d2',
-										backgroundColor: '#cfd8dc'
-										// fontSize: '14px',
-										// fontWeight: 800
-									}
-								}
-							}
-						}
-					},
-					events: {
-						render: e => {
-							e.preventDefault();
-							this.plotH = ((e.target as unknown) as Chart).plotHeight;
-							this.$nextTick(() => {
-								this.showMenu = false;
-							});
-						},
-						click: e => {
-							e.preventDefault();
-							this.$nextTick(() => {
-								this.showMenu = false;
-							});
-						},
-						selection: e => {
-							e.preventDefault();
-
-							console.log(e);
-							// console.time('selection');
-							if (e.xAxis) {
-								const data = this.series.filter(item => {
-									return e.xAxis[0].min <= item.datetime && item.datetime <= e.xAxis[0].max;
-								});
-								//
-								const l = data.length;
-								const inc = Math.ceil(l / 800); // 進位
-								// const Obj = {
-								const PG = [];
-								const upperTemp = [];
-								const lowerTemp = [];
-								const flow = [];
-								const PTVO = [];
-								const PTVT = [];
-								const PTVI = [];
-								const other = [];
-								// };
-								for (let i = 0; i < l; i += inc) {
-									const item = data[i];
-									const ts = item.datetime;
-									PG.push([ts, item.PG]);
-									upperTemp.push([ts, item.UpperTemp]);
-									lowerTemp.push([ts, item.LowerTemp]);
-									flow.push([ts, item.Flow]);
-									PTVO.push([ts, item.PTVO]);
-									PTVT.push([ts, item.PTVT]);
-									PTVI.push([ts, item.PTVI]);
-									other.push([ts, item.Other]);
-								}
-								//
-								((e.target as unknown) as Chart).update({
-									series: [
-										{ data: upperTemp },
-										{ data: lowerTemp },
-										{ data: PG },
-										{ data: PTVO },
-										{ data: PTVT },
-										{ data: PTVI },
-										{ data: flow },
-										{ data: other }
-									]
-								});
-								// e.target.showResetZoom();
-							} else {
-								//
-								const series = this.series;
-								const l = series.length;
-								const inc = Math.ceil(l / 800);
-								//
-								const PG = [];
-								const upperTemp = [];
-								const lowerTemp = [];
-								const flow = [];
-								const PTVO = [];
-								const PTVT = [];
-								const PTVI = [];
-								const other = [];
-								for (let i = 0; i < l; i += inc) {
-									const item = series[i];
-									// const ts = this.$moment(item.datetime).valueOf();
-									const ts = item.datetime;
-									PG.push([ts, item.PG]);
-									upperTemp.push([ts, item.UpperTemp]);
-									lowerTemp.push([ts, item.LowerTemp]);
-									flow.push([ts, item.Flow]);
-									PTVO.push([ts, item.PTVO]);
-									PTVT.push([ts, item.PTVT]);
-									PTVI.push([ts, item.PTVI]);
-									other.push([ts, item.Other]);
-								}
-								e.target.update({
-									series: [
-										{ data: upperTemp },
-										{ data: lowerTemp },
-										{ data: PG },
-										{ data: PTVO },
-										{ data: PTVT },
-										{ data: PTVI },
-										{ data: flow },
-										{ data: other }
-									]
-								});
-								// e.target.resetZoomButton.hide();
-							}
-							// console.timeEnd('selection');
-						}
-					}
-				},
-				title: {
-					align: 'right',
-					text: '爐溫曲線圖',
-					x: -20,
-					y: 25,
-					style: {
-						fontSize: '28px',
-						fontWeight: '900'
-					}
-				},
-				subtitle: {
-					enabled: false
-				},
-				time: { timezoneOffset: -8 * 60 },
-				xAxis: {
-					events: {},
-					// categories: xaxis,
-					// tickInterval: 4 * 60 * 。60 * 1000, // 30 分鐘
-					tickPixelInterval: 40,
-					type: 'datetime',
-					title: {
-						text: 'Time',
+		this.chart = Highcharts.chart('container', {
+			boost: {
+				enabled: true
+				// useGPUTranslations: true
+			},
+			chart: {
+				// type: 'line',
+				marginTop: 80,
+				zoomType: 'x',
+				// height / width ratio
+				height: (7 / 16) * 100 + '%',
+				// height: 720,
+				resetZoomButton: {
+					position: { x: 0, y: -40 },
+					theme: {
 						style: {
-							fontWeight: 600,
+							color: '#1976d2',
+							fontSize: '14px',
+							fontWeight: '800'
+						},
+						r: 5,
+						states: {
+							hover: {
+								style: {
+									backgroundColor: '#cfd8dc'
+								}
+							}
+						}
+					}
+				},
+				events: {
+					render: e => {
+						e.preventDefault();
+						this.plotH = ((e.target as unknown) as Chart).plotHeight;
+						this.$nextTick(() => {
+							this.showMenu = false;
+						});
+					},
+					click: e => {
+						e.preventDefault();
+						this.$nextTick(() => {
+							this.showMenu = false;
+						});
+					},
+					selection: e => {
+						e.preventDefault();
+
+						if (e.xAxis) {
+							const data = this.series.filter(item => {
+								return e.xAxis[0].min <= item.datetime && item.datetime <= e.xAxis[0].max;
+							});
+							//
+							const l = data.length;
+							const inc = Math.ceil(l / 800); // 進位
+							// const Obj = {
+							const PG = [];
+							const upperTemp = [];
+							const lowerTemp = [];
+							const flow = [];
+							const PTVO = [];
+							const PTVT = [];
+							const PTVI = [];
+							const other = [];
+							// };
+							for (let i = 0; i < l; i += inc) {
+								const item = data[i];
+								const ts = item.datetime;
+								PG.push([ts, item.PG]);
+								upperTemp.push([ts, item.UpperTemp]);
+								lowerTemp.push([ts, item.LowerTemp]);
+								flow.push([ts, item.Flow]);
+								PTVO.push([ts, item.PTVO]);
+								PTVT.push([ts, item.PTVT]);
+								PTVI.push([ts, item.PTVI]);
+								other.push([ts, item.Other]);
+							}
+
+							//
+							((e.target as unknown) as Chart).update({
+								series: [
+									{ type: 'line', data: upperTemp },
+									{ type: 'line', data: lowerTemp },
+									{ type: 'line', data: PG },
+									{ type: 'line', data: PTVO },
+									{ type: 'line', data: PTVT },
+									{ type: 'line', data: PTVI },
+									{ type: 'line', data: flow },
+									{ type: 'line', data: other }
+								]
+							});
+							// e.target.showResetZoom();
+						} else {
+							//
+							const series = this.series;
+							const l = series.length;
+							const inc = Math.ceil(l / 800);
+							//
+							const PG = [];
+							const upperTemp = [];
+							const lowerTemp = [];
+							const flow = [];
+							const PTVO = [];
+							const PTVT = [];
+							const PTVI = [];
+							const other = [];
+							for (let i = 0; i < l; i += inc) {
+								const item = series[i];
+								// const ts = this.$moment(item.datetime).valueOf();
+								const ts = item.datetime;
+								PG.push([ts, item.PG]);
+								upperTemp.push([ts, item.UpperTemp]);
+								lowerTemp.push([ts, item.LowerTemp]);
+								flow.push([ts, item.Flow]);
+								PTVO.push([ts, item.PTVO]);
+								PTVT.push([ts, item.PTVT]);
+								PTVI.push([ts, item.PTVI]);
+								other.push([ts, item.Other]);
+							}
+							((e.target as unknown) as Chart).update({
+								series: [
+									{ type: 'line', data: upperTemp },
+									{ type: 'line', data: lowerTemp },
+									{ type: 'line', data: PG },
+									{ type: 'line', data: PTVO },
+									{ type: 'line', data: PTVT },
+									{ type: 'line', data: PTVI },
+									{ type: 'line', data: flow },
+									{ type: 'line', data: other }
+								]
+							});
+						}
+						return undefined;
+					}
+				}
+			},
+			title: {
+				align: 'right',
+				text: '爐溫曲線圖',
+				x: -20,
+				y: 25,
+				style: {
+					fontSize: '28px',
+					fontWeight: '900'
+				}
+			},
+			subtitle: {
+				// enabled: false
+			},
+			time: { timezoneOffset: -8 * 60 },
+			xAxis: {
+				events: {},
+				// categories: xaxis,
+				// tickInterval: 4 * 60 * 。60 * 1000, // 30 分鐘
+				tickPixelInterval: 40,
+				type: 'datetime',
+				title: {
+					text: 'Time',
+					style: {
+						fontWeight: '600',
+						fontSize: '16px',
+						fontFamily: 'consolas'
+					}
+				},
+				labels: {
+					style: {
+						fontSize: '14px'
+					}
+				},
+				crosshair: {
+					width: 1,
+					color: 'gray',
+					dashStyle: 'Dot'
+				},
+				dateTimeLabelFormats: {
+					day: '%m/%d'
+				}
+			},
+			yAxis: [
+				{
+					lineColor: 'darkcyan',
+					lineWidth: 1,
+					tickColor: 'darkcyan',
+					tickWidth: 1,
+					tickAmount: 11,
+					tickInterval: 12,
+					// max: 1200,
+					// min: 0,
+					title: {
+						align: 'high',
+						textAlign: 'center',
+						text: 'KPa',
+						x: 20,
+						y: -10,
+						rotation: 0,
+						style: {
+							fontWeight: '500',
 							fontSize: '16px',
 							fontFamily: 'consolas'
 						}
-					},
-					labels: {
+					}
+				},
+				{
+					lineColor: 'green',
+					lineWidth: 1,
+					tickColor: 'green',
+					tickWidth: 1,
+					tickAmount: 11,
+					tickInterval: 140 * 1000,
+					title: {
+						align: 'high',
+						textAlign: 'center',
+						text: 'Pa',
+						x: 20,
+						y: -10,
+						rotation: 0,
 						style: {
-							fontSize: '14px'
-						}
-					},
-					crosshair: {
-						width: 1,
-						color: 'gray',
-						dashStyle: 'Dot'
-					},
-					dateTimeLabelFormats: {
-						day: '%m/%d'
-					}
-				},
-				yAxis: [
-					{
-						lineColor: 'darkcyan',
-						lineWidth: 1,
-						tickColor: 'darkcyan',
-						tickWidth: 1,
-						tickAmount: 11,
-						tickInterval: 12,
-						// max: 1200,
-						// min: 0,
-						title: {
-							align: 'high',
-							textAlign: 'center',
-							text: 'KPa',
-							x: 20,
-							y: -10,
-							rotation: 0,
-							style: {
-								fontWeight: '500',
-								fontSize: '16px',
-								fontFamily: 'consolas'
-							}
-						}
-					},
-					{
-						lineColor: 'green',
-						lineWidth: 1,
-						tickColor: 'green',
-						tickWidth: 1,
-						tickAmount: 11,
-						tickInterval: 140 * 1000,
-						title: {
-							align: 'high',
-							textAlign: 'center',
-							text: 'Pa',
-							x: 20,
-							y: -10,
-							rotation: 0,
-							style: {
-								fontWeight: '500',
-								fontSize: '16px',
-								fontFamily: 'consolas'
-							}
-						}
-					},
-					{
-						opposite: true,
-						lineColor: 'red',
-						lineWidth: 1,
-						tickColor: 'red',
-						tickWidth: 1,
-						tickAmount: 11,
-						tickInterval: 180,
-						title: {
-							align: 'high',
-							textAlign: 'center',
-							text: '℃',
-							x: -20,
-							y: -10,
-							rotation: 0,
-							style: {
-								fontWeight: '500',
-								fontSize: '16px',
-								fontFamily: 'consolas'
-							}
-						}
-					},
-					{
-						opposite: true,
-						lineColor: 'blue',
-						lineWidth: 1,
-						tickColor: 'blue',
-						tickWidth: 1,
-						tickAmount: 11,
-						tickInterval: 110,
-						title: {
-							align: 'high',
-							textAlign: 'center',
-							text: 'L/min',
-							x: -20,
-							y: -10,
-							rotation: 0,
-							style: {
-								fontWeight: 500,
-								fontSize: '16px',
-								fontFamily: 'consolas'
-							}
-						}
-					}
-				],
-				legend: {
-					layout: 'horizontal',
-					align: 'right',
-					verticalAlign: 'bottom',
-					itemStyle: {
-						fontSize: '16px'
-					}
-				},
-				tooltip: {
-					// enabled: false,
-					shared: true,
-					borderWidth: 0,
-					backgroundColor: 'transparent',
-					shadow: false,
-					useHTML: true,
-					padding: 0,
-					xDateFormat: '%y/%m/%d %H:%M:%S',
-					headerFormat:
-						'<div class="d-flex align-center">' +
-						'<div class="col font-weight-bold primary--text">{point.key}</div>',
-					pointFormat:
-						'<div class="col" style="color: {series.color}; min-width: 120px;">' +
-						'<span class="font-weight-bold">{series.name}: </span><br>' +
-						'<span>{point.y} {series.unit}</span></div>',
-					footerFormat: '</div>',
-					positioner: function() {
-						return { x: 20, y: 0 };
-					}
-				},
-				plotOptions: {
-					line: {
-						lineWidth: 1,
-						states: {
-							hover: {
-								lineWidth: 1
-							}
-						},
-						marker: {
-							enabled: false
-						},
-						cursor: 'pointer',
-						point: {
-							events: {
-								click: e => {
-									e.preventDefault();
-									const index = e.point.index;
-									this.menuX = e.x;
-									this.menuY = e.y;
-									this.menuUppertemp = this.chart?.series[0].data[index].y as number;
-									this.menuLowertemp = this.chart?.series[1].data[index].y as number;
-									this.$nextTick(() => {
-										this.showMenu = true;
-									});
-								}
-								// mouseOut: () => {
-								// 	this.$nextTick(() => {
-								// 		this.showMenu = false;
-								// 	});
-								// }
-							}
+							fontWeight: '500',
+							fontSize: '16px',
+							fontFamily: 'consolas'
 						}
 					}
 				},
-				series: [
-					{ type: 'line', name: '上部溫度', data: Obj.upperTemp, lineWidth: 1, yAxis: 2, color: 'red' },
-					{ type: 'line', name: '下部溫度', data: Obj.lowerTemp, lineWidth: 1, yAxis: 2, color: 'purple' },
-					{ type: 'line', name: '真空度', data: Obj.PG, lineWidth: 1, yAxis: 1, color: 'green' },
-					{ type: 'line', name: '爐內壓力', data: Obj.PTVO, lineWidth: 1, yAxis: 0, color: 'darkcyan' },
-					{ type: 'line', name: '脫脂管道壓力', data: Obj.PTVT, lineWidth: 1, yAxis: 0, color: 'orange' },
-					{ type: 'line', name: '分壓管道壓力', data: Obj.PTVI, lineWidth: 1, yAxis: 0, color: 'gray' },
-					{ type: 'line', name: '氣體流量', data: Obj.flow, lineWidth: 1, yAxis: 3, color: 'blue' },
-					{ type: 'line', name: '保留', data: Obj.other, lineWidth: 1, yAxis: 3, color: 'black' }
-				],
-				credits: {
-					enabled: false
+				{
+					opposite: true,
+					lineColor: 'red',
+					lineWidth: 1,
+					tickColor: 'red',
+					tickWidth: 1,
+					tickAmount: 11,
+					tickInterval: 180,
+					title: {
+						align: 'high',
+						textAlign: 'center',
+						text: '℃',
+						x: -20,
+						y: -10,
+						rotation: 0,
+						style: {
+							fontWeight: '500',
+							fontSize: '16px',
+							fontFamily: 'consolas'
+						}
+					}
+				},
+				{
+					opposite: true,
+					lineColor: 'blue',
+					lineWidth: 1,
+					tickColor: 'blue',
+					tickWidth: 1,
+					tickAmount: 11,
+					tickInterval: 110,
+					title: {
+						align: 'high',
+						textAlign: 'center',
+						text: 'L/min',
+						x: -20,
+						y: -10,
+						rotation: 0,
+						style: {
+							fontWeight: '500',
+							fontSize: '16px',
+							fontFamily: 'consolas'
+						}
+					}
+				}
+			],
+			legend: {
+				layout: 'horizontal',
+				align: 'right',
+				verticalAlign: 'bottom',
+				itemStyle: {
+					fontSize: '16px'
 				}
 			},
-			null
-		);
-
-		console.log(this.chart);
+			tooltip: {
+				// enabled: false,
+				shared: true,
+				borderWidth: 0,
+				backgroundColor: 'transparent',
+				shadow: false,
+				useHTML: true,
+				padding: 0,
+				xDateFormat: '%y/%m/%d %H:%M:%S',
+				headerFormat:
+					'<div class="d-flex align-center">' +
+					'<div class="col font-weight-bold primary--text">{point.key}</div>',
+				pointFormat:
+					'<div class="col" style="color: {series.color}; min-width: 120px;">' +
+					'<span class="font-weight-bold">{series.name}: </span><br>' +
+					'<span>{point.y} {series.unit}</span></div>',
+				footerFormat: '</div>',
+				positioner: function() {
+					return { x: 20, y: 0 };
+				}
+			},
+			plotOptions: {
+				line: {
+					lineWidth: 1,
+					states: {
+						hover: {
+							lineWidth: 1
+						}
+					},
+					marker: {
+						enabled: false
+					},
+					cursor: 'pointer',
+					point: {
+						events: {
+							click: e => {
+								e.preventDefault();
+								const index = e.point.index;
+								this.menuX = e.x;
+								this.menuY = e.y;
+								this.menuUppertemp = this.chart?.series[0].data[index].y as number;
+								this.menuLowertemp = this.chart?.series[1].data[index].y as number;
+								this.$nextTick(() => {
+									this.showMenu = true;
+								});
+							}
+							// mouseOut: () => {
+							// 	this.$nextTick(() => {
+							// 		this.showMenu = false;
+							// 	});
+							// }
+						}
+					}
+				}
+			},
+			series: [
+				{ type: 'line', name: '上部溫度', data: Obj.upperTemp, lineWidth: 1, yAxis: 2, color: 'red' },
+				{ type: 'line', name: '下部溫度', data: Obj.lowerTemp, lineWidth: 1, yAxis: 2, color: 'purple' },
+				{ type: 'line', name: '真空度', data: Obj.PG, lineWidth: 1, yAxis: 1, color: 'green' },
+				{ type: 'line', name: '爐內壓力', data: Obj.PTVO, lineWidth: 1, yAxis: 0, color: 'darkcyan' },
+				{ type: 'line', name: '脫脂管道壓力', data: Obj.PTVT, lineWidth: 1, yAxis: 0, color: 'orange' },
+				{ type: 'line', name: '分壓管道壓力', data: Obj.PTVI, lineWidth: 1, yAxis: 0, color: 'gray' },
+				{ type: 'line', name: '氣體流量', data: Obj.flow, lineWidth: 1, yAxis: 3, color: 'blue' },
+				{ type: 'line', name: '保留', data: Obj.other, lineWidth: 1, yAxis: 3, color: 'black' }
+			],
+			credits: {
+				enabled: false
+			}
+		});
 	}
 }
 </script>
@@ -603,7 +594,7 @@ export default class HiperChart extends Vue {
 }
 .fixed-crosshair {
 	position: absolute;
-	margin: 0 -12px;
+	margin: 0;
 	border-left: 1px dashed black;
 	top: 80px;
 	left: 0;
