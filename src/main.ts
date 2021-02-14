@@ -13,7 +13,7 @@ import i18n from '@/plugins/i18n';
 import { IpcRenderer, Shell } from 'electron';
 // const { /*remote,*/ /*IpcRenderer,*/ ipcRenderer, shell } = window.require('electron');
 
-import moment, { Moment, MomentInput } from 'moment';
+import moment, { Moment, MomentInput, MomentFormatSpecification } from 'moment';
 import lodash, { LoDashStatic, once } from 'lodash';
 import axios, { AxiosStatic } from 'axios';
 import qs, { stringify } from 'qs';
@@ -78,7 +78,7 @@ declare global {
 declare module 'vue/types/vue' {
 	/**Vue add some module interfaces */
 	interface Vue {
-		// $moment(input?: MomentInput): Moment;
+		$moment(input?: MomentInput, format?: MomentFormatSpecification): Moment;
 		// $axios: AxiosStatic;
 		$lodash: LoDashStatic;
 		// $qs: { stringify: typeof stringify };

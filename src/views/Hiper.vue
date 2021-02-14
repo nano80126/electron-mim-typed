@@ -22,7 +22,9 @@
 			<v-tab-item>
 				<Dashboard />
 			</v-tab-item>
-			<v-tab-item>456</v-tab-item>
+			<v-tab-item>
+				<Linechart />
+			</v-tab-item>
 			<v-tab-item v-if="isElectron">
 				<Connect />
 			</v-tab-item>
@@ -32,6 +34,7 @@
 
 <script lang="ts">
 import board from '@/components/HiperChild/Dashboard.vue';
+import chart from '@/components/HiperChild/Chart.vue';
 import connect from '@/components/HiperChild/Connect.vue';
 
 import { Component, Vue } from 'vue-property-decorator';
@@ -40,6 +43,7 @@ import { AppModule } from '@/store/modules/app';
 @Component({
 	components: {
 		Dashboard: board,
+		Linechart: chart,
 		Connect: connect
 	}
 })

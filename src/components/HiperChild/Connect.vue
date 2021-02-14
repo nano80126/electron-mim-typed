@@ -86,7 +86,7 @@ import { HiperModule } from '@/store/modules/hiper';
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component({})
-export default class App extends Vue {
+export default class HiperConnect extends Vue {
 	/**判斷 form 輸入是否合法 */
 	private valid = false;
 	/**嘗試連線中 */
