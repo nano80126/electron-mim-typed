@@ -34,6 +34,8 @@ module.exports = {
 		// }
 	},
 	chainWebpack: config => {
+
+
 		// 保留空白
 		config.module
 			.rule('vue')
@@ -41,6 +43,15 @@ module.exports = {
 			.tap(args => {
 				args.compilerOptions.whitespace = 'preserve';
 			});
+
+		// config.module
+		// 	.rule("worker")
+		// 	.test(/\.worker\.js$/)
+		// 	.use("worker")
+		// 	.loader('worker-loader')
+		// 	.options({
+		// 		inline: 'fallback'
+		// 	});
 
 		config.optimization.splitChunks({
 			cacheGroups: {
@@ -68,6 +79,8 @@ module.exports = {
 				}
 			}
 		});
+
+		config.output.globalObject('this');
 	},
 	configureWebpack: () => {
 		return {

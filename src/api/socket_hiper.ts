@@ -39,7 +39,7 @@ new CronJob(
 		let msg = `\n現在時間: ${moment().format('MM/DD HH:mm:ss')}\n伺服器狀態: 正常`;
 
 		if (tcpClient && tcpClient.connected) {
-			msg += `\n工藝狀態: ${tcpClient.stepState} \n工藝名稱${tcpClient.stepName}`;
+			msg += `\n工藝狀態: ${tcpClient.stepState} \n工藝名稱: ${tcpClient.stepName}`;
 		} else {
 			msg += '\n燒結爐狀態: 未連線';
 		}

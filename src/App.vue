@@ -88,7 +88,14 @@
 				</v-btn> -->
 			</v-app-bar>
 
-			<v-navigation-drawer app permanent mini-variant mini-variant-width="64" class="brown darken-2">
+			<v-navigation-drawer
+				app
+				permanent
+				mini-variant
+				mini-variant-width="64"
+				:class="isDarkMode ? 'brown darken-2' : 'blue-grey lighten-3'"
+			>
+				<!-- class="brown" -->
 				<div class="window-drag left" />
 				<!--  -->
 				<v-list flat class="no-drag mt-8">

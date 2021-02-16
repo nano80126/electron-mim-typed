@@ -105,8 +105,9 @@ import Highcharts, { Chart } from 'highcharts';
 
 import { AppModule } from '@/store/modules/app';
 import { Component, Vue } from 'vue-property-decorator';
-import { worker } from 'cluster';
-import { Worker } from 'worker_threads';
+
+import Worker from '@/worker';
+// const worker = new Worker();
 
 @Component({})
 export default class HiperChart extends Vue {
@@ -133,6 +134,10 @@ export default class HiperChart extends Vue {
 	/** */
 	private plotH = 0;
 
+	mounted() {
+		//
+	}
+
 	/**input file change event */
 	private onChange(e: Event) {
 		AppModule.changeOverlay(true);
@@ -141,14 +146,29 @@ export default class HiperChart extends Vue {
 		if (files?.length > 0) this.file = files[0];
 
 		// setTimeout(() => {
-		this.$nextTick(() => {
+		this.$nextTick(async () => {
 			// console.log((e.target as HTMLInputElement).value);
 			// (e.target as HTMLInputElement).value = '';
 			this.dragging = false;
 			//
-			this.dataDeal(e);
+			const reader = new FileReader();
+			// const str = await new Promise(resolve => {
+			reader.addEventListener(
+				'load',
+				readData => {
+					Worker.analyzeCSV(readData.target?.result as string)
+						.then(res => {
+							this.series = res.series;
+						})
+						.finally(() => {
+							(e.target as HTMLInputElement).value = '';
+							AppModule.changeOverlay(false);
+						});
+				},
+				{ once: true }
+			);
+			reader.readAsBinaryString(this.file as File);
 		});
-		// }, 1500);
 	}
 
 	/**處理資料 */
