@@ -12,7 +12,6 @@ import {
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-console.log(process.env.NODE_ENV);
 // import crawler
 // import './api/fastify';
 import './api/log4js';
@@ -26,7 +25,7 @@ import { registerHotkey, unregisterAllHotKey } from './api/shortcut';
 // import { mongoCLient } from './api/mongo';
 
 // custom types
-import { Iconfig, IchannelLyricsObj } from './types/main-process';
+import { IchannelLyricsObj } from './types/main-process';
 // import './api/mongo';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -40,7 +39,7 @@ let mainWin: Electron.webContents | null;
 let child: BrowserWindow | null = null;
 let childCloseTimer: NodeJS.Timeout | null = null;
 //
-let locale: string | undefined = process.env.VUE_APP_I18N_LOCALE;
+const locale: string | undefined = process.env.VUE_APP_I18N_LOCALE;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
@@ -61,7 +60,7 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: tru
 function createWindow() {
 	// Create the browser window.
 	win = new BrowserWindow({
-		title: 'EleCrawler',
+		title: 'furnace viewer',
 		backgroundColor: '#212121',
 		// backgroundColor: 'transparent',
 		minWidth: 1280,
@@ -167,8 +166,8 @@ function createWindow() {
 	} else {
 		createProtocol('app');
 		// Load the index.html when not in development
-		// win.loadURL('app://./index.html');
-		win.loadURL('http://localhost:4000/');
+		win.loadURL('app://./index.html');
+		// win.loadURL(`http://localhost:${process.env.VUE_APP_PORT}/electron`);
 	}
 
 	win.on('ready-to-show', () => {
@@ -225,7 +224,7 @@ app.on('ready', () => {
 			click: () => win?.close()
 		}
 	]);
-	tray.setToolTip('EleCrawler');
+	tray.setToolTip('furnace viewer');
 	tray.setContextMenu(contextMenu);
 
 	tray.on('double-click', () => {
@@ -316,9 +315,15 @@ ipcMain.handle('isMaxmized', () => {
 // // // // // // // // // // // // // // // // // // //
 
 /**同步語言 */
-ipcMain.on('syncLanguage', (e, args) => {
-	locale = args.locale;
-	child?.webContents.send('syncLanguage', locale);
+// ipcMain.on('syncLanguage', (e, args) => {
+// 	locale = args.locale;
+// 	child?.webContents.send('syncLanguage', locale);
+// });
+
+/**登入 */
+ipcMain.handle('loginCheck', (e, args) => {
+	const { user, pass } = args;
+	return user == process.env.VUE_APP_USER && pass == process.env.VUE_APP_PASS;
 });
 
 // // // // // // // // // // // // // // // // // // //

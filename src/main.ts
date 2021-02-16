@@ -5,35 +5,23 @@ import store from '@/store';
 import { AppModule, Colors } from '@/store/modules/app';
 // import { PlayerModule } from '@/store/modules/player';
 import vuetify from '@/plugins/vuetify';
-import i18n from '@/plugins/i18n';
+// import i18n from '@/plugins/i18n';
 
 // import path from 'path';
 // import * as fs from 'fs';
 // import { remote, IpcRenderer, Shell } from 'electron';
-import { IpcRenderer, Shell } from 'electron';
+import { IpcRenderer } from 'electron';
 // const { /*remote,*/ /*IpcRenderer,*/ ipcRenderer, shell } = window.require('electron');
 
 import moment, { Moment, MomentInput, MomentFormatSpecification } from 'moment';
-import lodash, { LoDashStatic, once } from 'lodash';
-import axios, { AxiosStatic } from 'axios';
-import qs, { stringify } from 'qs';
+import lodash, { LoDashStatic } from 'lodash';
+import axios from 'axios';
+// import qs from 'qs';
 
-import {
-	IdisplayTxt,
-	IlyricsDisplayObj,
-	IlyricsObj,
-	IsongList,
-	IwsMsg,
-	IwsConnMsg,
-	IwsOpenMsg,
-	EwsChannel,
-	EwsFurnaceType,
-	IwsCmdResMsg
-} from '@/types/renderer';
+import { IwsMsg, IwsConnMsg, IwsOpenMsg, EwsChannel, EwsFurnaceType, IwsCmdResMsg } from '@/types/renderer';
 
 import { HiperModule } from './store/modules/hiper';
 import '@/style.scss';
-import { IwsCommandResMessage } from './types/main-process';
 
 const { VUE_APP_ADDRESS, VUE_APP_PORT } = process.env;
 const wsUrl = `ws://${VUE_APP_ADDRESS}:${VUE_APP_PORT}`;
@@ -49,12 +37,9 @@ Object.defineProperties(Vue.prototype, {
 	$axios: {
 		value: axios
 	},
-	$qs: {
-		value: qs
-	},
-	$shell: {
-		value: process.env.IS_ELECTRON ? window.require('electron').shell : undefined
-	},
+	// $shell: {
+	// 	value: process.env.IS_ELECTRON ? window.require('electron').shell : undefined
+	// },
 	$ipcRenderer: {
 		value: process.env.IS_ELECTRON ? window.require('electron').ipcRenderer : undefined
 	},
@@ -97,7 +82,7 @@ new Vue({
 	router,
 	store,
 	vuetify,
-	i18n,
+	// i18n,
 	render: h => h(App),
 
 	///
@@ -180,8 +165,6 @@ new Vue({
 					this.$ws.addEventListener('message', msg => {
 						const wsMsg = JSON.parse(msg.data) as IwsMsg;
 						let openMsg;
-
-						console.log(wsMsg);
 
 						switch (wsMsg.channel) {
 							case EwsChannel.OPEN:

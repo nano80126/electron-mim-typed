@@ -48,7 +48,7 @@ new CronJob(
 			.then(res => {
 				// mainWin.send
 				mainWin?.send('notifyRes', res.data);
-				log.info('每日定期通知。');
+				log.info('Daily notification');
 			})
 			.catch(err => {
 				// mainWin.send

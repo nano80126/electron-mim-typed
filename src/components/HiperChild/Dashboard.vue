@@ -363,8 +363,8 @@ export default class HiperDashboard extends Vue {
 		this.$root.$ws.addEventListener('message', e => {
 			const data = JSON.parse(e.data);
 
-			console.log(e);
-			console.log(data);
+			// console.log(e);
+			// console.log(data);
 
 			switch (data.channel) {
 				case 'serial':

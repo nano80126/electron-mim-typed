@@ -6,6 +6,7 @@ export interface AppState {
 	snackbars: { show: boolean; color: Colors | string; text: string; timeout: number }[];
 	isElectron: boolean;
 	isWsOpend: boolean;
+	loginAuth: boolean;
 
 	// 以下無用
 	// picPath: string;
@@ -33,6 +34,8 @@ class Common extends VuexModule implements AppState {
 	public isElectron = process.env.IS_ELECTRON ? true : false;
 	/**ws 是否連線 */
 	public isWsOpend = false;
+	/**是否登入 */
+	public loginAuth = false;
 
 	/**圖片路徑 */
 	// public picPath = '';
@@ -77,6 +80,11 @@ class Common extends VuexModule implements AppState {
 	@Mutation
 	changeWsOpened(bool: boolean) {
 		this.isWsOpend = bool;
+	}
+
+	@Mutation
+	changeLoginAuth(bool: boolean) {
+		this.loginAuth = bool;
 	}
 
 	// @Mutation

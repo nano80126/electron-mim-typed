@@ -73,14 +73,12 @@ module.exports = {
 					name: 'chunk-common',
 					priority: -20,
 					chunks: "initial",
-					minChunks: 2,
+					minChunks: 1,
 					reuseExistingChunk: true,
 					enforce: true
 				}
 			}
 		});
-
-		config.output.globalObject('this');
 	},
 	configureWebpack: () => {
 		return {
@@ -97,21 +95,17 @@ module.exports = {
 					// appenders: "commonjs appenders",
 					bufferutil: "commonjs bufferutil",
 					'utf-8-validate': 'commonjs utf-8-validate',
-					sharp: 'commonjs2 sharp'
+					// log4js: 'commonjs log4js'
 				};
 
 				Object.assign(
 					exts,
-					process.env.NODE_ENV == 'development' ? { mongodb: 'commonjs2 mongodb' } : undefined
+					process.env.NODE_ENV == 'development' ? { 
+						express: 'commonjs express', 
+						log4js: 'commonjs log4js' 
+					} : undefined
 				);
-
-				config.externals([
-					exts,
-					{
-						// bufferutil: 'commonjs bufferutil',
-						// 'utf-8-validate': 'commonjs utf-8-validate'
-					}
-				]);
+				config.externals([exts]);
 			},
 			chainWebpackRendererProcess: config => {
 				// config.plugin('define').tap(args => {

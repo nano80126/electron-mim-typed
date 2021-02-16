@@ -362,7 +362,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { AppModule } from './store/modules/app';
+import { AppModule, Colors } from './store/modules/app';
 
 @Component({})
 export default class App extends Vue {
@@ -396,7 +396,7 @@ export default class App extends Vue {
 	}
 
 	get isLogin(): boolean {
-		return false;
+		return AppModule.loginAuth;
 	}
 
 	get overlay(): boolean {
@@ -443,9 +443,6 @@ export default class App extends Vue {
 		//
 		this.SHOW = true;
 		//
-
-		// AppModule.changeOverlay(true);
-
 		this.$root.$on('alarmToggle', () => {
 			const audio = this.$refs.alarmAudio as HTMLAudioElement;
 			if (audio.paused) audio.play();
@@ -493,10 +490,29 @@ export default class App extends Vue {
 	private loginCheck(e: Event) {
 		e.preventDefault();
 		//
+		if (AppModule.isElectron) {
+			this.$ipcRenderer
+				.invoke('loginCheck', { user: this.loginUser, pass: this.loginPass })
+				.then(login => {
+					AppModule.changeLoginAuth(login);
+					if (login) {
+						AppModule.snackbar({ text: '登入成功', color: Colors.Success });
+					} else {
+						AppModule.snackbar({ text: '帳號或密碼錯誤', color: Colors.Error });
+					}
+				})
+				.finally(() => {
+					this.loginUser = null;
+					this.loginPass = null;
+					this.dialogModal = false;
+				});
+		}
 	}
 
 	private logout() {
 		//
+		AppModule.changeLoginAuth(false);
+		AppModule.snackbar({ text: '登出成功', color: Colors.Info });
 	}
 }
 </script>

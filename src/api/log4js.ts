@@ -7,8 +7,11 @@ const { IS_ELECTRON, NODE_ENV } = process.env;
 const logPath = IS_ELECTRON
 	? NODE_ENV == 'development'
 		? path.resolve(app.getPath('documents'), 'electron-min')
-		: path.resolve(app.getPath('exe'), '../log')
+		: path.resolve(app.getPath('exe'), '../logs')
 	: undefined;
+
+// const logPath = path.resolve(app.getPath('documents'), 'electron-min');
+// console.log(path.resolve(app.getPath('exe'), '../logs'));
 
 if (logPath) {
 	try {
@@ -20,7 +23,6 @@ if (logPath) {
 		}
 	}
 
-	console.log(__dirname);
 	// configure('src/config/log4js.json');
 
 	configure({

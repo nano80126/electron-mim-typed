@@ -26,6 +26,7 @@ const frontPath = NODE_ENV == 'development' ? path.resolve(__dirname, '../dist')
 app.use('/', router);
 // externals js and css need this, in this project is iframe_api.js
 app.use('/', express.static(frontPath));
+// app.use('/electron/', express.static(__dirname));
 // settings for cross-site
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
@@ -39,6 +40,10 @@ app.use((req, res, next) => {
 router.get('/', (req, res) => {
 	res.sendFile(path.resolve(frontPath, 'index.html'));
 });
+
+// router.get('/electron', (req, res) => {
+// 	res.sendFile(path.resolve(__dirname, 'index.html'));
+// });
 
 router.get('/root', (req, res) => {
 	res.send(frontPath);

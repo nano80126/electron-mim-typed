@@ -42,8 +42,9 @@ Revoke POST https://notify-api.line.me/api/revoke
 * [ ] Add alarm audio 
 * [ ] Add mongoDB for recording work step history 
  
-## bug 
+## bugs
 * [ ] Progress is not full when uploading csv
+* [ ] log4js not create log files in logs
 
 ## Test list 
 * [ ] Test connect 
