@@ -157,7 +157,7 @@ export default class HiperChart extends Vue {
 				'load',
 				readData => {
 					Worker.analyzeCSV(readData.target?.result as string)
-						.then(res => {
+						.then((res: { type: string; series: { [key: string]: number }[] }) => {
 							this.series = res.series;
 						})
 						.finally(() => {

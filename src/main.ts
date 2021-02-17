@@ -153,6 +153,10 @@ new Vue({
 					console.info(`%c${JSON.stringify(args)}`, 'color: #4CAF50');
 				}
 			});
+
+			this.$ipcRenderer.on('test', (e, args) => {
+				console.log('test', args);
+			});
 		} else {
 			// IN BROWSER ENV
 			this.wsInitialize();
@@ -180,7 +184,7 @@ new Vue({
 						switch (wsMsg.channel) {
 							case EwsChannel.OPEN:
 								openMsg = `%c${(wsMsg as IwsOpenMsg).text} ID: ${(wsMsg as IwsOpenMsg).id}`;
-								console.info(openMsg, 'color: #4CAF50;');
+								console.info(openMsg, 'color: #4CAF50');
 								break;
 							case EwsChannel.CONNECT:
 								if (wsMsg.furnace == EwsFurnaceType.HIPER) {
