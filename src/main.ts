@@ -18,7 +18,15 @@ import lodash, { LoDashStatic } from 'lodash';
 import axios from 'axios';
 // import qs from 'qs';
 
-import { IwsMsg, IwsConnMsg, IwsOpenMsg, EwsChannel, EwsFurnaceType, IwsCmdResMsg } from '@/types/renderer';
+import {
+	EwsChannel,
+	EwsFurnaceType,
+	IwsMsg,
+	IwsOpenMsg,
+	IwsConnMsg,
+	IwsSerialMsg,
+	IwsCmdResMsg
+} from '@/types/renderer';
 
 import { HiperModule } from './store/modules/hiper';
 import '@/style.scss';
@@ -166,9 +174,12 @@ new Vue({
 						const wsMsg = JSON.parse(msg.data) as IwsMsg;
 						let openMsg;
 
+						console.log(msg);
+						console.log(wsMsg);
+
 						switch (wsMsg.channel) {
 							case EwsChannel.OPEN:
-								openMsg = `${(wsMsg as IwsOpenMsg).text} ID: ${(wsMsg as IwsOpenMsg).id}`;
+								openMsg = `%c${(wsMsg as IwsOpenMsg).text} ID: ${(wsMsg as IwsOpenMsg).id}`;
 								console.info(openMsg, 'color: #4CAF50;');
 								break;
 							case EwsChannel.CONNECT:
@@ -180,7 +191,11 @@ new Vue({
 								break;
 							case EwsChannel.SERIAL:
 								//
-
+								if (wsMsg.furnace == EwsFurnaceType.HIPER) {
+									this.$emit('hiperSerial', wsMsg as IwsSerialMsg);
+								} else if (wsMsg.furnace == EwsFurnaceType.VTECH) {
+									//
+								}
 								break;
 							case EwsChannel.COMMANDRES:
 								//

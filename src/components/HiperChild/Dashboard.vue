@@ -258,7 +258,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import stepName from '@/json/stepName.json';
 import stepState from '@/json/stepState.json';
 import { HiperModule } from '@/store/modules/hiper';
-import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg } from '@/types/renderer';
+import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg, IwsSerialMsg } from '@/types/renderer';
 
 @Component({})
 export default class HiperDashboard extends Vue {
@@ -274,7 +274,7 @@ export default class HiperDashboard extends Vue {
 	// private workArr = []; no used now
 	private workNowName: string | null = null;
 	private workNowState: string | null = null;
-	private nowState = null;
+	private nowState = 0;
 
 	private waitTime = 0;
 
@@ -344,12 +344,14 @@ export default class HiperDashboard extends Vue {
 		this.topTemp = this.HexArrToVal(serial, [2, 3]) / 10;
 		this.bottomTemp = this.HexArrToVal(serial, [4, 5]) / 10;
 		//
+		this.pressure = this.HexArrToVal(serial, [6, 7]) / 10;
 		this.vacuum = this.HexArrToVal(serial, [10, 11, 8, 9]) / 100;
 
 		this.flow = this.HexArrToVal(serial, [12, 13]) / 10;
 		this.leaveTime = this.HexArrToVal(serial, [14, 15]) / 10;
 
 		// 狀態號碼轉文字
+		this.nowState = this.HexArrToVal(serial, [48, 49]);
 		this.workNowState = stepState[this.HexArrToVal(serial, [48, 49])];
 		// 工藝名稱轉文字
 		this.workNowName = stepName[this.HexArrToVal(serial, [66, 67])];
@@ -360,33 +362,44 @@ export default class HiperDashboard extends Vue {
 	// 新增 ws 訊息事件
 	private addMsgEvent() {
 		//
-		this.$root.$ws.addEventListener('message', e => {
-			const data = JSON.parse(e.data);
+		this.$root.$on('hiperSerial', (data: IwsSerialMsg) => {
+			console.log(data, 'hiperSerial');
+			this.serialToData(this.$lodash.drop(data.serial, 9));
 
-			// console.log(e);
-			// console.log(data);
-
-			switch (data.channel) {
-				case 'serial':
-					this.serialToData(this.$lodash.drop(data.serial.data, 9));
-
-					if (data.alarm) {
-						// 報警且未回覆，開啟警鈴
-						if (!this.hasResponse) this.$root.$emit('alarmOn');
-					} else {
-						// 關閉警鈴
-						this.$root.$emit('alarmOff');
-					}
-					break;
-				default:
+			if (data.alarm) {
+				if (!this.hasResponse) this.$root.$emit('alarmOn');
+			} else {
+				this.$root.$emit('alarmOff');
 			}
 		});
+
+		// this.$root.$ws.addEventListener('message', e => {
+		// 	const data = JSON.parse(e.data);
+
+		// 	console.log(e);
+		// 	console.log(data);
+
+		// 	switch (data.channel) {
+		// 		case 'serial':
+		// 			this.serialToData(this.$lodash.drop(data.serial.data, 9));
+
+		// 			if (data.alarm) {
+		// 				// 報警且未回覆，開啟警鈴
+		// 				if (!this.hasResponse) this.$root.$emit('alarmOn');
+		// 			} else {
+		// 				// 關閉警鈴
+		// 				this.$root.$emit('alarmOff');
+		// 			}
+		// 			break;
+		// 		default:
+		// 	}
+		// });
 	}
 
 	/**廣播所有客戶端 */
 	private broadcast = this.$lodash.debounce(() => {
 		if (this.isElectron) {
-			this.$ipcRenderer.send('boardcast', { text: 'text', id: 456 });
+			this.$ipcRenderer.send('broadcast', { msg: 'test', color: Colors.Info });
 		}
 	}, 500);
 

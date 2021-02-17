@@ -61,24 +61,30 @@ export interface IwsMessage {
 	furnace: EwsFurnaceType;
 }
 
-export interface IwsOpenMessage extends IwsMessage {
+// Omit => 移除特定屬性
+/**Web socket open message interface */
+export interface IwsOpenMessage extends Omit<IwsMessage, 'furnace'> {
 	text?: string;
 	id?: string;
 }
 
+/**Web socket connected message interface */
 export interface IwsConnectedMessasge extends IwsMessage {
 	connected: boolean;
 }
 
+/**Web socket serial message interface */
 export interface IwsSerialMessage extends IwsMessage {
 	serial: number[];
 	alarm: boolean;
 }
 
+/**Web socket command message interface */
 export interface IwsCommandMessage extends IwsMessage {
 	command: EwsCommand;
 }
 
+/**Web socket command response message interface */
 export interface IwsCommandResMessage extends IwsMessage {
 	text: string;
 }

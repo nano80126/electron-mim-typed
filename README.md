@@ -32,6 +32,9 @@ Status GET https://notify-api.line.me/api/status
  
 Revoke POST https://notify-api.line.me/api/revoke
 
+
+### Check .env variable can be used in node environment even if it is not VUE_APP_XXX format
+
 ### To do list 
 
 * [*] Redirect if wrong path or refresh

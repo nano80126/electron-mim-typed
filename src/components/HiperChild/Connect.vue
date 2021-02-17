@@ -92,9 +92,9 @@ export default class HiperConnect extends Vue {
 	/**嘗試連線中 */
 	private connecting = false;
 	/**IP */
-	private ip = '192.168.50.162';
+	private ip = '192.168.3.18';
 	/**port */
-	private port = 3000;
+	private port = 502;
 	/**取樣頻率 */
 	private interval = 3000;
 
@@ -120,10 +120,6 @@ export default class HiperConnect extends Vue {
 		if (AppModule.isElectron) {
 			if (HiperModule.ip != '') this.ip = HiperModule.ip;
 			if (HiperModule.port != 0) this.port = HiperModule.port;
-
-			console.log(HiperModule);
-			console.log(HiperModule.ip);
-			console.log(HiperModule.port);
 		}
 	}
 

@@ -202,7 +202,7 @@
 								<v-list-item v-else v-bind="attrs" v-on="on" @click="isDarkMode = true">
 									<v-badge color="transparent" overlap style="width: 100%;">
 										<template v-slot:badge>
-											<v-icon x-small color="yellow darken-2">fas fa-sun</v-icon>
+											<v-icon x-small color="yellow darken-4">fas fa-sun</v-icon>
 										</template>
 										<v-list-item-content>
 											<v-icon small>fas fa-adjust</v-icon>

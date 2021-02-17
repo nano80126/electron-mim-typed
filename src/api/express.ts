@@ -1,14 +1,24 @@
 import express from 'express';
 import webSocket from 'ws';
 import path from 'path';
+import crypto from 'crypto';
 import { getLogger } from 'log4js';
 
 import { hiperClient } from './socket_hiper';
 // import { app as electron } from 'electron';
 
-import { EwsChannel, EwsCommand, EwsFurnaceType, IwsCommandMessage, IwsCommandResMessage } from '@/types/main-process';
+import {
+	EwsChannel,
+	EwsCommand,
+	EwsFurnaceType,
+	IwsCommandMessage,
+	IwsCommandResMessage,
+	IwsConnectedMessasge,
+	IwsOpenMessage
+} from '@/types/main-process';
+import { ipcMain } from 'electron';
 
-const log = getLogger('app');
+const appLog = getLogger('app');
 const hiperLog = getLogger('hiper');
 
 const app = express();
@@ -83,13 +93,24 @@ wsServer.on('connection', (socket, req) => {
 	let ip = req.socket.remoteAddress;
 	ip = ip?.replace(/^::ffff:/, '');
 
-	log.info(`One client connected from IP address ${ip}`);
+	appLog.info(`One client connected from IP address ${ip}`);
 
 	// new client connect
-	socket.send(JSON.stringify({ channel: EwsChannel.OPEN, text: 'Hello, new client' }));
+	const helloMsg: IwsOpenMessage = {
+		channel: EwsChannel.OPEN,
+		text: 'Hello, new client',
+		id: crypto.randomBytes(8).toString('hex') // Socket id, not used now
+	};
+	socket.send(JSON.stringify(helloMsg));
 
-	// furnace state
-	socket.send(JSON.stringify({ channel: EwsChannel.CONNECT, state: hiperClient ? hiperClient.connected : false }));
+	// send to client if furnace is connceted
+	const msg: IwsConnectedMessasge = {
+		channel: EwsChannel.CONNECT,
+		furnace: EwsFurnaceType.HIPER,
+		connected: hiperClient ? hiperClient.connected : false
+	};
+	socket.send(JSON.stringify(msg));
+	//
 
 	socket.on('message', msg => {
 		const data = JSON.parse(msg.toString()) as IwsCommandMessage;
@@ -155,11 +176,16 @@ wsServer.on('connection', (socket, req) => {
 });
 
 wsServer.on('error', err => {
-	log.error(`ws server error occurred, ${err.message}`);
+	appLog.error(`ws server error occurred, ${err.message}`);
 });
 
 //
-// ws server 廣播事件?
-//
+// Web socket 廣播事件
+ipcMain.on('broadcast', (e, args) => {
+	const { msg, color } = args;
+	wsServer.clients.forEach(client => {
+		client.send(JSON.stringify({ msg, color }));
+	});
+});
 
 export { wsServer };
