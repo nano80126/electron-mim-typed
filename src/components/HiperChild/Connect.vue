@@ -77,13 +77,17 @@
 				<v-btn color="error darken-2" :disabled="!isConnected" @click="disconnect">斷線</v-btn>
 			</v-card-actions>
 		</v-card>
+
+		<v-row no-gutters class="mt-10">
+			<v-btn color="info" class="offset-9 col-1" @click="resetTab(0)">返回</v-btn>
+		</v-row>
 	</div>
 </template>
 
 <script lang="ts">
 import { AppModule } from '@/store/modules/app';
 import { HiperModule } from '@/store/modules/hiper';
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Emit, Vue } from 'vue-property-decorator';
 
 @Component({})
 export default class HiperConnect extends Vue {
@@ -250,6 +254,11 @@ export default class HiperConnect extends Vue {
 			//
 			console.log('sample', bool == res.sampling);
 		});
+	}
+
+	@Emit('bindTab')
+	private resetTab(tab: number) {
+		return tab;
 	}
 }
 </script>

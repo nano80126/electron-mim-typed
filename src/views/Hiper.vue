@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-tabs v-model="tab" height="36" color="warning" background-color="green darken-3">
+		<v-tabs v-model="tab" height="36" color="warning" background-color="green darken-3" @change="tabChange">
 			<v-tabs-slider color="transparent" />
 			<v-tab class="">
 				<span class="mr-2 font-weight-bold">面板</span>
@@ -23,10 +23,10 @@
 				<Dashboard />
 			</v-tab-item>
 			<v-tab-item>
-				<Linechart />
+				<Linechart ref="chart" />
 			</v-tab-item>
 			<v-tab-item v-if="isElectron">
-				<Connect />
+				<Connect @bindTab="resetTab" />
 			</v-tab-item>
 		</v-tabs-items>
 	</div>
@@ -34,10 +34,10 @@
 
 <script lang="ts">
 import board from '@/components/HiperChild/Dashboard.vue';
-import chart from '@/components/HiperChild/Chart.vue';
+import chart, { ChartComponent } from '@/components/HiperChild/Chart.vue';
 import connect from '@/components/HiperChild/Connect.vue';
 
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Ref, Vue } from 'vue-property-decorator';
 import { AppModule } from '@/store/modules/app';
 
 @Component({
@@ -48,6 +48,8 @@ import { AppModule } from '@/store/modules/app';
 	}
 })
 export default class HIPER extends Vue {
+	@Ref() chart?: ChartComponent;
+
 	/**啟用的 tab */
 	private tab = 0;
 
@@ -57,13 +59,19 @@ export default class HIPER extends Vue {
 	}
 
 	mounted() {
-		// this.$root.$on('alarmToggle', () => {
-		// 	const audio = this.$refs.alarmAudio;
-		// });
+		//
 	}
 
 	beforeDestroy() {
 		//
+	}
+
+	private tabChange() {
+		if (this.chart) this.chart.showMenu = false;
+	}
+
+	private resetTab(tab: number) {
+		this.tab = tab;
 	}
 }
 </script>

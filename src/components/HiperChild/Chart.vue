@@ -109,8 +109,12 @@ import { Component, Vue } from 'vue-property-decorator';
 import Worker from '@/worker';
 // const worker = new Worker();
 
+export interface ChartComponent {
+	showMenu: boolean;
+}
+
 @Component({})
-export default class HiperChart extends Vue {
+export default class HiperChart extends Vue implements ChartComponent {
 	/**曲線圖CSV */
 	private file: File | null = null;
 	/**是否 dragin */
@@ -122,7 +126,7 @@ export default class HiperChart extends Vue {
 	/**chart 物件 */
 	private chart: Chart | null = null;
 	/**顯示 menu */
-	private showMenu = false;
+	public showMenu = false;
 	/**menu X 座標 */
 	private menuX = 0;
 	/**menu Y 座標 */
@@ -136,6 +140,10 @@ export default class HiperChart extends Vue {
 
 	mounted() {
 		//
+	}
+
+	beforeDestroy() {
+		this.showMenu = false;
 	}
 
 	/**input file change event */
