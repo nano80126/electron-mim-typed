@@ -372,28 +372,6 @@ export default class HiperDashboard extends Vue {
 				this.$root.$emit('alarmOff');
 			}
 		});
-
-		// this.$root.$ws.addEventListener('message', e => {
-		// 	const data = JSON.parse(e.data);
-
-		// 	console.log(e);
-		// 	console.log(data);
-
-		// 	switch (data.channel) {
-		// 		case 'serial':
-		// 			this.serialToData(this.$lodash.drop(data.serial.data, 9));
-
-		// 			if (data.alarm) {
-		// 				// 報警且未回覆，開啟警鈴
-		// 				if (!this.hasResponse) this.$root.$emit('alarmOn');
-		// 			} else {
-		// 				// 關閉警鈴
-		// 				this.$root.$emit('alarmOff');
-		// 			}
-		// 			break;
-		// 		default:
-		// 	}
-		// });
 	}
 
 	/**廣播所有客戶端 */

@@ -92,9 +92,9 @@ export default class HiperConnect extends Vue {
 	/**嘗試連線中 */
 	private connecting = false;
 	/**IP */
-	private ip = '192.168.50.162';
+	private ip = '192.168.3.39';
 	/**port */
-	private port = 3000;
+	private port = 1028;
 	/**取樣頻率 */
 	private interval = 3000;
 

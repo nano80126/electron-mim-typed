@@ -102,7 +102,6 @@ ipcMain.handle('conn', async (e, args) => {
 
 	tcpClient = new FSocket();
 	// Object.assign(tcpClient, furnace);
-
 	tcpClient.cron = cronReconn;
 
 	tcpClient.on('close', () => {

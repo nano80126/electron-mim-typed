@@ -7,7 +7,7 @@
 			class="mt-3"
 			:style="{ height: isElectron ? `${$root.webHeight - 140}px` : `${$root.webHeight - 108}px` }"
 		>
-			<v-col class="d-flex flex-column align-start justify-between">
+			<v-col class="d-flex flex-column align-start justify-between red">
 				<v-card class="ml-3" flat outlined width="240px">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">
 						<span class="font-weight-black subtitle-1">連線狀態</span>
@@ -36,27 +36,16 @@
 					</v-card-text>
 				</v-card>
 
-				<div class="ml-3 my-auto" style="position: relative; top: -10%; width: calc(100% - 16px)">
+				<!-- <div class="ml-3 my-auto" style="position: relative; top: -10%; width: calc(100% - 16px)">
 					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
-						<!-- <v-text-field
-							v-model="flow"
-							label="流量"
-							class="flow-text"
-							outlined
-							dense
-							hide-details
-							:loading="flow != 0"
-							readonly
-							style="user-select: none;"
-						></v-text-field> -->
 						<v-chip class="mt-n3 flow-chip d-flex justify-center">
 							<span>{{ flow }}</span>
 							<v-icon class="ml-3" small :color="flow != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
 						</v-chip>
 					</v-sheet>
-				</div>
+				</div> -->
 			</v-col>
-			<v-col cols="auto" class="d-flex flex-column">
+			<v-col cols="auto" class="d-flex flex-column yellow">
 				<v-card
 					class="mx-auto my-auto"
 					max-width="400px"
@@ -65,111 +54,60 @@
 					style="border-radius: 40%;"
 				>
 					<v-card-text class="pa-5">
-						<v-row align="center" justify="start" class=" font-weight-bold subtitle-1">
-							<v-col
-								cols="6"
-								class="text-right"
-								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
-							>
-								溫度設定值:
-							</v-col>
-							<v-col cols="4" class="d-flex justify-space-around">
-								<span>{{ setTemp }}</span>
-								<span>&deg;C</span>
-							</v-col>
-							<!--  -->
-							<v-col
-								cols="6"
-								class="text-right"
-								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
-							>
-								上部溫度當前值:
-							</v-col>
-							<v-col cols="4" class="d-flex justify-space-around">
-								<span>{{ topTemp }}</span>
-								<span>&deg;C</span>
-							</v-col>
-							<!--  -->
-							<v-col
-								cols="6"
-								class="text-right"
-								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
-							>
-								下部溫度當前值:
-							</v-col>
-							<v-col cols="4" class="d-flex justify-space-around">
-								<span>{{ bottomTemp }}</span>
-								<span>&deg;C</span>
-							</v-col>
-							<!--  -->
-							<v-col
-								cols="6"
-								class="text-right"
-								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
-							>
-								爐內壓力值:
-							</v-col>
-							<v-col cols="4" class="d-flex justify-space-around">
-								<span>{{ pressure }}</span>
-								<span>kPa</span>
-							</v-col>
-							<!--  -->
-							<v-col
-								cols="6"
-								class="text-right"
-								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
-							>
-								爐內真空值:
-							</v-col>
-							<v-col cols="4" class="d-flex justify-space-around">
-								<span>{{ vacuum }}</span>
-								<span>Pa</span>
-							</v-col>
-						</v-row>
+						//
 					</v-card-text>
 				</v-card>
 			</v-col>
-			<v-col>
+			<v-col class="blue">
 				<!-- empty for design -->
 			</v-col>
 			<div class="col-12" />
 
 			<v-col cols="4" class="mt-auto">
-				<v-card class="ml-3 rounded-lg" outlined min-width="360" max-height="500" style="">
+				<v-card class="ml-3 rounded-lg" outlined min-width="300" max-height="500" style="">
 					<v-card-text>
 						<v-row align="start" justify="center" class="subtitle-1">
-							<v-col cols="4" class="font-weight-bold  primary--text">
-								當前步剩餘時間:
+							<v-col cols="4" class="font-weight-bold  info--text text--darken-1">
+								溫度設定值(℃)
 							</v-col>
 							<v-col cols="8" class="font-weight-bold text-center d-flex justify-space-around">
-								<span>{{ leaveTime }}</span>
-								<span class="ml-5">分鐘</span>
+								<span>{{ setTemp }}</span>
+								<!-- <span class="ml-5">分鐘</span> -->
 							</v-col>
 							<!--  -->
-							<v-col cols="4" class="font-weight-bold primary--text">
-								當前工藝名稱:
+							<v-col cols="4" class="font-weight-bold info--text text--darken-1">
+								中心溫度(℃)
 							</v-col>
-							<v-col cols="8" class="font-weight-bold text-center info--text">
-								<span>{{ workNowName || '(NULL)' }}</span>
-							</v-col>
-							<!--  -->
-							<v-col cols="4" class="font-weight-bold primary--text">
-								當前工藝狀態:
-							</v-col>
-							<v-col
-								cols="8"
-								class="font-weight-bold text-center"
-								:class="nowState && nowState <= 5 ? 'error--text' : 'info--text'"
-							>
-								<span>{{ workNowState || '(NULL)' }}</span>
+							<v-col cols="8" class="font-weight-bold text-center">
+								<span>{{ centerTemp }}</span>
 							</v-col>
 							<!--  -->
-							<v-col cols="4" class="font-weight-bold primary--text">
-								等待時間:
+							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
+								上部溫度(℃)
 							</v-col>
-							<v-col cols="8" class="font-weight-bold text-center d-flex justify-space-around">
-								<span>{{ waitTime }}</span>
-								<span>分鐘</span>
+							<v-col class="font-weight-bold text-center">
+								<span>{{ topTemp }}</span>
+							</v-col>
+							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
+								下部溫度(℃)
+							</v-col>
+							<v-col class="font-weight-bold text-center">
+								<span>{{ bottomTemp }}</span>
+							</v-col>
+							<!--  -->
+							<div class="col-12 py-0" />
+							<!--  -->
+							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
+								爐內壓力(kPa)
+							</v-col>
+							<v-col class="font-weight-bold text-center">
+								<span>{{ pressure }}</span>
+							</v-col>
+							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
+								爐內真空(Pa)
+							</v-col>
+							<v-col class="font-weight-bold text-center">
+								<span>{{ vacuum }}</span>
 							</v-col>
 						</v-row>
 					</v-card-text>
@@ -191,7 +129,7 @@
 		<v-bottom-navigation v-model="bottomNav" class="mt-3" height="48" @change="resetNav">
 			<v-btn class="d-none">{{ bottomNav }}</v-btn>
 
-			<v-col v-if="isElectron" cols="2" class="text-center">
+			<!-- <v-col v-if="isElectron" cols="2" class="text-center">
 				<v-tooltip top color="info">
 					<template v-slot:activator="{ on, attrs }">
 						<v-btn text class="font-weight-black title" @click="broadcast" v-bind="attrs" v-on="on">
@@ -222,7 +160,7 @@
 					</template>
 					<span>報警鈴響測試</span>
 				</v-tooltip>
-			</v-col>
+			</v-col> -->
 
 			<v-spacer />
 
@@ -264,12 +202,14 @@ import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg } from '@/types/rende
 export default class HiperDashboard extends Vue {
 	//
 	private setTemp = 0;
+	private centerTemp = 0;
 	private topTemp = 0;
 	private bottomTemp = 0;
 	private pressure = 0;
 	private vacuum = 0;
 	//
-	private flow = 0;
+	private flowN2 = 0;
+	private flowAr = 0;
 	private leaveTime = 0;
 	// private workArr = []; no used now
 	private workNowName: string | null = null;
@@ -340,47 +280,12 @@ export default class HiperDashboard extends Vue {
 
 	/**序列轉資料 */
 	private serialToData(serial: number[]) {
-		this.setTemp = this.HexArrToVal(serial, [0, 1]) / 10;
-		this.topTemp = this.HexArrToVal(serial, [2, 3]) / 10;
-		this.bottomTemp = this.HexArrToVal(serial, [4, 5]) / 10;
 		//
-		this.vacuum = this.HexArrToVal(serial, [10, 11, 8, 9]) / 100;
-
-		this.flow = this.HexArrToVal(serial, [12, 13]) / 10;
-		this.leaveTime = this.HexArrToVal(serial, [14, 15]) / 10;
-
-		// 狀態號碼轉文字
-		this.workNowState = stepState[this.HexArrToVal(serial, [48, 49])];
-		// 工藝名稱轉文字
-		this.workNowName = stepName[this.HexArrToVal(serial, [66, 67])];
-
-		this.waitTime = this.HexArrToVal(serial, [52, 53, 50, 51]);
 	}
 
 	// 新增 ws 訊息事件
 	private addMsgEvent() {
 		//
-		this.$root.$ws.addEventListener('message', e => {
-			const data = JSON.parse(e.data);
-
-			console.log(e);
-			console.log(data);
-
-			switch (data.channel) {
-				case 'serial':
-					this.serialToData(this.$lodash.drop(data.serial.data, 9));
-
-					if (data.alarm) {
-						// 報警且未回覆，開啟警鈴
-						if (!this.hasResponse) this.$root.$emit('alarmOn');
-					} else {
-						// 關閉警鈴
-						this.$root.$emit('alarmOff');
-					}
-					break;
-				default:
-			}
-		});
 	}
 
 	/**廣播所有客戶端 */
