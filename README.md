@@ -47,7 +47,7 @@ Revoke POST https://notify-api.line.me/api/revoke
 * [ ] vtech farnace 
 * [ ] Add alarm audio 
 * [ ] Add mongoDB for recording work step history 
-* [ ] Add enum between ipcMain and ipcRenderer
+* [ ] Add enum between ipcMain and ipcRenderer (invoke and handle done ex. connect, disconnect, sample)
  
 ## bugs
 * [ ] Progress is not full when uploading csv
