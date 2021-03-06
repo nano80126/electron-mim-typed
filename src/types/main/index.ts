@@ -89,6 +89,15 @@ export interface IwsCommandResMessage extends IwsMessage {
 	text: string;
 }
 
+/**ipcMain handle socket commnad from ipcRenderer */
+export enum EsocketHandle {
+	CONNECT = 'conn-hiper',
+	DISCONNECT = 'disc-hiper',
+	SAMPLE = 'sample-hipder',
+	ALARMRES = 'alarm-res-hiper',
+	ALARMRST = 'alarm-rst-hipder'
+}
+
 //
 //
 // 以下待刪

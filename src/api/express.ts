@@ -4,7 +4,8 @@ import path from 'path';
 import crypto from 'crypto';
 import { getLogger } from 'log4js';
 
-import { hiperClient } from './socket_hiper';
+import { hiperClient } from '@/api/socket/socket_hiper';
+import { vtechClient } from '@/api/socket/socket_vtech';
 // import { app as electron } from 'electron';
 
 import {
@@ -15,7 +16,7 @@ import {
 	IwsCommandResMessage,
 	IwsConnectedMessasge,
 	IwsOpenMessage
-} from '@/types/main-process';
+} from '@/types/main';
 import { ipcMain } from 'electron';
 
 const appLog = getLogger('app');
@@ -103,7 +104,7 @@ wsServer.on('connection', (socket, req) => {
 	};
 	socket.send(JSON.stringify(helloMsg));
 
-	// send to client if furnace is connceted
+	// send to client if hiper furnace is connceted
 	const msg: IwsConnectedMessasge = {
 		channel: EwsChannel.CONNECT,
 		furnace: EwsFurnaceType.HIPER,

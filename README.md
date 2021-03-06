@@ -35,6 +35,9 @@ Revoke POST https://notify-api.line.me/api/revoke
 
 ### Check .env variable can be used in node environment even if it is not VUE_APP_XXX format
 
+
+### update to electron-11
+
 ### To do list 
 
 * [*] Redirect if wrong path or refresh
@@ -44,6 +47,7 @@ Revoke POST https://notify-api.line.me/api/revoke
 * [ ] vtech farnace 
 * [ ] Add alarm audio 
 * [ ] Add mongoDB for recording work step history 
+* [ ] Add enum between ipcMain and ipcRenderer
  
 ## bugs
 * [ ] Progress is not full when uploading csv

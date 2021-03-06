@@ -87,6 +87,7 @@
 <script lang="ts">
 import { AppModule } from '@/store/modules/app';
 import { HiperModule } from '@/store/modules/hiper';
+import { EsocketInvoke } from '@/types/renderer/socket_hiper';
 import { Component, Emit, Vue } from 'vue-property-decorator';
 
 @Component({})
@@ -167,6 +168,7 @@ export default class HiperConnect extends Vue {
 			}
 
 			console.log(this.$ipcRenderer.eventNames());
+			console.log(EsocketInvoke.CONNECT);
 		}
 	}
 
@@ -221,7 +223,7 @@ export default class HiperConnect extends Vue {
 		this.connecting = true;
 
 		// 設定 IP, port, 間隔, 是否重新連線
-		const ret = await this.$ipcRenderer.invoke('conn', {
+		const ret = await this.$ipcRenderer.invoke(EsocketInvoke.CONNECT, {
 			ip: this.ip,
 			port: this.port,
 			interval: this.interval,
@@ -237,7 +239,7 @@ export default class HiperConnect extends Vue {
 	}
 	/**與設備斷線 */
 	private async disconnect() {
-		const ret = await this.$ipcRenderer.invoke('disc');
+		const ret = await this.$ipcRenderer.invoke(EsocketInvoke.DISCONNECT);
 
 		if (!ret.connected) {
 			// 設定燒結爐已斷線
@@ -250,7 +252,7 @@ export default class HiperConnect extends Vue {
 	private sampleChanged(bool: boolean) {
 		// this.$ipcRenderer.send('sampling', { sampling: bool });
 
-		this.$ipcRenderer.invoke('sampling', { sampling: bool }).then(res => {
+		this.$ipcRenderer.invoke(EsocketInvoke.SAMPLE, { sampling: bool }).then(res => {
 			//
 			console.log('sample', bool == res.sampling);
 		});

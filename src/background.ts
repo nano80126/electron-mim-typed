@@ -16,7 +16,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 // import './api/fastify';
 import './api/log4js';
 import './api/express';
-import './api/socket_hiper';
+import './api/socket/socket_hiper';
 // import './api/crawler';
 // import './api/sharp';
 
@@ -25,7 +25,7 @@ import { registerHotkey, unregisterAllHotKey } from './api/shortcut';
 // import { mongoCLient } from './api/mongo';
 
 // custom types
-import { IchannelLyricsObj } from './types/main-process';
+import { IchannelLyricsObj } from '@/types/main';
 // import './api/mongo';
 
 // Keep a global reference of the window object, if you don't, the window will

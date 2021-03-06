@@ -8,16 +8,16 @@ import moment from 'moment';
 import { getLogger } from 'log4js';
 
 // 主視窗 webContents
-import { mainWin } from '../background';
+import { mainWin } from '@/background';
 
 // 設備工序狀態 & 工序名稱
-import stepName from '../json/stepName.json';
-import stepState from '../json/stepState.json';
+import stepName from '@/json/stepName.json';
+import stepState from '@/json/stepState.json';
 
 // 自定義引入
-import { EwsChannel, EwsFurnaceType, FSocket, IwsConnectedMessasge, IwsSerialMessage } from '@/types/main-process';
-import { message } from './line';
-import { wsServer } from './express';
+import { EwsChannel, EwsFurnaceType, FSocket, IwsConnectedMessasge, IwsSerialMessage } from '@/types/main';
+import { message } from '@/api/line';
+import { wsServer } from '@/api/express';
 // import {  clearInterval } from 'timers';
 
 //
@@ -492,4 +492,4 @@ ipcMain.on('notifySend', (e, args) => {
 // 	return this.toString(16).padStart(2, '0');
 // };
 
-export { tcpClient as hiperClient };
+export { tcpClient as vtechClient };
