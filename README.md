@@ -39,6 +39,7 @@ Revoke POST https://notify-api.line.me/api/revoke
 
 * [*] Redirect if wrong path or refresh
 * [ ] Save IP and port in hipermodule if connected
+* [ ] Divide socket api for two furnace
 * [ ] Login for response and reset alarm 
 * [ ] Use Web Worker to deal data
 * [ ] vtech farnace 

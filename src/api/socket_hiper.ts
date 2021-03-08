@@ -452,6 +452,32 @@ ipcMain.handle('alarm-res', () => {
 			const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
 			tcpClient.write(Buffer.from(arrW));
 		}, 1500);
+
+		/**以下 test */
+		// const arrW = [
+		// 	0x50,
+		// 	0x00,
+		// 	0x00,
+		// 	0xff,
+		// 	0xff,
+		// 	0x03,
+		// 	0x00,
+		// 	0x0c,
+		// 	0x00,
+		// 	0x10,
+		// 	0x00,
+		// 	0x01,
+		// 	0x04,
+		// 	0x00,
+		// 	0x00,
+		// 	0x33,
+		// 	0x01,
+		// 	0x00,
+		// 	0xa8,
+		// 	0x02,
+		// 	0x00
+		// ]; // 讀上部溫度 (D307)
+		// tcpClient.write(Buffer.from(arrW));
 		return { response: true, reset: false };
 	} else {
 		return { error: 'Hiper furnace is not connected' };
