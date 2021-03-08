@@ -394,12 +394,13 @@ export default class HiperDashboard extends Vue {
 		this.$root.$emit('alarmToggle');
 	}
 
+	/**回應警報 */
 	private alarmRes() {
 		//
 		this.$root.$emit('alarmOff');
 		if (this.isElectron) {
 			this.$ipcRenderer
-				.invoke('alarm-res')
+				.invoke('alarm-res-hiper')
 				.then((res: { response: boolean; reset: boolean; error?: string }) => {
 					if (res.error) throw Error(res.error);
 					this.hasResponse = res.response;
@@ -419,12 +420,13 @@ export default class HiperDashboard extends Vue {
 		}
 	}
 
+	/**重置警報 */
 	private alarmReset() {
 		//
 		this.$root.$emit('alarmOff');
 		if (this.isElectron) {
 			this.$ipcRenderer
-				.invoke('alarm-rst')
+				.invoke('alarm-rst-hiper')
 				.then((res: { response: boolean; reset: boolean; error?: string }) => {
 					if (res.error) throw Error(res.error);
 					this.hasResponse = res.response;

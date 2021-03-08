@@ -8,7 +8,7 @@ import {
 	IwsSerialMessage,
 	IwsCommandMessage,
 	IwsCommandResMessage
-} from './main-process';
+} from '../main';
 
 export enum EwsChannel {
 	OPEN = 0,
@@ -36,6 +36,13 @@ export type IwsConnMsg = IwsConnectedMessasge;
 export type IwsSerialMsg = IwsSerialMessage;
 export type IwsCmdMsg = IwsCommandMessage;
 export type IwsCmdResMsg = IwsCommandResMessage;
+
+// export enum EsocketInvoke {
+// 	CONNECT = 'conn-hiper'
+// }
+
+// export enum EsocketOn {}
+//
 
 //
 // 以下待刪
