@@ -36,7 +36,9 @@ Revoke POST https://notify-api.line.me/api/revoke
 ### Check .env variable can be used in node environment even if it is not VUE_APP_XXX format
 
 
-### update to electron-11
+### Update to electron-11
+
+### Use mongodb to save steps
 
 ### To do list 
 
@@ -49,7 +51,7 @@ Revoke POST https://notify-api.line.me/api/revoke
 * [ ] Add alarm audio 
 * [ ] Add mongoDB for recording work step history 
 * [ ] Add enum between ipcMain and ipcRenderer (invoke and handle done ex. connect, disconnect, sample)
- 
+
 ## bugs
 * [ ] Progress is not full when uploading csv
 * [ ] log4js not create log files in logs

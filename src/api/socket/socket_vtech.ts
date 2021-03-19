@@ -399,8 +399,12 @@ const doSample = function(e: IpcMainInvokeEvent) {
 			}
 		}, (tcpClient.interval as number) * 0.5);
 
-		const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x04, 0x00, 0x00, 0x00, 0x22]);
-		tcpClient.write(buf);
+		// const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x04, 0x00, 0x00, 0x00, 0x22]);
+		const c = [0x0c, 0x00]; // 請由資料長度 (2 bytes)
+		// 副標頭(2 bytes) + 網路編號(1 byte) + PC 編號(1 byte) + 請求目標模組IO編號(2 bytes) + 請求資料長度(2 bytes) + 監視計時器(2 bytes)
+		const buf = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, c[0], c[1], 0x01, 0x00];
+
+		tcpClient.write(Buffer.from(buf));
 	} else {
 		tcpClient.samplingState = false; // set sample state off
 		clearInterval(tcpClient.sampler as NodeJS.Timer);

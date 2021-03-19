@@ -17,6 +17,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 import './api/log4js';
 import './api/express';
 import './api/socket/socket_hiper';
+import './api/socket/socket_vtech';
 // import './api/crawler';
 // import './api/sharp';
 
