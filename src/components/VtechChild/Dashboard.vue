@@ -7,7 +7,7 @@
 			class="mt-3"
 			:style="{ height: isElectron ? `${$root.webHeight - 140}px` : `${$root.webHeight - 108}px` }"
 		>
-			<v-col class="d-flex flex-column align-start justify-between red">
+			<v-col class="d-flex flex-column align-start justify-between" cols="auto">
 				<v-card class="ml-3" flat outlined width="240px">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">
 						<span class="font-weight-black subtitle-1">連線狀態</span>
@@ -45,7 +45,7 @@
 					</v-sheet>
 				</div> -->
 			</v-col>
-			<v-col cols="auto" class="d-flex flex-column yellow">
+			<!-- <v-col cols="auto" class="d-flex flex-column yellow">
 				<v-card
 					class="mx-auto my-auto"
 					max-width="400px"
@@ -57,9 +57,61 @@
 						//
 					</v-card-text>
 				</v-card>
-			</v-col>
-			<v-col class="blue">
+			</v-col> -->
+			<v-col cols="" class="d-flex align-start justify-between blue">
 				<!-- empty for design -->
+				<v-card width="550" class="mt-5">
+					<v-card-title class="">
+						<v-avatar></v-avatar>
+						<v-row>
+							<v-col>當前步</v-col>
+							<v-col>{{ workNowName }}</v-col>
+							<v-col>剩餘時間</v-col>
+							<v-col>{{ leaveTime }}</v-col>
+						</v-row>
+					</v-card-title>
+
+					<v-card-text>
+						<v-timeline align-top dense>
+							<v-timeline-item v-for="m in [1, 2, 4, 5]" :key="m" small>
+								<div class="font-weight-normal">
+									<strong>{{ m }}</strong>
+								</div>
+							</v-timeline-item>
+						</v-timeline>
+					</v-card-text>
+				</v-card>
+
+				<!-- <div class="" style="position: relative; top: -10%; min-width: 200px"> -->
+				<div class="" style="position: relative; min-width: 200px;">
+					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative; top: -10%;">
+						<v-chip class="mt-n3 flow-chip d-flex justify-center">
+							<span>{{ flowN2 }}</span>
+							<v-icon class="ml-3" small :color="flowN2 != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
+						</v-chip>
+					</v-sheet>
+
+					<v-sheet
+						height="8px"
+						color="grey darken-2"
+						elevation="2"
+						style="position: relative; margin-top: 50%;"
+					>
+						<v-chip class="mt-n3 flow-chip d-flex justify-center">
+							<span>{{ flowAr }}</span>
+							<v-icon class="ml-3" small :color="flowAr != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
+						</v-chip>
+					</v-sheet>
+				</div>
+
+				<!-- <div class="ml-3" style="position: relative; top: -10%; width: 200px">
+					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
+						<v-chip class="mt-n3 flow-chip d-flex justify-center">
+							<span>{{ flowN2 }}</span>
+							<v-icon class="ml-3" small :color="flow != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
+						</v-chip>
+					</v-sheet>
+				</div> -->
 			</v-col>
 			<div class="col-12" />
 
@@ -98,11 +150,21 @@
 							<div class="col-12 py-0" />
 							<!--  -->
 							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
+								管道壓力(kPa)
+							</v-col>
+							<v-col class="font-weight-bold text-center">
+								<span>{{ tubePres }}</span>
+							</v-col>
+							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
 								爐內壓力(kPa)
 							</v-col>
 							<v-col class="font-weight-bold text-center">
-								<span>{{ pressure }}</span>
+								<span>{{ furnacePres }}</span>
 							</v-col>
+							<!--  -->
+							<div class="col-12 py-0" />
+							<!--  -->
+
 							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
 								爐內真空(Pa)
 							</v-col>
@@ -205,7 +267,11 @@ export default class HiperDashboard extends Vue {
 	private centerTemp = 0;
 	private topTemp = 0;
 	private bottomTemp = 0;
-	private pressure = 0;
+
+	/**管道壓力 */
+	private tubePres = 0;
+	/**爐內壓力 */
+	private furnacePres = 0;
 	private vacuum = 0;
 	//
 	private flowN2 = 0;

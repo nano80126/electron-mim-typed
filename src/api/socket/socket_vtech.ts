@@ -3,7 +3,7 @@
 // import net from 'net';
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
 import { CronJob } from 'cron';
-import { drop } from 'lodash';
+import { drop, flatten } from 'lodash';
 import moment from 'moment';
 import { getLogger } from 'log4js';
 
@@ -400,11 +400,44 @@ const doSample = function(e: IpcMainInvokeEvent) {
 		}, (tcpClient.interval as number) * 0.5);
 
 		// const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x04, 0x00, 0x00, 0x00, 0x22]);
-		const c = [0x0c, 0x00]; // 請由資料長度 (2 bytes)
+		// const leng = [0x3c, 0x00]; // 請由資料長度 (2 bytes)
 		// 副標頭(2 bytes) + 網路編號(1 byte) + PC 編號(1 byte) + 請求目標模組IO編號(2 bytes) + 請求資料長度(2 bytes) + 監視計時器(2 bytes)
-		const buf = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, c[0], c[1], 0x01, 0x00];
+		// const cmd = [0x01, 0x04, 0x00, 0x00, 0x33, 0x01, 0x00, 0xa8, 0x01, 0x00];
+		const cmd = [0x03, 0x04, 0x00, 0x00]; // cmd, subcmd
+		// const addrW1 = [0x24, 0x01, 0x00, 0xa8, 0x33, 0x01, 0x00, 0xa8, 0x89, 0x01, 0x00, 0xa8, 0x3a, 0x01, 0x00, 0xa8]; // addr of temp
+		// const addrW2 = [0x14, 0x00, 0x00, 0xa8]; // addr of presure
+		// const addrW3 = [0x17, 0x00, 0x00, 0xa8, 0x18, 0x00, 0x00, 0xa8]; // addr of N2, Ar
+		// const addrW4 = [0x51, 0x00, 0x00, 0xa8, 0x23, 0x01, 0x00, 0xa8]; // addr of leave time, step name
+		// const addrW5 = [0x70, 0x00, 0x00, 0x90]; // addr of step status
+		// const addrW6 = [0x6e, 0x00, 0x00, 0xa8, 0x6f, 0x00, 0x00, 0xa8, 0x70, 0x00, 0x00, 0xa8]; // addr of wait time
 
+		let addrW: number[] | number[][] = [
+			[0x24, 0x01, 0x00, 0xa8, 0x33, 0x01, 0x00, 0xa8, 0x89, 0x01, 0x00, 0xa8, 0x3a, 0x01, 0x00, 0xa8], // addr of temp
+			[0x14, 0x00, 0x00, 0xa8, 0x15, 0x00, 0x00, 0xa8], // addr of furnace presure, tube presure
+			[0x17, 0x00, 0x00, 0xa8, 0x18, 0x00, 0x00, 0xa8], // addr of N2, Ar
+			[0x51, 0x00, 0x00, 0xa8, 0x23, 0x01, 0x00, 0xa8], // addr of leave time, step name
+			[0x0c, 0x00, 0x00, 0x90], // addr of step status
+			[0x6e, 0x00, 0x00, 0xa8, 0x6f, 0x00, 0x00, 0xa8, 0x70, 0x00, 0x00, 0xa8] // addr of wait time
+		];
+		const addrDw = [0x1f, 0x00, 0x00, 0xa8];
+		addrW = flatten(addrW); // 平整化陣列
+		// const addrW = addrW1.concat(addrW2, addrW3, addrW4, addrW5, addrW6); // concat addr of word type
+
+		const nb = [addrW.length / 4, addrDw.length / 4]; // word length, dbword length // length of else, length of vacuum
+
+		const l = 2 + cmd.length + nb.length + addrW.length + addrDw.length; // 2 + 4 + 2 + 15 * 4 + 1 * 4
+		const leng = [l & 0xff, (l & 0xff00) >> 8];
+
+		// 副標頭(2 bytes) + 網路編號(1 byte) + PC 編號(1 byte) + 請求目標模組IO編號(2 bytes) + 請求資料長度(2 bytes) + 監視計時器(2 bytes)
+		const head = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, leng[0], leng[1], 0x01, 0x00];
+
+		const buf = head.concat(cmd, nb, addrW, addrDw); // 合併陣列
+		console.log(buf);
+		// tcpClient.write(Buffer.from(buf));
 		tcpClient.write(Buffer.from(buf));
+
+		///
+		doErrorCatch();
 	} else {
 		tcpClient.samplingState = false; // set sample state off
 		clearInterval(tcpClient.sampler as NodeJS.Timer);
@@ -419,6 +452,26 @@ const startSample = function(e: IpcMainInvokeEvent) {
 	tcpClient.samplingState = true;
 	tcpClient.sampler = setInterval(() => doSample(e), tcpClient.interval as number);
 	doSample(e);
+};
+
+const doErrorCatch = function() {
+	if (tcpClient.writable) {
+		//
+		const cmd = [0x01, 0x04, 0x00, 0x00];
+		const addr = [0xbc, 0x02, 0x00, 0x90, 0x04, 0x00]; // M700 ~ M759 60 bits <= 16 * 4
+
+		const l = 2 + cmd.length + addr.length;
+		const leng = [l & 0xff, (l & 0xff) >> 8];
+
+		const head = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, leng[0], leng[1], 0x01, 0x00];
+
+		const buf = head.concat(cmd, addr);
+		console.log(buf);
+		//
+		tcpClient.write(Buffer.from(buf));
+	} else {
+		// do nothing
+	}
 };
 
 // 處理取樣命令
