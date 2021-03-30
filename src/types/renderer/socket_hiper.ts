@@ -5,9 +5,9 @@
 export enum EsocketInvoke {
 	CONNECT = 'conn-hiper',
 	DISCONNECT = 'disc-hiper',
-	SAMPLE = 'sample-hipder',
+	SAMPLE = 'sample-hiper',
 	ALARMRES = 'alarm-res-hiper',
-	ALARMRST = 'alarm-rst-hipder'
+	ALARMRST = 'alarm-rst-hiper'
 }
 
 /**ipcRenderer send command enum invoke ipcMain to do something

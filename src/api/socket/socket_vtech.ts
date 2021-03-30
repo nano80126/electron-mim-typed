@@ -15,7 +15,14 @@ import stepName from '@/json/stepName.json';
 import stepState from '@/json/stepState.json';
 
 // 自定義引入
-import { EwsChannel, EwsFurnaceType, FSocket, IwsConnectedMessasge, IwsSerialMessage } from '@/types/main';
+import {
+	EsocketVtechHandle,
+	EwsChannel,
+	EwsFurnaceType,
+	FSocket,
+	IwsConnectedMessasge,
+	IwsSerialMessage
+} from '@/types/main';
 import { message } from '@/api/line';
 import { wsServer } from '@/api/express';
 // import {  clearInterval } from 'timers';
@@ -24,7 +31,7 @@ import { wsServer } from '@/api/express';
 // 配置 log
 //
 // const appPath = app.getAppPath();
-const log = getLogger('hiper');
+const log = getLogger('vtech');
 
 // log.info('create new log for test, 測試新log');
 // // // // // // // // // // // // // // //
@@ -32,7 +39,7 @@ const log = getLogger('hiper');
 /**宣告 client */
 let tcpClient: FSocket;
 
-log.info('Start daily notification of Hiper furnace');
+log.info('Start daily notification of Vtech furnace');
 new CronJob(
 	'0 30 17,22 * * 0-6',
 	() => {
@@ -92,7 +99,7 @@ const cronReconn = new CronJob(
 );
 
 /**connect 要求 */
-ipcMain.handle('conn', async (e, args) => {
+ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 	const ip = args.ip as string;
 	const port = args.port as number;
 	const interval = args.interval as number;
@@ -347,7 +354,7 @@ ipcMain.handle('conn', async (e, args) => {
 });
 
 // 處理斷線請求
-ipcMain.handle('disc', async () => {
+ipcMain.handle(EsocketVtechHandle.DISCONNECT, async () => {
 	tcpClient.handleDisc = true; // 手動斷線
 
 	const promise = await new Promise(resolve => {
@@ -475,7 +482,7 @@ const doErrorCatch = function() {
 };
 
 // 處理取樣命令
-ipcMain.handle('sampling', (e, args) => {
+ipcMain.handle(EsocketVtechHandle.SAMPLE, (e, args) => {
 	const { sampling } = args;
 
 	if (sampling) {
@@ -495,53 +502,31 @@ ipcMain.handle('sampling', (e, args) => {
 	return { sampling: sampling };
 });
 
-ipcMain.handle('alarm-res', () => {
+/**處理警報回應命令 */
+ipcMain.handle(EsocketVtechHandle.ALARMRES, () => {
 	log.info('handle alarm response');
 	console.log('handle alarm response');
 	if (tcpClient && tcpClient.writable) {
 		// 報警應答
-		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
-		tcpClient.write(Buffer.from(arrW));
+		// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
+		// tcpClient.write(Buffer.from(arrW));
 
-		// 等待 1500 ms
-		setTimeout(() => {
-			// 關閉應答
-			const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
-			tcpClient.write(Buffer.from(arrW));
-		}, 1500);
+		// // 等待 1500 ms
+		// setTimeout(() => {
+		// 	// 關閉應答
+		// 	const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
+		// 	tcpClient.write(Buffer.from(arrW));
+		// }, 1500);
 
-		/**以下 test */
-		// const arrW = [
-		// 	0x50,
-		// 	0x00,
-		// 	0x00,
-		// 	0xff,
-		// 	0xff,
-		// 	0x03,
-		// 	0x00,
-		// 	0x0c,
-		// 	0x00,
-		// 	0x10,
-		// 	0x00,
-		// 	0x01,
-		// 	0x04,
-		// 	0x00,
-		// 	0x00,
-		// 	0x33,
-		// 	0x01,
-		// 	0x00,
-		// 	0xa8,
-		// 	0x02,
-		// 	0x00
-		// ]; // 讀上部溫度 (D307)
 		// tcpClient.write(Buffer.from(arrW));
 		return { response: true, reset: false };
 	} else {
-		return { error: 'Hiper furnace is not connected' };
+		return { error: 'Vtech furnace is not connected' };
 	}
 });
 
-ipcMain.handle('alarm-rst', () => {
+/**處理警報重製命令 */
+ipcMain.handle(EsocketVtechHandle.ALARMRST, () => {
 	log.info('handle alarm reset');
 	if (tcpClient && tcpClient.writable) {
 		// 報警重置
@@ -555,7 +540,7 @@ ipcMain.handle('alarm-rst', () => {
 		}, 1500);
 		return { response: false, reset: true };
 	} else {
-		return { error: 'Hiper furnace is not connected' };
+		return { error: 'Vtech furnace is not connected' };
 	}
 });
 

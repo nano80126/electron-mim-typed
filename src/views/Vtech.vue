@@ -12,17 +12,17 @@
 			</v-tab> -->
 			<v-spacer></v-spacer>
 
-			<v-tab class="">
+			<v-tab v-if="isElectron">
 				<span class="mr-2 font-weight-bold">連線</span>
 				<v-icon small>fas fa-network-wired</v-icon>
 			</v-tab>
 		</v-tabs>
 
 		<v-tabs-items v-model="tab" class="transparent">
-			<v-tab-item transition="slide-x-transition">
+			<v-tab-item>
 				<Dashboard />
 			</v-tab-item>
-			<v-tab-item transition="slide-x-transition">
+			<v-tab-item v-if="isElectron">
 				<Connect />
 			</v-tab-item>
 		</v-tabs-items>
@@ -34,6 +34,7 @@ import board from '@/components/VtechChild/Dashboard.vue';
 import connect from '@/components/VtechChild/Connect.vue';
 
 import { Component, Vue } from 'vue-property-decorator';
+import { AppModule } from '@/store/modules/app';
 
 @Component({
 	components: {
@@ -44,5 +45,10 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class HIPER extends Vue {
 	/**啟用的 tab */
 	private tab = 0;
+
+	/**是否為electron */
+	get isElectron() {
+		return AppModule.isElectron;
+	}
 }
 </script>

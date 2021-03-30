@@ -16,7 +16,7 @@ import stepState from '@/json/stepState.json';
 
 // 自定義引入
 import {
-	EsocketHandle,
+	EsocketHiperHandle,
 	EwsChannel,
 	EwsFurnaceType,
 	FSocket,
@@ -105,7 +105,7 @@ const cronReconn = new CronJob(
 );
 
 /**處理連線要求 */
-ipcMain.handle(EsocketHandle.CONNECT, async (e, args) => {
+ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 	const ip = args.ip as string;
 	const port = args.port as number;
 	const interval = args.interval as number;
@@ -362,7 +362,7 @@ ipcMain.handle(EsocketHandle.CONNECT, async (e, args) => {
 });
 
 // 處理斷線請求
-ipcMain.handle(EsocketHandle.DISCONNECT, async () => {
+ipcMain.handle(EsocketHiperHandle.DISCONNECT, async () => {
 	// 手動斷線
 	tcpClient.handleDisc = true;
 	// 若 cron 執行中，則停止
@@ -437,7 +437,7 @@ const startSample = function(e: IpcMainInvokeEvent) {
 };
 
 // 處理取樣命令
-ipcMain.handle(EsocketHandle.SAMPLE, (e, args) => {
+ipcMain.handle(EsocketHiperHandle.SAMPLE, (e, args) => {
 	const { sampling } = args;
 
 	if (sampling) {
@@ -458,7 +458,7 @@ ipcMain.handle(EsocketHandle.SAMPLE, (e, args) => {
 });
 
 /**處理警報回應命令 */
-ipcMain.handle(EsocketHandle.ALARMRES, () => {
+ipcMain.handle(EsocketHiperHandle.ALARMRES, () => {
 	log.info('handle alarm response');
 	console.log('handle alarm response');
 	if (tcpClient && tcpClient.writable) {
@@ -479,7 +479,7 @@ ipcMain.handle(EsocketHandle.ALARMRES, () => {
 });
 
 /**處理警報重置命令 */
-ipcMain.handle(EsocketHandle.ALARMRST, () => {
+ipcMain.handle(EsocketHiperHandle.ALARMRST, () => {
 	log.info('handle alarm reset');
 	if (tcpClient && tcpClient.writable) {
 		// 報警重置
