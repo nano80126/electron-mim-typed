@@ -167,11 +167,12 @@ ipcMain.handle('conn', async (e, args) => {
 				const strArr = Array.from(str);
 				console.log(strArr);
 
-				if (strArr[7] == 5) {
-					// 寫線圈回傳
-					console.log('Response of writing coil: ', strArr);
-					return;
-				}
+				// 寫coil回傳
+				// if (strArr[7] == 5) {
+				// 	// 寫線圈回傳
+				// 	console.log('Response of writing coil: ', strArr);
+				// 	return;
+				// }
 
 				// 有回應，清除Timeout notify
 				clearTimeout(tcpClient.samplingTimeoutTimer as NodeJS.Timeout);
@@ -435,9 +436,8 @@ const doSample = function(e: IpcMainInvokeEvent) {
 		console.log(buf);
 		// tcpClient.write(Buffer.from(buf));
 		tcpClient.write(Buffer.from(buf));
-
 		///
-		doErrorCatch();
+		// doErrorCatch();
 	} else {
 		tcpClient.samplingState = false; // set sample state off
 		clearInterval(tcpClient.sampler as NodeJS.Timer);

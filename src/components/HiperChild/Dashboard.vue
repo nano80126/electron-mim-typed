@@ -65,7 +65,7 @@
 					style="border-radius: 40%;"
 				>
 					<v-card-text class="pa-5">
-						<v-row align="center" justify="start" class=" font-weight-bold subtitle-1">
+						<v-row align="center" justify="start" class="font-weight-bold subtitle-1">
 							<v-col
 								cols="6"
 								class="text-right"
@@ -138,7 +138,7 @@
 				<v-card class="ml-3 rounded-lg" outlined min-width="360" max-height="500" style="">
 					<v-card-text>
 						<v-row align="start" justify="center" class="subtitle-1">
-							<v-col cols="4" class="font-weight-bold  primary--text">
+							<v-col cols="4" class="font-weight-bold primary--text">
 								當前步剩餘時間:
 							</v-col>
 							<v-col cols="8" class="font-weight-bold text-center d-flex justify-space-around">
@@ -338,7 +338,7 @@ export default class HiperDashboard extends Vue {
 		return val;
 	}
 
-	/**序列轉資料 */
+	/**序列轉資料  */
 	private serialToData(serial: number[]) {
 		this.setTemp = this.HexArrToVal(serial, [0, 1]) / 10;
 		this.topTemp = this.HexArrToVal(serial, [2, 3]) / 10;

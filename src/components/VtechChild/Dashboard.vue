@@ -7,7 +7,7 @@
 			class="mt-3"
 			:style="{ height: isElectron ? `${$root.webHeight - 140}px` : `${$root.webHeight - 108}px` }"
 		>
-			<v-col class="d-flex flex-column align-start justify-between" cols="auto">
+			<v-col class="d-flex flex-column align-start justify-between">
 				<v-card class="ml-3" flat outlined width="240px">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">
 						<span class="font-weight-black subtitle-1">連線狀態</span>
@@ -36,30 +36,113 @@
 					</v-card-text>
 				</v-card>
 
-				<!-- <div class="ml-3 my-auto" style="position: relative; top: -10%; width: calc(100% - 16px)">
+				<div class="ml-3 my-auto" style="position: relative; top: 0%; width: calc(100% - 16px)">
 					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
 						<v-chip class="mt-n3 flow-chip d-flex justify-center">
-							<span>{{ flow }}</span>
-							<v-icon class="ml-3" small :color="flow != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
+							<span>氮氣流量</span>
+							<span class="mx-3">{{ flowN2 }}</span>
+							<v-icon small :color="flowN2 != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
 						</v-chip>
 					</v-sheet>
-				</div> -->
+				</div>
+
+				<div class="ml-3 my-auto" style="position: relative; top: -20%; width: calc(100% - 16px)">
+					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
+						<v-chip class="mt-n3 flow-chip d-flex justify-center">
+							<span>氬氣流量</span>
+							<span class="mx-3">{{ flowAr }}</span>
+							<v-icon small :color="flowAr != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
+						</v-chip>
+					</v-sheet>
+				</div>
 			</v-col>
-			<!-- <v-col cols="auto" class="d-flex flex-column yellow">
+			<v-col cols="auto" class="d-flex flex-column">
 				<v-card
 					class="mx-auto my-auto"
-					max-width="400px"
+					max-width="520px"
 					color="grey"
 					:class="isDarkMode ? 'darken-2' : 'lighten-3'"
 					style="border-radius: 40%;"
 				>
-					<v-card-text class="pa-5">
-						//
+					<v-card-text class="pa-10">
+						<v-row align="center" justify="start" class="font-weight-bold subtitle-1">
+							<v-col
+								cols="6"
+								class="text-right"
+								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
+							>
+								溫度設定值(℃)
+							</v-col>
+							<v-col cols="4" class="text-center">
+								<span>{{ setTemp }}</span>
+							</v-col>
+							<!--  -->
+							<v-col
+								cols="6"
+								class="text-right"
+								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
+							>
+								中心溫度(℃)
+							</v-col>
+							<v-col cols="4" class="text-center">
+								<span>{{ centerTemp }}</span>
+							</v-col>
+							<!--  -->
+							<v-col
+								cols="4"
+								class="text-right"
+								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
+							>
+								上部溫度(℃)
+							</v-col>
+							<v-col cols="2" class="text-center">
+								<span>{{ topTemp }}</span>
+							</v-col>
+							<v-col
+								class="text-right"
+								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
+							>
+								下部溫度(℃)
+							</v-col>
+							<v-col cols="2" class="text-center">
+								<span>{{ bottomTemp }}</span>
+							</v-col>
+							<!--  -->
+							<v-col
+								cols="4"
+								class="text-right"
+								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
+							>
+								管道壓力(kPa)
+							</v-col>
+							<v-col cols="2" class="text-center">
+								<span>{{ tubePres }}</span>
+							</v-col>
+							<v-col
+								class="text-right"
+								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
+							>
+								爐內壓力(kPa)
+							</v-col>
+							<v-col cols="2" class="text-center">
+								<span>{{ furnacePres }}</span>
+							</v-col>
+							<!--  -->
+							<v-col
+								cols="6"
+								class="text-right"
+								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
+							>
+								爐內真空(Pa)
+							</v-col>
+							<v-col cols="4" class="text-center">
+								<span>{{ vacuum }}</span>
+							</v-col>
+						</v-row>
 					</v-card-text>
 				</v-card>
-			</v-col> -->
-			<v-col cols="" class="d-flex align-start justify-between blue">
-				<!-- empty for design -->
+			</v-col>
+			<!-- <v-col cols="" class="d-flex align-start justify-between">
 				<v-card width="550" class="mt-5">
 					<v-card-title class="">
 						<v-avatar></v-avatar>
@@ -82,7 +165,6 @@
 					</v-card-text>
 				</v-card>
 
-				<!-- <div class="" style="position: relative; top: -10%; min-width: 200px"> -->
 				<div class="" style="position: relative; min-width: 200px;">
 					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative; top: -10%;">
 						<v-chip class="mt-n3 flow-chip d-flex justify-center">
@@ -103,73 +185,51 @@
 						</v-chip>
 					</v-sheet>
 				</div>
-
-				<!-- <div class="ml-3" style="position: relative; top: -10%; width: 200px">
-					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
-						<v-chip class="mt-n3 flow-chip d-flex justify-center">
-							<span>{{ flowN2 }}</span>
-							<v-icon class="ml-3" small :color="flow != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
-						</v-chip>
-					</v-sheet>
-				</div> -->
+			</v-col> -->
+			<v-col>
+				<!-- empty for design -->
 			</v-col>
 			<div class="col-12" />
 
 			<v-col cols="4" class="mt-auto">
-				<v-card class="ml-3 rounded-lg" outlined min-width="300" max-height="500" style="">
+				<v-card class="ml-3 rounded-lg" outlined min-width="360" max-height="500" style="">
 					<v-card-text>
 						<v-row align="start" justify="center" class="subtitle-1">
-							<v-col cols="4" class="font-weight-bold  info--text text--darken-1">
-								溫度設定值(℃)
+							<v-col cols="4" class="font-weight-bold info--text">
+								<!-- 溫度設定值(℃) -->
+								當前步剩餘時間:
 							</v-col>
 							<v-col cols="8" class="font-weight-bold text-center d-flex justify-space-around">
-								<span>{{ setTemp }}</span>
-								<!-- <span class="ml-5">分鐘</span> -->
+								<span>{{ leaveTime }}</span>
+								<span class="ml-5">分鐘</span>
 							</v-col>
 							<!--  -->
-							<v-col cols="4" class="font-weight-bold info--text text--darken-1">
-								中心溫度(℃)
+							<v-col cols="4" class="font-weight-bold info--text">
+								<!-- 中心溫度(℃) -->
+								當前工藝名稱:
 							</v-col>
-							<v-col cols="8" class="font-weight-bold text-center">
-								<span>{{ centerTemp }}</span>
-							</v-col>
-							<!--  -->
-							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
-								上部溫度(℃)
-							</v-col>
-							<v-col class="font-weight-bold text-center">
-								<span>{{ topTemp }}</span>
-							</v-col>
-							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
-								下部溫度(℃)
-							</v-col>
-							<v-col class="font-weight-bold text-center">
-								<span>{{ bottomTemp }}</span>
+							<v-col cols="8" class="font-weight-bold text-center info--text">
+								<!-- <span>{{ centerTemp }}</span> -->
+								<span>{{ workNowName || '(NULL)' }}</span>
 							</v-col>
 							<!--  -->
-							<div class="col-12 py-0" />
-							<!--  -->
-							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
-								管道壓力(kPa)
+							<v-col cols="4" class="font-weight-bold primary--text">
+								當前工藝狀態:
 							</v-col>
-							<v-col class="font-weight-bold text-center">
-								<span>{{ tubePres }}</span>
-							</v-col>
-							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
-								爐內壓力(kPa)
-							</v-col>
-							<v-col class="font-weight-bold text-center">
-								<span>{{ furnacePres }}</span>
+							<v-col
+								cols="8"
+								class="font-weight-bold text-center"
+								:class="nowState && nowState <= 5 ? 'error--text' : 'info--text'"
+							>
+								<span>{{ workNowState || '(NULL)' }}</span>
 							</v-col>
 							<!--  -->
-							<div class="col-12 py-0" />
-							<!--  -->
-
-							<v-col cols="auto" class="font-weight-bold info--text text--darken-1">
-								爐內真空(Pa)
+							<v-col cols="4" class="font-weight-bold primary--text">
+								等待時間:
 							</v-col>
-							<v-col class="font-weight-bold text-center">
-								<span>{{ vacuum }}</span>
+							<v-col cols="8" class="font-weight-bold text-center d-flex justify-space-around">
+								<span>{{ waitTime }}</span>
+								<span>分鐘</span>
 							</v-col>
 						</v-row>
 					</v-card-text>
