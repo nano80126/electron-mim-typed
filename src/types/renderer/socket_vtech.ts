@@ -20,6 +20,10 @@ export enum EsocketSend {}
  *
  * Furnace: VTECH
  */
-export enum EsocketOn {}
+export enum EsocketOn {
+	CONNECTIONERROR = 'conn-error-vtech',
+	CONNECTIONSUCCESS = 'conn-success-vtech',
+	SAMPLINGCHANGED = 'sampling-changed-vtech'
+}
 //
 //

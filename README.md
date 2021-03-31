@@ -51,6 +51,8 @@ Revoke POST https://notify-api.line.me/api/revoke
 * [ ] Add alarm audio 
 * [ ] Add mongoDB for recording work step history 
 * [ ] Add enum between ipcMain and ipcRenderer (invoke and handle done ex. connect, disconnect, sample)
+* [ ] Vtech Connect.vue 返回
+* [ ] Make sure no duplicated mutation exist in hiper and vtech module
 
 ## bugs
 * [ ] Progress is not full when uploading csv

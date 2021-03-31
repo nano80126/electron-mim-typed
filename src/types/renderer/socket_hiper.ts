@@ -1,6 +1,6 @@
-/**ipcRenderer invoke command enum invoke ipcMain to do something
+/** ipcRenderer invoke command enum invoke ipcMain to do something
  *
- * Furnace: HIPER
+ *  Furnace: HIPER
  */
 export enum EsocketInvoke {
 	CONNECT = 'conn-hiper',
@@ -10,16 +10,20 @@ export enum EsocketInvoke {
 	ALARMRST = 'alarm-rst-hiper'
 }
 
-/**ipcRenderer send command enum invoke ipcMain to do something
+/** ipcRenderer send command enum invoke ipcMain to do something
  *
- * Furnace: HIPER
+ *  Furnace: HIPER
  */
 export enum EsocketSend {}
 
-/**ipcRender On event when get send command from ipcMain
+/** ipcRender On event when get send command from ipcMain
  *
- * Furnace: HIPER
+ *  Furnace: HIPER
  */
-export enum EsocketOn {}
+export enum EsocketOn {
+	CONNECTIONERROR = 'conn-error-hiper',
+	CONNECTIONSUCCESS = 'conn-success-hiper',
+	SAMPLINGCHANGED = 'sampling-changed-hiper'
+}
 //
 //

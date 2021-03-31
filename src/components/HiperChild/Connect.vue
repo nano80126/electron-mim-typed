@@ -87,7 +87,8 @@
 <script lang="ts">
 import { AppModule } from '@/store/modules/app';
 import { HiperModule } from '@/store/modules/hiper';
-import { EsocketInvoke } from '@/types/renderer/socket_hiper';
+import { VtechModule } from '@/store/modules/vtech';
+import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_hiper';
 import { Component, Emit, Vue } from 'vue-property-decorator';
 
 @Component({})
@@ -130,11 +131,11 @@ export default class HiperConnect extends Vue {
 
 	mounted() {
 		if (AppModule.isElectron) {
-			if (!this.$ipcRenderer.eventNames().includes('conn-error')) {
-				console.info('%cRegister conn-error', 'color: #2196f3');
+			if (!this.$ipcRenderer.eventNames().includes(EsocketOn.CONNECTIONERROR)) {
+				console.info(`%cRegister ${EsocketOn.CONNECTIONERROR}`, 'color: #2196f3');
 				//
-				this.$ipcRenderer.on('conn-error', (e, args) => {
-					HiperModule.changeConnected(args.connected);
+				this.$ipcRenderer.on(EsocketOn.CONNECTIONERROR, (e, args) => {
+					HiperModule.changeConnected1(args.connected);
 
 					if (args.error) {
 						//
@@ -143,11 +144,11 @@ export default class HiperConnect extends Vue {
 				});
 			}
 
-			if (!this.$ipcRenderer.eventNames().includes('conn-success')) {
-				console.info('%cRegister conn-success', 'color: #2196f3');
+			if (!this.$ipcRenderer.eventNames().includes(EsocketOn.CONNECTIONSUCCESS)) {
+				console.info(`%cRegister ${EsocketOn.CONNECTIONSUCCESS}`, 'color: #2196f3');
 				//
-				this.$ipcRenderer.on('conn-success', (e, args) => {
-					HiperModule.changeConnected(args.connected);
+				this.$ipcRenderer.on(EsocketOn.CONNECTIONSUCCESS, (e, args) => {
+					HiperModule.changeConnected1(args.connected);
 					console.info(`%cIP: ${args.remoteIP}:${args.remotePort}`, 'color: #4CAF50;');
 
 					if (!args.error) {
@@ -159,10 +160,10 @@ export default class HiperConnect extends Vue {
 				});
 			}
 
-			if (!this.$ipcRenderer.eventNames().includes('sample-change')) {
-				console.info('%cRegister sample-change', 'color: #2196f3');
+			if (!this.$ipcRenderer.eventNames().includes(EsocketOn.SAMPLINGCHANGED)) {
+				console.info(`%cRegister ${EsocketOn.SAMPLINGCHANGED}`, 'color: #2196f3');
 				// 改變 sampling，自動重連後使用
-				this.$ipcRenderer.on('sample-change', (e, args) => {
+				this.$ipcRenderer.on(EsocketOn.SAMPLINGCHANGED, (e, args) => {
 					HiperModule.changeSampling(args.sampling);
 				});
 			}
@@ -232,8 +233,12 @@ export default class HiperConnect extends Vue {
 
 		if (ret.connected) {
 			// 設定燒結爐已連線
-			HiperModule.changeConnected(ret.connected);
+			HiperModule.changeConnected1(ret.connected);
 		}
+
+		console.log(HiperModule.connected);
+		console.log(VtechModule.connected);
+		console.log(this.$store);
 
 		this.connecting = false;
 	}
@@ -243,7 +248,7 @@ export default class HiperConnect extends Vue {
 
 		if (!ret.connected) {
 			// 設定燒結爐已斷線
-			HiperModule.changeConnected(ret.connected);
+			HiperModule.changeConnected1(ret.connected);
 			// 斷線後停止取樣
 			HiperModule.changeSampling(false);
 		}

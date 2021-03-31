@@ -89,6 +89,8 @@ export interface IwsCommandResMessage extends IwsMessage {
 	text: string;
 }
 
+/// /// /// /// /// /// /// enum for hiper module /// /// /// /// /// /// /// ///
+
 /**ipcMain handle socket commnad of Hiper from ipcRenderer */
 export enum EsocketHiperHandle {
 	CONNECT = 'conn-hiper',
@@ -98,6 +100,14 @@ export enum EsocketHiperHandle {
 	ALARMRST = 'alarm-rst-hiper'
 }
 
+export enum EsocketHiperSend {
+	CONNECTIONERROR = 'conn-error-hiper',
+	CONNECTIONSUCCESS = 'conn-success-hiper',
+	SAMPLINGCHANGED = 'sampling-changed-hiper'
+}
+
+/// /// /// /// /// /// /// enum for vtech module /// /// /// /// /// /// /// ///
+
 /**ipcMain handle socket commnad of Vtech from ipcRenderer */
 export enum EsocketVtechHandle {
 	CONNECT = 'conn-vtech',
@@ -105,6 +115,12 @@ export enum EsocketVtechHandle {
 	SAMPLE = 'sample-vtech',
 	ALARMRES = 'alarm-res-vtech',
 	ALARMRST = 'alarm-rst-vtech'
+}
+
+export enum EsocketVtechSend {
+	CONNECTIONERROR = 'conn-error-vtech',
+	CONNECTIONSUCCESS = 'conn-success-vtech',
+	SAMPLINGCHANGED = 'sampling-changed-vtech'
 }
 
 // export

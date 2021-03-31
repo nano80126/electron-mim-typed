@@ -319,6 +319,7 @@ import stepName from '@/json/stepName.json';
 import stepState from '@/json/stepState.json';
 import { HiperModule } from '@/store/modules/hiper';
 import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg } from '@/types/renderer';
+import { VtechModule } from '@/store/modules/vtech';
 
 @Component({})
 export default class HiperDashboard extends Vue {
@@ -355,7 +356,7 @@ export default class HiperDashboard extends Vue {
 	}
 	/**設備是否連線 */
 	get isConnected() {
-		return HiperModule.connected;
+		return VtechModule.connected;
 	}
 	/**websocket是否連線 */
 	get isWebsocket() {

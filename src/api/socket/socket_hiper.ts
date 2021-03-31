@@ -17,6 +17,7 @@ import stepState from '@/json/stepState.json';
 // 自定義引入
 import {
 	EsocketHiperHandle,
+	EsocketHiperSend,
 	EwsChannel,
 	EwsFurnaceType,
 	FSocket,
@@ -159,7 +160,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 			//
 
 			// response connection successful
-			e.sender.send('conn-success', { connected: true, remoteIP: ip, remotePort: port });
+			e.sender.send(EsocketHiperSend.CONNECTIONSUCCESS, { connected: true, remoteIP: ip, remotePort: port });
 			// 廣播 clients 燒結爐已連線
 			wsServer.clients.forEach(client => {
 				const msg: IwsConnectedMessasge = {
@@ -175,7 +176,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				// 取樣器不存在
 				if (!tcpClient.sampler) {
 					startSample(e);
-					e.sender.send('sample-change', { sampling: true });
+					e.sender.send(EsocketHiperSend.SAMPLINGCHANGED, { sampling: true });
 				}
 			}
 
@@ -283,7 +284,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				case 'ECONNREFUSED': // 有IP, port沒開
 				case 'ETIMEDOUT': // 沒IP
 					// send to renderer
-					e.sender.send('conn-error', {
+					e.sender.send(EsocketHiperSend.CONNECTIONERROR, {
 						connected: false,
 						error: { message: err.message, code: err.code }
 					});
@@ -291,7 +292,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					break;
 				case 'ECONNRESET': // 被斷線
 					// send to renderer
-					e.sender.send('conn-error', {
+					e.sender.send(EsocketHiperSend.CONNECTIONERROR, {
 						connected: false,
 						error: { message: err.message, code: err.code }
 					});
@@ -425,7 +426,7 @@ const doSample = function(e: IpcMainInvokeEvent) {
 		clearInterval(tcpClient.sampler as NodeJS.Timer);
 		tcpClient.sampler = undefined;
 		// 無法連線，改變取樣狀態
-		e.sender.send('sample-change', { sampling: false });
+		e.sender.send(EsocketHiperSend.SAMPLINGCHANGED, { sampling: false });
 	}
 };
 
