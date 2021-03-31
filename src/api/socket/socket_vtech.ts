@@ -11,8 +11,8 @@ import { getLogger } from 'log4js';
 import { mainWin } from '@/background';
 
 // 設備工序狀態 & 工序名稱
-import stepName from '@/json/stepName.json';
-import stepState from '@/json/stepState.json';
+import stepName from '@/json/vtech/stepName.json';
+import stepState from '@/json/vtech/stepState.json';
 
 // 自定義引入
 import {

@@ -255,8 +255,8 @@
 import { AppModule, Colors } from '@/store/modules/app';
 import { Component, Vue } from 'vue-property-decorator';
 
-import stepName from '@/json/stepName.json';
-import stepState from '@/json/stepState.json';
+import stepName from '@/json/hiper/stepName.json';
+import stepState from '@/json/hiper/stepState.json';
 import { HiperModule } from '@/store/modules/hiper';
 import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg, IwsSerialMsg } from '@/types/renderer';
 
