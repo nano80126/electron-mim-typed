@@ -27,32 +27,32 @@ class Vtech extends VuexModule implements VtechState {
 	public connectionErr: NodeJS.ErrnoException | null = null;
 
 	@Mutation
-	changeIP(IP: string) {
+	changeVtechIP(IP: string) {
 		this.ip = IP;
 	}
 
 	@Mutation
-	changePort(port: number) {
+	changeVtechPort(port: number) {
 		this.port = port;
 	}
 
 	@Mutation
-	changeConnected(bool: boolean) {
+	changeVtechConnected(bool: boolean) {
 		this.connected = bool;
 	}
 
 	@Mutation
-	changeReconnect(bool: boolean) {
+	changeVtechReconnect(bool: boolean) {
 		this.reconnect = bool;
 	}
 
 	@Mutation
-	changeSampling(bool: boolean) {
+	changeVtechSampling(bool: boolean) {
 		this.sampling = bool;
 	}
 
 	@Mutation
-	changeConntionErr(err: NodeJS.ErrnoException | null) {
+	changeVtechConntionErr(err: NodeJS.ErrnoException | null) {
 		this.connectionErr = err;
 	}
 }

@@ -30,6 +30,7 @@ import {
 
 import { HiperModule } from './store/modules/hiper';
 import '@/style.scss';
+import { VtechModule } from './store/modules/vtech';
 
 const { VUE_APP_ADDRESS, VUE_APP_PORT } = process.env;
 const wsUrl = `ws://${VUE_APP_ADDRESS}:${VUE_APP_PORT}`;
@@ -188,9 +189,10 @@ new Vue({
 								break;
 							case EwsChannel.CONNECT:
 								if (wsMsg.furnace == EwsFurnaceType.HIPER) {
-									HiperModule.changeConnected((wsMsg as IwsConnMsg).connected);
+									HiperModule.changeHiperConnected((wsMsg as IwsConnMsg).connected);
 								} else if (wsMsg.furnace == EwsFurnaceType.VTECH) {
 									//
+									VtechModule.changeVtechConnected((wsMsg as IwsConnMsg).connected);
 								}
 								break;
 							case EwsChannel.SERIAL:
@@ -198,7 +200,7 @@ new Vue({
 								if (wsMsg.furnace == EwsFurnaceType.HIPER) {
 									this.$emit('hiperSerial', wsMsg as IwsSerialMsg);
 								} else if (wsMsg.furnace == EwsFurnaceType.VTECH) {
-									//
+									// this.$emit('vtechSerial', );
 								}
 								break;
 							case EwsChannel.COMMANDRES:

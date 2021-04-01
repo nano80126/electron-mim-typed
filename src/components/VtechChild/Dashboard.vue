@@ -315,8 +315,8 @@
 import { AppModule, Colors } from '@/store/modules/app';
 import { Component, Vue } from 'vue-property-decorator';
 
-import stepName from '@/json/stepName.json';
-import stepState from '@/json/stepState.json';
+import stepName from '@/json/vtech/stepName.json';
+import stepState from '@/json/vtech/stepState.json';
 import { HiperModule } from '@/store/modules/hiper';
 import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg } from '@/types/renderer';
 import { VtechModule } from '@/store/modules/vtech';

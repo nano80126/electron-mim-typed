@@ -135,11 +135,11 @@ export default class HiperConnect extends Vue {
 				console.info(`%cRegister ${EsocketOn.CONNECTIONERROR}`, 'color: #2196f3');
 				//
 				this.$ipcRenderer.on(EsocketOn.CONNECTIONERROR, (e, args) => {
-					HiperModule.changeConnected(args.connected);
+					HiperModule.changeHiperConnected(args.connected);
 
 					if (args.error) {
 						//
-						HiperModule.changeConntionErr(args.error);
+						HiperModule.changeHiperConntionErr(args.error);
 					}
 				});
 			}
@@ -148,14 +148,14 @@ export default class HiperConnect extends Vue {
 				console.info(`%cRegister ${EsocketOn.CONNECTIONSUCCESS}`, 'color: #2196f3');
 				//
 				this.$ipcRenderer.on(EsocketOn.CONNECTIONSUCCESS, (e, args) => {
-					HiperModule.changeConnected(args.connected);
+					HiperModule.changeHiperConnected(args.connected);
 					console.info(`%cIP: ${args.remoteIP}:${args.remotePort}`, 'color: #4CAF50;');
 
 					if (!args.error) {
 						//
-						HiperModule.changeIP(args.remoteIP);
-						HiperModule.changePort(args.remotePort);
-						HiperModule.changeConntionErr(null);
+						HiperModule.changeHiperIP(args.remoteIP);
+						HiperModule.changeHiperPort(args.remotePort);
+						HiperModule.changeHiperConntionErr(null);
 					}
 				});
 			}
@@ -164,7 +164,7 @@ export default class HiperConnect extends Vue {
 				console.info(`%cRegister ${EsocketOn.SAMPLINGCHANGED}`, 'color: #2196f3');
 				// 改變 sampling，自動重連後使用
 				this.$ipcRenderer.on(EsocketOn.SAMPLINGCHANGED, (e, args) => {
-					HiperModule.changeSampling(args.sampling);
+					HiperModule.changeHiperSampling(args.sampling);
 				});
 			}
 
@@ -186,7 +186,7 @@ export default class HiperConnect extends Vue {
 	}
 
 	set reconnect(bool: boolean) {
-		HiperModule.changeReconnect(bool);
+		HiperModule.changeHiperReconnect(bool);
 	}
 
 	get sampling() {
@@ -194,7 +194,7 @@ export default class HiperConnect extends Vue {
 	}
 
 	set sampling(bool: boolean) {
-		HiperModule.changeSampling(bool);
+		HiperModule.changeHiperSampling(bool);
 	}
 
 	get connErrorCode() {
@@ -233,7 +233,7 @@ export default class HiperConnect extends Vue {
 
 		if (ret.connected) {
 			// 設定燒結爐已連線
-			HiperModule.changeConnected(ret.connected);
+			HiperModule.changeHiperConnected(ret.connected);
 		}
 
 		console.log(HiperModule.connected);
@@ -248,9 +248,9 @@ export default class HiperConnect extends Vue {
 
 		if (!ret.connected) {
 			// 設定燒結爐已斷線
-			HiperModule.changeConnected(ret.connected);
+			HiperModule.changeHiperConnected(ret.connected);
 			// 斷線後停止取樣
-			HiperModule.changeSampling(false);
+			HiperModule.changeHiperSampling(false);
 		}
 	}
 	/**開始取樣 */

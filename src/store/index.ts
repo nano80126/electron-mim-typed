@@ -23,9 +23,11 @@ export interface RootState {
 }
 
 export default new Vuex.Store<RootState>({
-	// state: {},
 	// getters: {},
 	// mutations: {},
 	// actions: {},
-	// modules: {}
+	// modules: {
+	// a: new Vuex.Store<HiperState>({}),
+	// b: new Vuex.Store<VtechState>({})
+	// }
 });

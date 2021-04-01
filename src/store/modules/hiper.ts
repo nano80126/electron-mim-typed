@@ -27,33 +27,33 @@ class Hiper extends VuexModule implements HiperState {
 	public connectionErr: NodeJS.ErrnoException | null = null;
 
 	@Mutation
-	changeIP(IP: string) {
+	changeHiperIP(IP: string) {
 		this.ip = IP;
 	}
 
 	@Mutation
-	changePort(port: number) {
+	changeHiperPort(port: number) {
 		this.port = port;
 	}
 
 	@Mutation
-	changeConnected(bool: boolean) {
+	changeHiperConnected(bool: boolean) {
 		this.connected = bool;
 		console.log(this);
 	}
 
 	@Mutation
-	changeReconnect(bool: boolean) {
+	changeHiperReconnect(bool: boolean) {
 		this.reconnect = bool;
 	}
 
 	@Mutation
-	changeSampling(bool: boolean) {
+	changeHiperSampling(bool: boolean) {
 		this.sampling = bool;
 	}
 
 	@Mutation
-	changeConntionErr(err: NodeJS.ErrnoException | null) {
+	changeHiperConntionErr(err: NodeJS.ErrnoException | null) {
 		this.connectionErr = err;
 	}
 }

@@ -134,11 +134,11 @@ export default class HiperConnect extends Vue {
 				console.info('%cRegister conn-error', 'color: #2196f3');
 				//
 				this.$ipcRenderer.on('conn-error', (e, args) => {
-					VtechModule.changeConnected(args.connected);
+					VtechModule.changeVtechConnected(args.connected);
 
 					if (args.error) {
 						//
-						VtechModule.changeConntionErr(args.error);
+						VtechModule.changeVtechConntionErr(args.error);
 					}
 				});
 			}
@@ -147,14 +147,14 @@ export default class HiperConnect extends Vue {
 				console.info('%cRegister conn-success', 'color: #2196f3');
 				//
 				this.$ipcRenderer.on('conn-success', (e, args) => {
-					VtechModule.changeConnected(args.connected);
+					VtechModule.changeVtechConnected(args.connected);
 					console.info(`%cIP: ${args.remoteIP}:${args.remotePort}`, 'color: #4CAF50;');
 
 					if (!args.error) {
 						//
-						VtechModule.changeIP(args.remoteIP);
-						VtechModule.changePort(args.remotePort);
-						VtechModule.changeConntionErr(null);
+						VtechModule.changeVtechIP(args.remoteIP);
+						VtechModule.changeVtechPort(args.remotePort);
+						VtechModule.changeVtechConntionErr(null);
 					}
 				});
 			}
@@ -163,7 +163,7 @@ export default class HiperConnect extends Vue {
 				console.info('%cRegister sample-change', 'color: #2196f3');
 				// 改變 sampling，自動重連後使用
 				this.$ipcRenderer.on('sample-change', (e, args) => {
-					VtechModule.changeSampling(args.sampling);
+					VtechModule.changeVtechSampling(args.sampling);
 				});
 			}
 
@@ -184,7 +184,7 @@ export default class HiperConnect extends Vue {
 	}
 
 	set reconnect(bool: boolean) {
-		VtechModule.changeReconnect(bool);
+		VtechModule.changeVtechReconnect(bool);
 	}
 
 	get sampling() {
@@ -192,7 +192,7 @@ export default class HiperConnect extends Vue {
 	}
 
 	set sampling(bool: boolean) {
-		VtechModule.changeSampling(bool);
+		VtechModule.changeVtechSampling(bool);
 	}
 
 	get connErrorCode() {
@@ -231,7 +231,7 @@ export default class HiperConnect extends Vue {
 
 		if (ret.connected) {
 			// 設定燒結爐已連線
-			VtechModule.changeConnected(ret.connected);
+			VtechModule.changeVtechConnected(ret.connected);
 		}
 
 		this.connecting = false;
@@ -242,9 +242,9 @@ export default class HiperConnect extends Vue {
 
 		if (!ret.connected) {
 			// 設定燒結爐已斷線
-			VtechModule.changeConnected(ret.connected);
+			VtechModule.changeVtechConnected(ret.connected);
 			// 斷線後停止取樣
-			VtechModule.changeSampling(false);
+			VtechModule.changeVtechSampling(false);
 		}
 	}
 	/**開始取樣 */
