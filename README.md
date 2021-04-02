@@ -43,10 +43,10 @@ Revoke POST https://notify-api.line.me/api/revoke
 ### To do list 
 
 * [*] Redirect if wrong path or refresh
-* [ ] Save IP and port in hipermodule if connected
-* [ ] Divide socket api for two furnace
+* [x] Save IP and port in hipermodule if connected
+* [x] Divide socket api for two furnace
 * [ ] Login for response and reset alarm 
-* [ ] Use Web Worker to deal data
+* [x] Use Web Worker to deal data
 * [ ] vtech farnace 
 * [ ] Add alarm audio 
 * [ ] Add mongoDB for recording work step history 
@@ -54,6 +54,7 @@ Revoke POST https://notify-api.line.me/api/revoke
 * [ ] Vtech Connect.vue 返回
 * [ ] Make sure no duplicated mutation exist in hiper and vtech module
 * [ ] Add comment of modbus tcp return
+* [ ] Add error json of HIPER
 
 ## bugs
 * [ ] Progress is not full when uploading csv
