@@ -10,7 +10,7 @@
 				<span class="mr-2 font-weight-bold">爐溫曲線圖</span>
 				<v-icon small>fas fa-chart-line</v-icon>
 			</v-tab>
-			<v-spacer></v-spacer>
+			<v-spacer />
 
 			<v-tab v-if="isElectron">
 				<span class="mr-2 font-weight-bold">連線</span>
@@ -18,7 +18,7 @@
 			</v-tab>
 		</v-tabs>
 
-		<v-tabs-items v-model="tab" class="transparent">
+		<v-tabs-items v-model="tab" class="transparent" reverse>
 			<v-tab-item>
 				<Dashboard />
 			</v-tab-item>
@@ -58,18 +58,12 @@ export default class HIPER extends Vue {
 		return AppModule.isElectron;
 	}
 
-	mounted() {
-		//
-	}
-
-	beforeDestroy() {
-		//
-	}
-
+	/**若 tab 變更，隱藏 menu */
 	private tabChange() {
 		if (this.chart) this.chart.showMenu = false;
 	}
 
+	/**重置tab，返回使用 */
 	private resetTab(tab: number) {
 		this.tab = tab;
 	}

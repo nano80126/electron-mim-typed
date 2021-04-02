@@ -77,6 +77,10 @@
 				<v-btn color="error darken-2" :disabled="!isConnected" @click="disconnect">斷線</v-btn>
 			</v-card-actions>
 		</v-card>
+
+		<v-row no-gutters class="mt-10">
+			<v-btn color="info" class="offset-9 col-1" @click="resetTab(0)">返回</v-btn>
+		</v-row>
 	</div>
 </template>
 
@@ -84,10 +88,10 @@
 import { AppModule } from '@/store/modules/app';
 import { VtechModule } from '@/store/modules/vtech';
 import { EsocketInvoke } from '@/types/renderer/socket_vtech';
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Emit, Vue } from 'vue-property-decorator';
 
 @Component({})
-export default class HiperConnect extends Vue {
+export default class VtechConnect extends Vue {
 	/**判斷 form 輸入是否合法 */
 	private valid = false;
 	/**嘗試連線中 */
@@ -255,6 +259,12 @@ export default class HiperConnect extends Vue {
 			//
 			console.log('sample', bool == res.sampling);
 		});
+	}
+
+	/**返回Daskboard */
+	@Emit('bindTab')
+	private resetTab(tab: number) {
+		return tab;
 	}
 }
 </script>

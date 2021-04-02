@@ -115,6 +115,7 @@
 							<v-list-item to="/hiper" exact v-bind="attrs" v-on="on">
 								<v-list-item-content>
 									<v-icon small>fas fa-tag</v-icon>
+									<!-- <img src="./assets/HIPER.png" width="32" /> -->
 								</v-list-item-content>
 							</v-list-item>
 						</template>
@@ -126,6 +127,7 @@
 							<v-list-item to="/vtech" exact v-bind="attrs" v-on="on">
 								<v-list-item-content>
 									<v-icon small>fas fa-tag</v-icon>
+									<!-- <v-img src="./assets/VTECH.png"></v-img> -->
 								</v-list-item-content>
 							</v-list-item>
 						</template>

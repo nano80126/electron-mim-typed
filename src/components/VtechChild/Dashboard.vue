@@ -7,7 +7,7 @@
 			class="mt-3"
 			:style="{ height: isElectron ? `${$root.webHeight - 140}px` : `${$root.webHeight - 108}px` }"
 		>
-			<v-col class="d-flex flex-column align-start justify-between">
+			<v-col class="d-flex flex-column align-start justify-start">
 				<v-card class="ml-3" flat outlined width="240px">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">
 						<span class="font-weight-black subtitle-1">連線狀態</span>
@@ -36,24 +36,26 @@
 					</v-card-text>
 				</v-card>
 
-				<div class="ml-3 my-auto" style="position: relative; top: 0%; width: calc(100% - 16px)">
-					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
-						<v-chip class="mt-n3 flow-chip d-flex justify-center">
-							<span>氮氣流量</span>
-							<span class="mx-3">{{ flowN2 }}</span>
-							<v-icon small :color="flowN2 != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
-						</v-chip>
-					</v-sheet>
-				</div>
+				<div class="ml-3" style="positin:relative; margin-top: 5%; width: calc(100% - 16px);">
+					<div class="my-10">
+						<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
+							<v-chip class="mt-n3 flow-chip d-flex justify-center">
+								<span>氮氣流量</span>
+								<span class="mx-3">{{ flowN2 }}</span>
+								<v-icon small :color="flowN2 != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
+							</v-chip>
+						</v-sheet>
+					</div>
 
-				<div class="ml-3 my-auto" style="position: relative; top: -20%; width: calc(100% - 16px)">
-					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
-						<v-chip class="mt-n3 flow-chip d-flex justify-center">
-							<span>氬氣流量</span>
-							<span class="mx-3">{{ flowAr }}</span>
-							<v-icon small :color="flowAr != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
-						</v-chip>
-					</v-sheet>
+					<div class="my-10">
+						<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
+							<v-chip class="mt-n3 flow-chip d-flex justify-center">
+								<span>氬氣流量</span>
+								<span class="mx-3">{{ flowAr }}</span>
+								<v-icon small :color="flowAr != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
+							</v-chip>
+						</v-sheet>
+					</div>
 				</div>
 			</v-col>
 			<v-col cols="auto" class="d-flex flex-column">
@@ -317,12 +319,11 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import stepName from '@/json/vtech/stepName.json';
 import stepState from '@/json/vtech/stepState.json';
-import { HiperModule } from '@/store/modules/hiper';
 import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg } from '@/types/renderer';
 import { VtechModule } from '@/store/modules/vtech';
 
 @Component({})
-export default class HiperDashboard extends Vue {
+export default class VtechDashboard extends Vue {
 	//
 	private setTemp = 0;
 	private centerTemp = 0;
@@ -452,7 +453,7 @@ export default class HiperDashboard extends Vue {
 			// Websocket response alarm
 			const wsMsg: IwsCmdMsg = {
 				channel: EwsChannel.COMMAND,
-				furnace: EwsFurnaceType.HIPER,
+				furnace: EwsFurnaceType.VTECH,
 				command: EwsCommand.ALARMRESPONSE
 			};
 			// console.log(wsMsg);
@@ -477,7 +478,7 @@ export default class HiperDashboard extends Vue {
 			// WebSocket reset alarm
 			const wsMsg: IwsCmdMsg = {
 				channel: EwsChannel.COMMAND,
-				furnace: EwsFurnaceType.HIPER,
+				furnace: EwsFurnaceType.VTECH,
 				command: EwsCommand.ALARMRESET
 			};
 			// console.log(wsMsg);

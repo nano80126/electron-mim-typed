@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const net = require('net');
 
 const port = 3000;
@@ -12,7 +13,7 @@ const listener2 = net.createServer();
 
 listener
 	.on('connection', socket => {
-		console.log('connected');
+		console.log(`port ${port} has been connected`);
 
 		socket.on('data', data => {
 			console.log(data);
@@ -37,7 +38,7 @@ listener
 
 listener2
 	.on('connection', socket => {
-		console.log('connected');
+		console.log(`port ${port2} has been connected`);
 
 		socket.on('data', data => {
 			console.log(data);

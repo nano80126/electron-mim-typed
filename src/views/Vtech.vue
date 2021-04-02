@@ -10,7 +10,7 @@
 				<span class="mr-2 font-weight-bold">爐溫曲線圖</span>
 				<v-icon small>fas fa-chart-line</v-icon>
 			</v-tab> -->
-			<v-spacer></v-spacer>
+			<v-spacer />
 
 			<v-tab v-if="isElectron">
 				<span class="mr-2 font-weight-bold">連線</span>
@@ -23,7 +23,7 @@
 				<Dashboard />
 			</v-tab-item>
 			<v-tab-item v-if="isElectron">
-				<Connect />
+				<Connect @bindTab="resetTab" />
 			</v-tab-item>
 		</v-tabs-items>
 	</div>
@@ -42,13 +42,18 @@ import { AppModule } from '@/store/modules/app';
 		Connect: connect
 	}
 })
-export default class HIPER extends Vue {
+export default class VTECH extends Vue {
 	/**啟用的 tab */
 	private tab = 0;
 
 	/**是否為electron */
 	get isElectron() {
 		return AppModule.isElectron;
+	}
+
+	/**重置tab，返回使用 */
+	private resetTab(tab: number) {
+		this.tab = tab;
 	}
 }
 </script>

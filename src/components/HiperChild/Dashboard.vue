@@ -50,8 +50,9 @@
 							style="user-select: none;"
 						></v-text-field> -->
 						<v-chip class="mt-n3 flow-chip d-flex justify-center">
-							<span>{{ flow }}</span>
-							<v-icon class="ml-3" small :color="flow != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
+							<span>氮氣流量</span>
+							<span class="mx-3">{{ flow }}</span>
+							<v-icon small :color="flow != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
 						</v-chip>
 					</v-sheet>
 				</div>

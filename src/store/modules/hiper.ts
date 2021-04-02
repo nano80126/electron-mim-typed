@@ -39,7 +39,6 @@ class Hiper extends VuexModule implements HiperState {
 	@Mutation
 	changeHiperConnected(bool: boolean) {
 		this.connected = bool;
-		console.log(this);
 	}
 
 	@Mutation

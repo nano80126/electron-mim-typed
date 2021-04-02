@@ -183,9 +183,11 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 			tcpClient.on('data', str => {
 				const strArr = Array.from(str);
 				console.log(strArr);
+				// 結構
+				//
 
 				if (strArr[7] == 5) {
-					// 寫線圈回傳
+					// 寫線圈回傳，可以直接忽略
 					console.log('Response of writing coil: ', strArr);
 					return;
 				}
@@ -193,7 +195,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				// 有回應，清除Timeout notify
 				clearTimeout(tcpClient.samplingTimeoutTimer as NodeJS.Timeout);
 
-				const arr = drop(strArr, 9);
+				const arr = drop(strArr, 9); // 移除多餘 header
 				tcpClient.stepName = stepName[arr[67]];
 				tcpClient.stepState = stepState[arr[49]];
 
@@ -419,8 +421,18 @@ const doSample = function(e: IpcMainInvokeEvent) {
 			}
 		}, (tcpClient.interval as number) * 0.5);
 
-		const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x04, 0x00, 0x00, 0x00, 0x22]);
-		tcpClient.write(buf);
+		// const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x04, 0x00, 0x00, 0x00, 0x22]);
+
+		const slave = [0x01]; // addr of slave
+		const fnCode = [0x04]; // function code
+		const addr = [0x00, 0x00]; // addr of start register
+		const data = [0x00, 0x22]; // data length
+		const cmd = slave.concat(fnCode, addr, data); // concat above for calculate length
+
+		const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
+
+		const buf = head.concat(cmd);
+		tcpClient.write(Buffer.from(buf));
 	} else {
 		tcpClient.samplingState = false; // set sample state off
 		clearInterval(tcpClient.sampler as NodeJS.Timer);

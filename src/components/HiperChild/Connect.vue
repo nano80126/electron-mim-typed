@@ -263,6 +263,7 @@ export default class HiperConnect extends Vue {
 		});
 	}
 
+	/**返回Daskboard */
 	@Emit('bindTab')
 	private resetTab(tab: number) {
 		return tab;

@@ -53,6 +53,7 @@ Revoke POST https://notify-api.line.me/api/revoke
 * [ ] Add enum between ipcMain and ipcRenderer (invoke and handle done ex. connect, disconnect, sample)
 * [ ] Vtech Connect.vue 返回
 * [ ] Make sure no duplicated mutation exist in hiper and vtech module
+* [ ] Add comment of modbus tcp return
 
 ## bugs
 * [ ] Progress is not full when uploading csv
