@@ -39,7 +39,7 @@
 		"src/**/*.vue",
 		"tests/**/*.ts",
 		"tests/**/*.tsx"
-	],
+, "src/json/hiper/errros.ts"	],
 	"exclude": [
 		"node_modules",
 		"public",

@@ -13,8 +13,8 @@ node_modules
 .env.*.local
 
 # test file
-test.js
-test/*
+# test.js
+# test/*
 
 # Log files
 npm-debug.log*

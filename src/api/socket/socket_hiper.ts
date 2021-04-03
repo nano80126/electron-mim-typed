@@ -13,6 +13,9 @@ import { mainWin } from '@/background';
 // 設備工序狀態 & 工序名稱
 import stepName from '@/json/hiper/stepName.json';
 import stepState from '@/json/hiper/stepState.json';
+import { r30028, r30030, r30032 } from '@/json/hiper/errros';
+
+// console.log(r30028);
 
 // 自定義引入
 import {
@@ -186,11 +189,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				// 結構
 				//
 
-				if (strArr[7] == 5) {
-					// 寫線圈回傳，可以直接忽略
-					console.log('Response of writing coil: ', strArr);
-					return;
-				}
+				if (strArr[7] == 5) return; // 寫線圈回傳，可以直接忽略
 
 				// 有回應，清除Timeout notify
 				clearTimeout(tcpClient.samplingTimeoutTimer as NodeJS.Timeout);
@@ -204,11 +203,41 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					// 先確認是否在冷卻
 					if (!tcpClient.coolState) {
 						// 若不在冷卻中
+
+						console.log(arr[55], arr[59], arr[63]);
+						// // // 處理錯誤 // // //
+						let errMsg1 = '';
+						let errMsg2 = '';
+						let errMsg3 = '';
+						const err1 = arr[55] + (arr[56] << 8) + (arr[57] << 16) + (arr[58] << 24); // 報警 1 // 30028
+						const err2 = arr[59] + (arr[60] << 8) + (arr[61] << 16) + (arr[62] << 24); // 報警 2 // 30030
+						const err3 = arr[63] + (arr[64] << 8) + (arr[65] << 16) + (arr[66] << 24); // 報警 3 // 30032
+						for (let bit = 0; bit < 32; bit++) {
+							if (err1 != 0)
+								if (((err1 >> bit) & 0b1) === 0b1) {
+									errMsg1 += `\n${r30028[bit]}`;
+								}
+							if (err2 != 0) {
+								if (((err2 >> bit) & 0b1) === 0b1) {
+									errMsg2 += `\n${r30030[bit]}`;
+								}
+							}
+							if (err3 != 0) {
+								if (((err3 >> bit) & 0b1) === 0b1) {
+									errMsg3 += `\n${r30032[bit]}`;
+								}
+							}
+						}
+
+						// 合併訊息 + 錯誤(如果有)
 						const msg =
 							'\n伺服器狀態: 正常' +
-							'\n警告: 報警產生' +
 							`\n工藝狀態: ${tcpClient.stepState}` +
-							`\n工藝名稱: ${tcpClient.stepName}`;
+							`\n工藝名稱: ${tcpClient.stepName}` +
+							'\n警告: 報警產生' +
+							(errMsg1 != '' ? errMsg1 : '') +
+							(errMsg2 != '' ? errMsg2 : '') +
+							(errMsg3 != '' ? errMsg3 : '');
 
 						message(msg)
 							.then(res => {
