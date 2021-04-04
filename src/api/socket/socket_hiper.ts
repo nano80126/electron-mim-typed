@@ -100,8 +100,7 @@ const cronReconn = new CronJob(
 				log.info(`${err.message}, code: ${err.code}`);
 				// console.error(err);
 			}
-
-			console.log('try to re connect');
+			console.log('Try to reconnect');
 		}
 	},
 	null,

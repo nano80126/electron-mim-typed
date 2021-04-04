@@ -21,11 +21,11 @@ module.exports = {
 	},
 	pages: {
 		main: {
-			entry: "src/main.ts",
-			template: "public/index.html",
-			filename: "index.html",
-			chunks: ["chunk-common", "chunk-main-vendors", "main"]
-		},
+			entry: 'src/main.ts',
+			template: 'public/index.html',
+			filename: 'index.html',
+			chunks: ['chunk-common', 'chunk-main-vendors', 'main']
+		}
 		// panel: {
 		// 	entry: "src/pages/panel/main.ts",
 		// 	template: "public/panel.html",
@@ -34,8 +34,6 @@ module.exports = {
 		// }
 	},
 	chainWebpack: config => {
-
-
 		// 保留空白
 		config.module
 			.rule('vue')
@@ -58,7 +56,7 @@ module.exports = {
 				main: {
 					name: 'chunk-main-vendors',
 					priority: -10,
-					chunks: chunk => chunk.name === "main",
+					chunks: chunk => chunk.name === 'main',
 					test: /[\\/]node_modules[\\/]/,
 					enforce: true
 				},
@@ -72,7 +70,7 @@ module.exports = {
 				common: {
 					name: 'chunk-common',
 					priority: -20,
-					chunks: "initial",
+					chunks: 'initial',
 					minChunks: 1,
 					reuseExistingChunk: true,
 					enforce: true
@@ -93,17 +91,20 @@ module.exports = {
 
 				const exts = {
 					// appenders: "commonjs appenders",
-					bufferutil: "commonjs bufferutil",
-					'utf-8-validate': 'commonjs utf-8-validate',
+					bufferutil: 'commonjs bufferutil',
+					'utf-8-validate': 'commonjs utf-8-validate'
 					// log4js: 'commonjs log4js'
 				};
 
 				Object.assign(
 					exts,
-					process.env.NODE_ENV == 'development' ? { 
-						express: 'commonjs express', 
-						log4js: 'commonjs log4js' 
-					} : undefined
+					process.env.NODE_ENV == 'development'
+						? {
+								express: 'commonjs express',
+								log4js: 'commonjs log4js',
+								mongodb: 'commonjs2 mongodb'
+						  }
+						: undefined
 				);
 				config.externals([exts]);
 			},
@@ -115,7 +116,7 @@ module.exports = {
 			},
 			// mainProcessFile: './src/background.ts',
 			//
-			mainProcessWatch: ['src/api/*.ts', "src/api/socket/*.ts"],
+			mainProcessWatch: ['src/api/*.ts', 'src/api/socket/*.ts'],
 			// disableMainProcessTypescript: true, // Manually disable typescript plugin for main process. Enable if you want to use regular js for the main process (src/background.js by default).
 			// mainProcessTypeChecking: false, // Manually enable type checking during webpck bundling for background file.
 			builderOptions: {

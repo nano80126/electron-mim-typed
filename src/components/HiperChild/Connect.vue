@@ -87,7 +87,6 @@
 <script lang="ts">
 import { AppModule } from '@/store/modules/app';
 import { HiperModule } from '@/store/modules/hiper';
-import { VtechModule } from '@/store/modules/vtech';
 import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_hiper';
 import { Component, Emit, Vue } from 'vue-property-decorator';
 
@@ -235,10 +234,6 @@ export default class HiperConnect extends Vue {
 			// 設定燒結爐已連線
 			HiperModule.changeHiperConnected(ret.connected);
 		}
-
-		console.log(HiperModule.connected);
-		console.log(VtechModule.connected);
-		console.log(this.$store);
 
 		this.connecting = false;
 	}

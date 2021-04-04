@@ -1,22 +1,31 @@
 <template>
 	<div>
-		<v-tabs v-model="tab" height="36" color="warning" background-color="green darken-3" @change="tabChange">
-			<v-tabs-slider color="transparent" />
-			<v-tab class="">
-				<span class="mr-2 font-weight-bold">面板</span>
-				<v-icon small>fas fa-tachometer-alt</v-icon>
-			</v-tab>
-			<v-tab class="">
-				<span class="mr-2 font-weight-bold">爐溫曲線圖</span>
-				<v-icon small>fas fa-chart-line</v-icon>
-			</v-tab>
-			<v-spacer />
+		<v-toolbar flat height="36" color="green darken-3">
+			<v-toolbar-title class="col-1 text-center grey--text text--lighten-1 mr-3">
+				<span class="font-weight-bold">恒普</span>
+				<small>HIPER</small>
+			</v-toolbar-title>
+			<!-- <img class="" src="@/assets/HIPER.png" height="20" /> -->
 
-			<v-tab v-if="isElectron">
-				<span class="mr-2 font-weight-bold">連線</span>
-				<v-icon small>fas fa-network-wired</v-icon>
-			</v-tab>
-		</v-tabs>
+			<!-- background-color="green darken-3" -->
+			<v-tabs v-model="tab" height="36" color="warning" @change="tabChange">
+				<v-tabs-slider color="transparent" />
+				<v-tab class="">
+					<span class="mr-2 font-weight-bold">面板</span>
+					<v-icon small>fas fa-tachometer-alt</v-icon>
+				</v-tab>
+				<v-tab class="">
+					<span class="mr-2 font-weight-bold">爐溫曲線圖</span>
+					<v-icon small>fas fa-chart-line</v-icon>
+				</v-tab>
+				<v-spacer />
+
+				<v-tab v-if="isElectron">
+					<span class="mr-2 font-weight-bold">連線</span>
+					<v-icon small>fas fa-network-wired</v-icon>
+				</v-tab>
+			</v-tabs>
+		</v-toolbar>
 
 		<v-tabs-items v-model="tab" class="transparent" reverse>
 			<v-tab-item>

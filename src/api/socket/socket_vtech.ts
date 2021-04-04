@@ -427,7 +427,7 @@ const doSample = function(e: IpcMainInvokeEvent) {
 			[0x0c, 0x00, 0x00, 0x90], // addr of step status
 			[0x6e, 0x00, 0x00, 0xa8, 0x6f, 0x00, 0x00, 0xa8, 0x70, 0x00, 0x00, 0xa8] // addr of wait time
 		];
-		const addrDw = [0x1f, 0x00, 0x00, 0xa8];
+		const addrDw = [0x1f, 0x00, 0x00, 0xa8, 0xbc, 0x02, 0x00, 0x90, 0xdc, 0x02, 0x00, 0x90];
 		addrW = flatten(addrW); // 平整化陣列
 		// const addrW = addrW1.concat(addrW2, addrW3, addrW4, addrW5, addrW6); // concat addr of word type
 
@@ -461,25 +461,26 @@ const startSample = function(e: IpcMainInvokeEvent) {
 	doSample(e);
 };
 
-const doErrorCatch = function() {
-	if (tcpClient.writable) {
-		//
-		const cmd = [0x01, 0x04, 0x00, 0x00];
-		const addr = [0xbc, 0x02, 0x00, 0x90, 0x04, 0x00]; // M700 ~ M759 60 bits <= 16 * 4
+/**保留，待刪除 */
+// const doErrorCatch = function() {
+// 	if (tcpClient.writable) {
+// 		//
+// 		const cmd = [0x01, 0x04, 0x00, 0x00];
+// 		const addr = [0xbc, 0x02, 0x00, 0x90, 0x04, 0x00]; // M700 ~ M759 60 bits <= 16 * 4
 
-		const l = 2 + cmd.length + addr.length;
-		const leng = [l & 0xff, (l & 0xff) >> 8];
+// 		const l = 2 + cmd.length + addr.length;
+// 		const leng = [l & 0xff, (l & 0xff) >> 8];
 
-		const head = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, leng[0], leng[1], 0x01, 0x00];
+// 		const head = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, leng[0], leng[1], 0x01, 0x00];
 
-		const buf = head.concat(cmd, addr);
-		console.log(buf);
-		//
-		tcpClient.write(Buffer.from(buf));
-	} else {
-		// do nothing
-	}
-};
+// 		const buf = head.concat(cmd, addr);
+// 		console.log(buf);
+// 		//
+// 		tcpClient.write(Buffer.from(buf));
+// 	} else {
+// 		// do nothing
+// 	}
+// };
 
 // 處理取樣命令
 ipcMain.handle(EsocketVtechHandle.SAMPLE, (e, args) => {

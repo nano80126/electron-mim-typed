@@ -36,7 +36,7 @@
 					</v-card-text>
 				</v-card>
 
-				<div class="ml-3" style="positin:relative; margin-top: 5%; width: calc(100% - 16px);">
+				<div class="ml-3" style="positin:relative; margin-top: 6%; width: calc(100% - 16px);">
 					<div class="my-10">
 						<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
 							<v-chip class="mt-n3 flow-chip d-flex justify-center">
