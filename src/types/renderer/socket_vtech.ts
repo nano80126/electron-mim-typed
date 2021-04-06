@@ -23,7 +23,8 @@ export enum EsocketSend {}
 export enum EsocketOn {
 	CONNECTIONERROR = 'conn-error-vtech',
 	CONNECTIONSUCCESS = 'conn-success-vtech',
-	SAMPLINGCHANGED = 'sampling-changed-vtech'
+	SAMPLINGCHANGED = 'sampling-changed-vtech',
+	SERIAL = 'serial-vtech'
 }
 //
 //

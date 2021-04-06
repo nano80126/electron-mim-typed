@@ -23,7 +23,8 @@ export enum EsocketSend {}
 export enum EsocketOn {
 	CONNECTIONERROR = 'conn-error-hiper',
 	CONNECTIONSUCCESS = 'conn-success-hiper',
-	SAMPLINGCHANGED = 'sampling-changed-hiper'
+	SAMPLINGCHANGED = 'sampling-changed-hiper',
+	SERIAL = 'serial-hiper'
 }
 //
 //

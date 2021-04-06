@@ -200,7 +200,7 @@ new Vue({
 								if (wsMsg.furnace == EwsFurnaceType.HIPER) {
 									this.$emit('hiperSerial', wsMsg as IwsSerialMsg);
 								} else if (wsMsg.furnace == EwsFurnaceType.VTECH) {
-									// this.$emit('vtechSerial', );
+									this.$emit('vtechSerial', wsMsg as IwsSerialMsg);
 								}
 								break;
 							case EwsChannel.COMMANDRES:

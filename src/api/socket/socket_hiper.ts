@@ -185,8 +185,16 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 			tcpClient.on('data', str => {
 				const strArr = Array.from(str);
 				console.log(strArr);
-				// 結構
-				//
+				// 回報結構
+				// [0x00, 0x00, 0x00, 0x00, 0x00, 0x47] => header
+				// [0x01, 0x04, 0x44] => slave, fnCode, length
+				// [0x17, 0x70, 0x17, 0x70, 0x17, 0x70] => 設定溫度, 上部溫度, 下部溫度
+				// [0x00, 0x30, 0x82, 0x55, 0x00, 0x07] => 爐內壓力, 爐內真空(32bits)
+				// [0x01, 0x25, 0x02, 0x26] => 流量計(0.1), 步剩餘時間()
+				// [0x00, 0x00, 0x45, 0x48, 0x32, 0x59, 0x20, 0x20, ...] => 工藝段名
+				// [0x00, 0x11, 0x00, 0x00, 0x00, 0x00] => 工藝狀態, 等待時間(32bits)
+				// [0x00, 0x00, 0x00, 0x00, ... x4] => 報警狀態
+				// [0x00, 0x0E] => 工藝名稱
 
 				if (strArr[7] == 5) return; // 寫線圈回傳，可以直接忽略
 
@@ -259,7 +267,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					}
 
 					// 回傳 renderer， 有報警
-					e.sender.send('serial', { serial: str, alarm: true });
+					e.sender.send(EsocketHiperSend.SERIAL, { serial: strArr, alarm: true });
 
 					// 廣播 web socket clients
 					wsServer.clients.forEach(client => {
@@ -278,7 +286,8 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					clearTimeout(tcpClient.coolTimer as NodeJS.Timeout);
 
 					// 回傳 renderer
-					e.sender.send('serial', { serial: str, alarm: false });
+					e.sender.send(EsocketHiperSend.SERIAL, { serial: strArr, alarm: false });
+
 					// 廣播 web socket clients
 					wsServer.clients.forEach(client => {
 						const msg: IwsSerialMessage = {

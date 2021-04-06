@@ -103,7 +103,8 @@ export enum EsocketHiperHandle {
 export enum EsocketHiperSend {
 	CONNECTIONERROR = 'conn-error-hiper',
 	CONNECTIONSUCCESS = 'conn-success-hiper',
-	SAMPLINGCHANGED = 'sampling-changed-hiper'
+	SAMPLINGCHANGED = 'sampling-changed-hiper',
+	SERIAL = 'serial-hiper'
 }
 
 /// /// /// /// /// /// /// enum for vtech module /// /// /// /// /// /// /// ///
@@ -120,7 +121,8 @@ export enum EsocketVtechHandle {
 export enum EsocketVtechSend {
 	CONNECTIONERROR = 'conn-error-vtech',
 	CONNECTIONSUCCESS = 'conn-success-vtech',
-	SAMPLINGCHANGED = 'sampling-changed-vtech'
+	SAMPLINGCHANGED = 'sampling-changed-vtech',
+	SERIAL = 'serial-vtech'
 }
 
 // export

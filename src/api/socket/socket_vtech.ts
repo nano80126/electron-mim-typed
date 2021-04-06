@@ -17,6 +17,7 @@ import stepState from '@/json/vtech/stepState.json';
 // 自定義引入
 import {
 	EsocketVtechHandle,
+	EsocketVtechSend,
 	EwsChannel,
 	EwsFurnaceType,
 	FSocket,
@@ -150,12 +151,12 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 			//
 
 			// response connection successful
-			e.sender.send('conn-success', { connected: true, remoteIP: ip, remotePort: port });
+			e.sender.send(EsocketVtechSend.CONNECTIONSUCCESS, { connected: true, remoteIP: ip, remotePort: port });
 			// 廣播 clients 燒結爐已連線
 			wsServer.clients.forEach(client => {
 				const msg: IwsConnectedMessasge = {
 					channel: EwsChannel.CONNECT,
-					furnace: EwsFurnaceType.HIPER,
+					furnace: EwsFurnaceType.VTECH,
 					connected: true
 				};
 				client.send(JSON.stringify(msg));
@@ -166,13 +167,20 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				// 取樣器不存在
 				if (!tcpClient.sampler) {
 					startSample(e);
-					e.sender.send('sample-change', { sampling: true });
+					e.sender.send(EsocketVtechSend.SAMPLINGCHANGED, { sampling: true });
 				}
 			}
 
 			tcpClient.on('data', str => {
 				const strArr = Array.from(str);
 				console.log(strArr);
+				// 回報結構
+				// [0xD0, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, 0x00] => 副標頭, 網路編號, PC編號, IO編號, ...
+				// [0x2A, 0x00, 0x00, 0x00] => 資料長度, 錯誤碼
+				// [0x00, 0x00, 0x18, 0x00, 0x24, 0x00, 0x19, 0x00] => 設定溫度, 上部溫度, 中部溫度, 下部溫度
+				// [0xff, 0xff, 0xfe, 0xff, 0x00, 0x00, 0x00, 0x00] => 爐內壓力, 爐內真空, 氮氣流量, 氬氣流量
+				//
+				//
 
 				// 寫coil回傳
 				// if (strArr[7] == 5) {
@@ -189,7 +197,8 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				tcpClient.stepState = stepState[arr[49]];
 
 				// 報警狀態
-				if (arr[49] != 0 && arr[49] <= 5) {
+				// if (arr[49] != 0 && arr[49] <= 5) {
+				if (false) {
 					// 先確認是否在冷卻
 					if (!tcpClient.coolState) {
 						// 若不在冷卻中
@@ -220,13 +229,13 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 					}
 
 					// 回傳 renderer， 有報警
-					e.sender.send('serial', { serial: str, alarm: true });
+					e.sender.send(EsocketVtechSend.SERIAL, { serial: strArr, alarm: true });
 
 					// 廣播 web socket clients
 					wsServer.clients.forEach(client => {
 						const msg: IwsSerialMessage = {
 							channel: EwsChannel.SERIAL,
-							furnace: EwsFurnaceType.HIPER,
+							furnace: EwsFurnaceType.VTECH,
 							serial: strArr,
 							alarm: true
 						};
@@ -239,12 +248,12 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 					clearTimeout(tcpClient.coolTimer as NodeJS.Timeout);
 
 					// 回傳 renderer
-					e.sender.send('serial', { serial: str, alarm: false });
+					e.sender.send(EsocketVtechSend.SERIAL, { serial: strArr, alarm: false });
 					// 廣播 web socket clients
 					wsServer.clients.forEach(client => {
 						const msg: IwsSerialMessage = {
 							channel: EwsChannel.SERIAL,
-							furnace: EwsFurnaceType.HIPER,
+							furnace: EwsFurnaceType.VTECH,
 							serial: strArr,
 							alarm: false
 						};
@@ -275,7 +284,7 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				case 'ECONNREFUSED': // 有IP, port沒開
 				case 'ETIMEDOUT': // 沒IP
 					// send to renderer
-					e.sender.send('conn-error', {
+					e.sender.send(EsocketVtechSend.CONNECTIONERROR, {
 						connected: false,
 						error: { message: err.message, code: err.code }
 					});
@@ -283,7 +292,7 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 					break;
 				case 'ECONNRESET': // 被斷線
 					// send to renderer
-					e.sender.send('conn-error', {
+					e.sender.send(EsocketVtechSend.CONNECTIONERROR, {
 						connected: false,
 						error: { message: err.message, code: err.code }
 					});
@@ -292,7 +301,7 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 					wsServer.clients.forEach(client => {
 						const msg: IwsConnectedMessasge = {
 							channel: EwsChannel.CONNECT,
-							furnace: EwsFurnaceType.HIPER,
+							furnace: EwsFurnaceType.VTECH,
 							connected: false
 						};
 						client.send(JSON.stringify(msg));
@@ -368,7 +377,7 @@ ipcMain.handle(EsocketVtechHandle.DISCONNECT, async () => {
 	wsServer.clients.forEach(client => {
 		const msg: IwsConnectedMessasge = {
 			channel: EwsChannel.CONNECT,
-			furnace: EwsFurnaceType.HIPER,
+			furnace: EwsFurnaceType.VTECH,
 			connected: false
 		};
 		client.send(JSON.stringify(msg));
@@ -427,7 +436,7 @@ const doSample = function(e: IpcMainInvokeEvent) {
 			[0x0c, 0x00, 0x00, 0x90], // addr of step status
 			[0x6e, 0x00, 0x00, 0xa8, 0x6f, 0x00, 0x00, 0xa8, 0x70, 0x00, 0x00, 0xa8] // addr of wait time
 		];
-		const addrDw = [0x1f, 0x00, 0x00, 0xa8, 0xbc, 0x02, 0x00, 0x90, 0xdc, 0x02, 0x00, 0x90];
+		const addrDw = [0x1f, 0x00, 0x00, 0xa8, 0xbc, 0x02, 0x00, 0x90, 0xdc, 0x02, 0x00, 0x90]; // addr of vacuum
 		addrW = flatten(addrW); // 平整化陣列
 		// const addrW = addrW1.concat(addrW2, addrW3, addrW4, addrW5, addrW6); // concat addr of word type
 
@@ -440,17 +449,14 @@ const doSample = function(e: IpcMainInvokeEvent) {
 		const head = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, leng[0], leng[1], 0x01, 0x00];
 
 		const buf = head.concat(cmd, nb, addrW, addrDw); // 合併陣列
-		console.log(buf);
 		// tcpClient.write(Buffer.from(buf));
 		tcpClient.write(Buffer.from(buf));
-		///
-		// doErrorCatch();
 	} else {
 		tcpClient.samplingState = false; // set sample state off
 		clearInterval(tcpClient.sampler as NodeJS.Timer);
 		tcpClient.sampler = undefined;
 		// 無法連線，改變取樣狀態
-		e.sender.send('sample-change', { sampling: false });
+		e.sender.send(EsocketVtechSend.SAMPLINGCHANGED, { sampling: false });
 	}
 };
 

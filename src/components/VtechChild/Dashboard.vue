@@ -317,10 +317,11 @@
 import { AppModule, Colors } from '@/store/modules/app';
 import { Component, Vue } from 'vue-property-decorator';
 
-// import stepName from '@/json/vtech/stepName.json';
+import stepName from '@/json/vtech/stepName.json';
 // import stepState from '@/json/vtech/stepState.json';
 import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg } from '@/types/renderer';
 import { VtechModule } from '@/store/modules/vtech';
+import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_vtech';
 
 @Component({})
 export default class VtechDashboard extends Vue {
@@ -371,9 +372,11 @@ export default class VtechDashboard extends Vue {
 	mounted() {
 		if (AppModule.isElectron) {
 			//
-			this.$ipcRenderer.on('serial', (e, args) => {
-				// 移除前 9 位
-				const serial = this.$lodash.drop(args.serial, 9) as number[];
+			this.$ipcRenderer.on(EsocketOn.SERIAL, (e, args) => {
+				console.log(args.serial);
+				// 移除 header(7), 資料長度(2), 錯誤碼(2) // 前 11 位
+				const serial = this.$lodash.drop(args.serial, 11) as number[];
+				console.log(serial);
 				this.serialToData(serial);
 				if (args.alarm) {
 					if (!this.hasResponse) this.$root.$emit('alarmOn');
@@ -392,7 +395,7 @@ export default class VtechDashboard extends Vue {
 	beforeDestroy() {
 		if (AppModule.isElectron) {
 			// remove serial event
-			this.$ipcRenderer.removeAllListeners('serial');
+			this.$ipcRenderer.removeAllListeners(EsocketOn.SERIAL);
 		} else {
 			// nothing to do,
 		}
@@ -408,7 +411,23 @@ export default class VtechDashboard extends Vue {
 
 	/**序列轉資料 */
 	private serialToData(serial: number[]) {
+		this.setTemp = this.HexArrToVal(serial, [1, 0]);
+		this.topTemp = this.HexArrToVal(serial, [3, 2]);
+		this.centerTemp = this.HexArrToVal(serial, [5, 4]);
+		this.bottomTemp = this.HexArrToVal(serial, [7, 6]);
 		//
+		this.furnacePres = (-(0xffff - this.HexArrToVal(serial, [9, 8])) - 1) / 10;
+		this.tubePres = (-(0xffff - this.HexArrToVal(serial, [11, 10])) - 1) / 10;
+		this.vacuum = this.HexArrToVal(serial, [31, 30, 29, 28]) / 100;
+		//
+		this.flowN2 = this.HexArrToVal(serial, [13, 12]);
+		this.flowAr = this.HexArrToVal(serial, [15, 14]);
+		//
+		this.leaveTime = this.HexArrToVal(serial, [17, 16]);
+		this.workNowName = stepName[this.HexArrToVal(serial, [19, 18])];
+		this.workNowState = (this.HexArrToVal(serial, [20]) & 0b1).toString(); // M12
+		//
+		this.waitTime = this.HexArrToVal(serial, [23, 22]);
 	}
 
 	// 新增 ws 訊息事件
@@ -436,12 +455,13 @@ export default class VtechDashboard extends Vue {
 		this.$root.$emit('alarmToggle');
 	}
 
+	/**回應警報(VTECH沒有此功能) */
 	private alarmRes() {
 		//
 		this.$root.$emit('alarmOff');
 		if (this.isElectron) {
 			this.$ipcRenderer
-				.invoke('alarm-res')
+				.invoke(EsocketInvoke.ALARMRES)
 				.then((res: { response: boolean; reset: boolean; error?: string }) => {
 					if (res.error) throw Error(res.error);
 					this.hasResponse = res.response;
@@ -461,12 +481,13 @@ export default class VtechDashboard extends Vue {
 		}
 	}
 
+	/**重置警報 */
 	private alarmReset() {
 		//
 		this.$root.$emit('alarmOff');
 		if (this.isElectron) {
 			this.$ipcRenderer
-				.invoke('alarm-rst')
+				.invoke(EsocketInvoke.ALARMRST)
 				.then((res: { response: boolean; reset: boolean; error?: string }) => {
 					if (res.error) throw Error(res.error);
 					this.hasResponse = res.response;

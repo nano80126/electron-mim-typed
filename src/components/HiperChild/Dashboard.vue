@@ -7,8 +7,8 @@
 			class="mt-3"
 			:style="{ height: isElectron ? `${$root.webHeight - 140}px` : `${$root.webHeight - 108}px` }"
 		>
-			<v-col class="d-flex flex-column align-start justify-between">
-				<v-card class="ml-3" flat outlined width="240px">
+			<v-col class="d-flex flex-column align-start justify-center yellow" style="position: relative;">
+				<v-card class="ml-3" flat outlined width="240px" style="position: absolute; top: 0;">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">
 						<span class="font-weight-black subtitle-1">連線狀態</span>
 					</v-card-subtitle>
@@ -36,19 +36,8 @@
 					</v-card-text>
 				</v-card>
 
-				<div class="ml-3 my-auto" style="position: relative; top: -10%; width: calc(100% - 16px)">
+				<div class="ml-3" style="width: calc(100% - 16px);">
 					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
-						<!-- <v-text-field
-							v-model="flow"
-							label="流量"
-							class="flow-text"
-							outlined
-							dense
-							hide-details
-							:loading="flow != 0"
-							readonly
-							style="user-select: none;"
-						></v-text-field> -->
 						<v-chip class="mt-n3 flow-chip d-flex justify-center">
 							<span>氣體流量</span>
 							<span class="mx-3">{{ flow }}</span>
@@ -56,8 +45,12 @@
 						</v-chip>
 					</v-sheet>
 				</div>
+
+				<div class="mt-auto text-center" style="position: absolute; bottom: 0; color: blue; height: 300px;">
+					(保留)工藝狀態用，需另外加CSS
+				</div>
 			</v-col>
-			<v-col cols="auto" class="d-flex flex-column">
+			<v-col cols="auto" class="d-flex flex-column blue h-100">
 				<v-card
 					class="mx-auto my-auto"
 					max-width="400px"
@@ -130,12 +123,12 @@
 					</v-card-text>
 				</v-card>
 			</v-col>
-			<v-col>
+			<v-col class="red">
 				<!-- empty for design -->
 			</v-col>
 			<div class="col-12" />
 
-			<v-col cols="4" class="mt-auto">
+			<v-col cols="4" class="mt-auto d-none1">
 				<v-card class="ml-3 rounded-lg" outlined min-width="360" max-height="500" style="">
 					<v-card-text>
 						<v-row align="start" justify="center" class="subtitle-1">
@@ -178,16 +171,16 @@
 			</v-col>
 
 			<!-- <v-col v-if="isElectron" cols="2">
-					<v-btn block class="font-weight-black title" @click="broadcast">廣播</v-btn>
-				</v-col>
+				<v-btn block class="font-weight-black title" @click="broadcast">廣播</v-btn>
+			</v-col>
 
-				<v-col v-if="isElectron" cols="2">
-					<v-btn block class="font-weight-black title" @click="lineNotify">Line</v-btn>
-				</v-col>
+			<v-col v-if="isElectron" cols="2">
+				<v-btn block class="font-weight-black title" @click="lineNotify">Line</v-btn>
+			</v-col>
 
-				<v-col v-if="isElectron" cols="2">
-					<v-btn block class="font-weight-black title" @click="alarmToggle">報警鈴警</v-btn>
-				</v-col> -->
+			<v-col v-if="isElectron" cols="2">
+				<v-btn block class="font-weight-black title" @click="alarmToggle">報警鈴警</v-btn>
+			</v-col> -->
 		</v-row>
 		<v-bottom-navigation v-model="bottomNav" class="mt-3" height="48" @change="resetNav">
 			<v-btn class="d-none">{{ bottomNav }}</v-btn>
@@ -260,6 +253,7 @@ import stepName from '@/json/hiper/stepName.json';
 import stepState from '@/json/hiper/stepState.json';
 import { HiperModule } from '@/store/modules/hiper';
 import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg, IwsSerialMsg } from '@/types/renderer';
+import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_hiper';
 
 @Component({})
 export default class HiperDashboard extends Vue {
@@ -304,7 +298,8 @@ export default class HiperDashboard extends Vue {
 	mounted() {
 		if (AppModule.isElectron) {
 			//
-			this.$ipcRenderer.on('serial', (e, args) => {
+			this.$ipcRenderer.on(EsocketOn.SERIAL, (e, args) => {
+				console.log(args.serial);
 				// 移除前 9 位
 				const serial = this.$lodash.drop(args.serial, 9) as number[];
 				this.serialToData(serial);
@@ -325,7 +320,7 @@ export default class HiperDashboard extends Vue {
 	beforeDestroy() {
 		if (AppModule.isElectron) {
 			// remove serial event
-			this.$ipcRenderer.removeAllListeners('serial');
+			this.$ipcRenderer.removeAllListeners(EsocketOn.SERIAL);
 		} else {
 			// nothing to do,
 		}
@@ -347,7 +342,7 @@ export default class HiperDashboard extends Vue {
 		//
 		this.pressure = this.HexArrToVal(serial, [6, 7]) / 10;
 		this.vacuum = this.HexArrToVal(serial, [10, 11, 8, 9]) / 100;
-
+		//
 		this.flow = this.HexArrToVal(serial, [12, 13]) / 10;
 		this.leaveTime = this.HexArrToVal(serial, [14, 15]) / 10;
 
@@ -401,7 +396,7 @@ export default class HiperDashboard extends Vue {
 		this.$root.$emit('alarmOff');
 		if (this.isElectron) {
 			this.$ipcRenderer
-				.invoke('alarm-res-hiper')
+				.invoke(EsocketInvoke.ALARMRES)
 				.then((res: { response: boolean; reset: boolean; error?: string }) => {
 					if (res.error) throw Error(res.error);
 					this.hasResponse = res.response;
@@ -427,7 +422,7 @@ export default class HiperDashboard extends Vue {
 		this.$root.$emit('alarmOff');
 		if (this.isElectron) {
 			this.$ipcRenderer
-				.invoke('alarm-rst-hiper')
+				.invoke(EsocketInvoke.ALARMRST)
 				.then((res: { response: boolean; reset: boolean; error?: string }) => {
 					if (res.error) throw Error(res.error);
 					this.hasResponse = res.response;
