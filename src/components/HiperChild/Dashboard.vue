@@ -54,7 +54,7 @@
 			<v-col cols="auto" class="d-flex flex-column">
 				<v-card
 					class="mx-auto my-auto"
-					max-width="400px"
+					max-width="450px"
 					color="grey"
 					:class="isDarkMode ? 'darken-2' : 'lighten-3'"
 					style="border-radius: 40%;"
@@ -66,11 +66,11 @@
 								class="text-right"
 								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
 							>
-								溫度設定值:
+								溫度設定值(℃)
 							</v-col>
 							<v-col cols="4" class="d-flex justify-space-around">
 								<span>{{ setTemp }}</span>
-								<span>&deg;C</span>
+								<!-- <span>&deg;C</span> -->
 							</v-col>
 							<!--  -->
 							<v-col
@@ -78,11 +78,11 @@
 								class="text-right"
 								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
 							>
-								上部溫度當前值:
+								上部溫度當前值(℃)
 							</v-col>
 							<v-col cols="4" class="d-flex justify-space-around">
 								<span>{{ topTemp }}</span>
-								<span>&deg;C</span>
+								<!-- <span>&deg;C</span> -->
 							</v-col>
 							<!--  -->
 							<v-col
@@ -90,11 +90,11 @@
 								class="text-right"
 								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
 							>
-								下部溫度當前值:
+								下部溫度當前值(℃)
 							</v-col>
 							<v-col cols="4" class="d-flex justify-space-around">
 								<span>{{ bottomTemp }}</span>
-								<span>&deg;C</span>
+								<!-- <span>&deg;C</span> -->
 							</v-col>
 							<!--  -->
 							<v-col
@@ -102,11 +102,11 @@
 								class="text-right"
 								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
 							>
-								爐內壓力值:
+								爐內壓力值(kPa)
 							</v-col>
 							<v-col cols="4" class="d-flex justify-space-around">
 								<span>{{ pressure }}</span>
-								<span>kPa</span>
+								<!-- <span>kPa</span> -->
 							</v-col>
 							<!--  -->
 							<v-col
@@ -114,11 +114,11 @@
 								class="text-right"
 								:class="isDarkMode ? 'lime--text text--lighten-2' : 'deep-purple--text text--darken-3'"
 							>
-								爐內真空值:
+								爐內真空值(Pa)
 							</v-col>
 							<v-col cols="4" class="d-flex justify-space-around">
 								<span>{{ vacuum }}</span>
-								<span>Pa</span>
+								<!-- <span>Pa</span> -->
 							</v-col>
 						</v-row>
 					</v-card-text>

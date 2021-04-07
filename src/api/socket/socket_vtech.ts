@@ -178,9 +178,10 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				// [0xD0, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, 0x00] => 副標頭, 網路編號, PC編號, IO編號, ...
 				// [0x2A, 0x00, 0x00, 0x00] => 資料長度, 錯誤碼
 				// [0x00, 0x00, 0x18, 0x00, 0x24, 0x00, 0x19, 0x00] => 設定溫度, 上部溫度, 中部溫度, 下部溫度
-				// [0xff, 0xff, 0xfe, 0xff, 0x00, 0x00, 0x00, 0x00] => 爐內壓力, 爐內真空, 氮氣流量, 氬氣流量
-				//
-				//
+				// [0xff, 0xff, 0xfe, 0xff, 0x00, 0x00, 0x00, 0x00] => 爐內壓力, 管道壓力, 氮氣流量, 氬氣流量
+				// [] => 剩餘時間, 工藝名稱, 工藝狀態
+				// [] => 爐內真空(32bits)
+				// [] => 報警 1(32bits), 報警 2(32bits), 報警 3(32bits)
 
 				// 寫coil回傳
 				// if (strArr[7] == 5) {
@@ -192,13 +193,38 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				// 有回應，清除Timeout notify
 				clearTimeout(tcpClient.samplingTimeoutTimer as NodeJS.Timeout);
 
-				const arr = drop(strArr, 9);
+				const arr = drop(strArr, 11);
 				tcpClient.stepName = stepName[arr[67]];
-				tcpClient.stepState = stepState[arr[49]];
+				tcpClient.stepState = stepState[arr[20]];
+
+				console.log(tcpClient.stepName);
+				console.log(tcpClient.stepState);
+
+				let errMsg1 = '';
+				let errMsg2 = '';
+				let errMsg3 = '';
+				const err1 = arr[32] + (arr[33] << 8) + (arr[34] << 16) + (arr[35] << 24); // 報警 1 // M700
+				const err2 = arr[36] + (arr[37] << 8) + (arr[38] << 16) + (arr[39] << 24); // 報警 2 // M7XX
+				const err3 = arr[40] + (arr[41] << 8) + (arr[42] << 16) + (arr[43] << 24); // 報警 3 // M7XX
+
+				for (let bit = 0; bit < 32; bit++) {
+					if (err1 != 0)
+						if (((err1 >> bit) & 0b1) === 0b1) {
+							errMsg1 += `\n${123}`;
+						}
+					if (err2 != 0)
+						if (((err1 >> bit) & 0b1) === 0b1) {
+							errMsg2 += `\n${123}`;
+						}
+					if (err3 != 0)
+						if (((err1 >> bit) & 0b1) === 0b1) {
+							errMsg3 += `\n${123}`;
+						}
+				}
 
 				// 報警狀態
 				// if (arr[49] != 0 && arr[49] <= 5) {
-				if (false) {
+				if (err1 !== 0 || err2 !== 0 || err3 !== 0) {
 					// 先確認是否在冷卻
 					if (!tcpClient.coolState) {
 						// 若不在冷卻中

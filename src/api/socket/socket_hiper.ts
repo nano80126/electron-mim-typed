@@ -206,7 +206,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				tcpClient.stepState = stepState[arr[49]];
 
 				// 報警狀態
-				if (arr[49] != 0 && arr[49] <= 5) {
+				if (arr[49] !== 0 && arr[49] <= 5) {
 					// 先確認是否在冷卻
 					if (!tcpClient.coolState) {
 						// 若不在冷卻中
