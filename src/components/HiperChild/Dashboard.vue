@@ -7,7 +7,7 @@
 			class="mt-3"
 			:style="{ height: isElectron ? `${$root.webHeight - 140}px` : `${$root.webHeight - 108}px` }"
 		>
-			<v-col class="d-flex flex-column align-start justify-center yellow" style="position: relative;">
+			<v-col class="d-flex flex-column align-start justify-center" style="position: relative;">
 				<v-card class="ml-3" flat outlined width="240px" style="position: absolute; top: 0;">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">
 						<span class="font-weight-black subtitle-1">連線狀態</span>
@@ -50,7 +50,8 @@
 					(保留)工藝狀態用，需另外加CSS
 				</div>
 			</v-col>
-			<v-col cols="auto" class="d-flex flex-column blue h-100">
+			<!-- h-100 -->
+			<v-col cols="auto" class="d-flex flex-column">
 				<v-card
 					class="mx-auto my-auto"
 					max-width="400px"
@@ -123,7 +124,7 @@
 					</v-card-text>
 				</v-card>
 			</v-col>
-			<v-col class="red">
+			<v-col class="">
 				<!-- empty for design -->
 			</v-col>
 			<div class="col-12" />

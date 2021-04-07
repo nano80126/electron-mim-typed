@@ -7,8 +7,8 @@
 			class="mt-3"
 			:style="{ height: isElectron ? `${$root.webHeight - 140}px` : `${$root.webHeight - 108}px` }"
 		>
-			<v-col class="d-flex flex-column align-start justify-start">
-				<v-card class="ml-3" flat outlined width="240px">
+			<v-col class="d-flex flex-column align-start justify-center">
+				<v-card class="ml-3" flat outlined width="240px" style="position: absolute; top: 0;">
 					<v-card-subtitle class="text-center py-2 grey" :class="isDarkMode ? 'darken-2' : 'lighten-2'">
 						<span class="font-weight-black subtitle-1">連線狀態</span>
 					</v-card-subtitle>
@@ -36,7 +36,7 @@
 					</v-card-text>
 				</v-card>
 
-				<div class="ml-3" style="positin:relative; margin-top: 6%; width: calc(100% - 16px);">
+				<div class="ml-3" style="width: calc(100% - 16px);">
 					<div class="my-10">
 						<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
 							<v-chip class="mt-n3 flow-chip d-flex justify-center">
