@@ -18,7 +18,8 @@ import './api/log4js';
 import './api/express';
 import './api/socket/socket_hiper';
 import './api/socket/socket_vtech';
-// import './api/crawler';
+import './api/cron';
+import { message } from '@/api/line';
 // import './api/sharp';
 
 import { registerHotkey, unregisterAllHotKey } from './api/shortcut';
@@ -314,6 +315,18 @@ ipcMain.handle('isMaxmized', () => {
 	return win?.isMaximized();
 });
 // // // // // // // // // // // // // // // // // // //
+
+/**Line notify test */
+ipcMain.on('notifySend', (e, args) => {
+	const { msg } = args;
+	message(msg)
+		.then(res => {
+			e.sender.send('notifyRes', res.data);
+		})
+		.catch((err: NodeJS.ErrnoException) => {
+			e.sender.send('notifyRes', { error: true, code: err.code, message: err.message });
+		});
+});
 
 /**同步語言 */
 // ipcMain.on('syncLanguage', (e, args) => {

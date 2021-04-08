@@ -373,10 +373,8 @@ export default class VtechDashboard extends Vue {
 		if (AppModule.isElectron) {
 			//
 			this.$ipcRenderer.on(EsocketOn.SERIAL, (e, args) => {
-				console.log(args.serial);
 				// 移除 header(7), 資料長度(2), 錯誤碼(2) // 前 11 位
 				const serial = this.$lodash.drop(args.serial, 11) as number[];
-				console.log(serial);
 				this.serialToData(serial);
 				if (args.alarm) {
 					if (!this.hasResponse) this.$root.$emit('alarmOn');
@@ -488,7 +486,6 @@ export default class VtechDashboard extends Vue {
 				furnace: EwsFurnaceType.VTECH,
 				command: EwsCommand.ALARMRESPONSE
 			};
-			// console.log(wsMsg);
 			this.$root.$ws.send(JSON.stringify(wsMsg));
 		}
 	}
@@ -514,7 +511,6 @@ export default class VtechDashboard extends Vue {
 				furnace: EwsFurnaceType.VTECH,
 				command: EwsCommand.ALARMRESET
 			};
-			// console.log(wsMsg);
 			this.$root.$ws.send(JSON.stringify(wsMsg));
 		}
 	}

@@ -4,11 +4,9 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
 import { CronJob } from 'cron';
 import { drop, flatten } from 'lodash';
-import moment from 'moment';
 import { getLogger } from 'log4js';
 
 // 主視窗 webContents
-import { mainWin } from '@/background';
 
 // 設備工序狀態 & 工序名稱
 import stepName from '@/json/vtech/stepName.json';
@@ -41,38 +39,38 @@ const log = getLogger('vtech');
 /**宣告 client */
 let tcpClient: FSocket;
 
-log.info('Start daily notification of Vtech furnace');
-new CronJob(
-	'0 30 17,22 * * 0-6',
-	() => {
-		let msg = `\n現在時間: ${moment().format('MM/DD HH:mm:ss')}\n伺服器狀態: 正常`;
+// log.info('Start daily notification of Vtech furnace');
+// new CronJob(
+// 	'0 30 17,22 * * 0-6',
+// 	() => {
+// 		let msg = `\n現在時間: ${moment().format('MM/DD HH:mm:ss')}\n伺服器狀態: 正常`;
 
-		if (tcpClient && tcpClient.connected) {
-			msg += `\n工藝狀態: ${tcpClient.stepState} \n工藝名稱: ${tcpClient.stepName}`;
-		} else {
-			msg += '\n燒結爐狀態: 未連線';
-		}
+// 		if (tcpClient && tcpClient.connected) {
+// 			msg += `\n工藝狀態: ${tcpClient.stepState} \n工藝名稱: ${tcpClient.stepName}`;
+// 		} else {
+// 			msg += '\n燒結爐狀態: 未連線';
+// 		}
 
-		message(msg)
-			.then(res => {
-				// mainWin.send
-				mainWin?.send('notifyRes', res.data);
-				log.info('Daily notification');
-			})
-			.catch(err => {
-				// mainWin.send
-				mainWin?.send('notifyRes', {
-					error: true,
-					code: err.code,
-					message: err.message
-				});
-				// append to log
-				log.warn(`${err.code} ${err.message}`);
-			});
-	},
-	null,
-	true
-);
+// 		message(msg)
+// 			.then(res => {
+// 				// mainWin.send
+// 				mainWin?.send('notifyRes', res.data);
+// 				log.info('Daily notification');
+// 			})
+// 			.catch(err => {
+// 				// mainWin.send
+// 				mainWin?.send('notifyRes', {
+// 					error: true,
+// 					code: err.code,
+// 					message: err.message
+// 				});
+// 				// append to log
+// 				log.warn(`${err.code} ${err.message}`);
+// 			});
+// 	},
+// 	null,
+// 	true
+// );
 
 ipcMain.on('data', (e, args) => {
 	console.log(args);
@@ -572,18 +570,6 @@ ipcMain.handle(EsocketVtechHandle.ALARMRST, () => {
 	} else {
 		return { error: 'Vtech furnace is not connected' };
 	}
-});
-
-// 處理 notify 發送命令
-ipcMain.on('notifySend', (e, args) => {
-	const { msg } = args;
-	message(msg)
-		.then(res => {
-			e.sender.send('notifyRes', res.data);
-		})
-		.catch((err: NodeJS.ErrnoException) => {
-			e.sender.send('notifyRes', { error: true, code: err.code, message: err.message });
-		});
 });
 
 // Number.prototype.toHex = function() {

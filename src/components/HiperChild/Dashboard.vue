@@ -301,7 +301,6 @@ export default class HiperDashboard extends Vue {
 		if (AppModule.isElectron) {
 			//
 			this.$ipcRenderer.on(EsocketOn.SERIAL, (e, args) => {
-				console.log(args.serial);
 				// 移除前 9 位
 				const serial = this.$lodash.drop(args.serial, 9) as number[];
 				this.serialToData(serial);
@@ -413,7 +412,6 @@ export default class HiperDashboard extends Vue {
 				furnace: EwsFurnaceType.HIPER,
 				command: EwsCommand.ALARMRESPONSE
 			};
-			// console.log(wsMsg);
 			this.$root.$ws.send(JSON.stringify(wsMsg));
 		}
 	}
@@ -439,7 +437,6 @@ export default class HiperDashboard extends Vue {
 				furnace: EwsFurnaceType.HIPER,
 				command: EwsCommand.ALARMRESET
 			};
-			// console.log(wsMsg);
 			this.$root.$ws.send(JSON.stringify(wsMsg));
 		}
 	}

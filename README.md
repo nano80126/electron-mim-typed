@@ -47,14 +47,16 @@ Revoke POST https://notify-api.line.me/api/revoke
 * [x] Divide socket api for two furnace
 * [ ] Login for response and reset alarm 
 * [x] Use Web Worker to deal data
-* [ ] vtech farnace 
-* [ ] Add alarm audio 
+* [x] vtech farnace 
+* [x] Add alarm audio 
 * [ ] Add mongoDB for recording work step history 
-* [ ] Add enum between ipcMain and ipcRenderer (invoke and handle done ex. connect, disconnect, sample)
-* [ ] Vtech Connect.vue 返回
+* [x] Add enum between ipcMain and ipcRenderer (invoke and handle done ex. connect, disconnect, sample)
+* [x] Vtech Connect.vue 返回
 * [ ] Make sure no duplicated mutation exist in hiper and vtech module
-* [ ] Add comment of modbus tcp return
-* [ ] Add error json of HIPER
+* [x] Add comment of modbus tcp return
+* [x] Add error json of HIPER
+* [ ] Move broadcast, line notify to overall page 
+* [ ] Rewrite changing background color logic 
 
 ## bugs
 * [ ] Progress is not full when uploading csv
