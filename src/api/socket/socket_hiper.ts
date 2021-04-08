@@ -15,8 +15,6 @@ import stepName from '@/json/hiper/stepName.json';
 import stepState from '@/json/hiper/stepState.json';
 import { r30028, r30030, r30032 } from '@/json/hiper/errros';
 
-// console.log(r30028);
-
 // 自定義引入
 import {
 	EsocketHiperHandle,

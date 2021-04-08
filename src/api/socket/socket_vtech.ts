@@ -13,6 +13,7 @@ import { mainWin } from '@/background';
 // 設備工序狀態 & 工序名稱
 import stepName from '@/json/vtech/stepName.json';
 import stepState from '@/json/vtech/stepState.json';
+import { M700, M732 } from '@/json/vtech/errros';
 
 // 自定義引入
 import {
@@ -194,45 +195,41 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				clearTimeout(tcpClient.samplingTimeoutTimer as NodeJS.Timeout);
 
 				const arr = drop(strArr, 11);
-				tcpClient.stepName = stepName[arr[67]];
+				tcpClient.stepName = stepName[arr[18] + (arr[19] << 8)];
 				tcpClient.stepState = stepState[arr[20]];
 
-				console.log(tcpClient.stepName);
-				console.log(tcpClient.stepState);
+				// console.log(tcpClient.stepName);
+				// console.log(tcpClient.stepState);
 
 				let errMsg1 = '';
 				let errMsg2 = '';
-				let errMsg3 = '';
 				const err1 = arr[32] + (arr[33] << 8) + (arr[34] << 16) + (arr[35] << 24); // 報警 1 // M700
 				const err2 = arr[36] + (arr[37] << 8) + (arr[38] << 16) + (arr[39] << 24); // 報警 2 // M7XX
-				const err3 = arr[40] + (arr[41] << 8) + (arr[42] << 16) + (arr[43] << 24); // 報警 3 // M7XX
 
 				for (let bit = 0; bit < 32; bit++) {
 					if (err1 != 0)
 						if (((err1 >> bit) & 0b1) === 0b1) {
-							errMsg1 += `\n${123}`;
+							errMsg1 += `\n${M700}`;
 						}
 					if (err2 != 0)
 						if (((err1 >> bit) & 0b1) === 0b1) {
-							errMsg2 += `\n${123}`;
-						}
-					if (err3 != 0)
-						if (((err1 >> bit) & 0b1) === 0b1) {
-							errMsg3 += `\n${123}`;
+							errMsg2 += `\n${M732}`;
 						}
 				}
 
 				// 報警狀態
 				// if (arr[49] != 0 && arr[49] <= 5) {
-				if (err1 !== 0 || err2 !== 0 || err3 !== 0) {
+				if (err1 !== 0 || err2 !== 0) {
 					// 先確認是否在冷卻
 					if (!tcpClient.coolState) {
 						// 若不在冷卻中
 						const msg =
 							'\n伺服器狀態: 正常' +
-							'\n警告: 報警產生' +
 							`\n工藝狀態: ${tcpClient.stepState}` +
-							`\n工藝名稱: ${tcpClient.stepName}`;
+							`\n工藝名稱: ${tcpClient.stepName}` +
+							'\n警告: 報警產生' +
+							(errMsg1 != '' ? errMsg1 : '') +
+							(errMsg2 != '' ? errMsg2 : '');
 
 						message(msg)
 							.then(res => {

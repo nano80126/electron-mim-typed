@@ -59,6 +59,12 @@ Object.defineProperties(Vue.prototype, {
 	$wsUrl: {
 		value: process.env.IS_ELECTRON ? undefined : wsUrl,
 		writable: process.env.IS_ELECTRON ? false : true
+	},
+	/**取得現在已註冊之事件名稱 */
+	$eventNames: {
+		value: function() {
+			return Object.keys(this._events);
+		}
 	}
 });
 
@@ -84,6 +90,7 @@ declare module 'vue/types/vue' {
 		// $picPath: string;
 		$ws: WebSocket;
 		$wsUrl: string;
+		$eventNames(): string[];
 	}
 }
 
@@ -179,8 +186,8 @@ new Vue({
 						const wsMsg = JSON.parse(msg.data) as IwsMsg;
 						let openMsg;
 
-						console.log(msg);
-						console.log(wsMsg);
+						// console.log(msg);
+						// console.log(wsMsg);
 
 						switch (wsMsg.channel) {
 							case EwsChannel.OPEN:
@@ -191,7 +198,6 @@ new Vue({
 								if (wsMsg.furnace == EwsFurnaceType.HIPER) {
 									HiperModule.changeHiperConnected((wsMsg as IwsConnMsg).connected);
 								} else if (wsMsg.furnace == EwsFurnaceType.VTECH) {
-									//
 									VtechModule.changeVtechConnected((wsMsg as IwsConnMsg).connected);
 								}
 								break;

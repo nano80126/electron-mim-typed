@@ -25,7 +25,6 @@
 						<v-icon color="grey darken-2" small>fas fa-moon</v-icon>
 					</span>
 				</div> -->
-
 				<v-spacer />
 
 				<v-btn min-width="24" width="36" text class="no-drag" small @click="windowMin">
@@ -436,7 +435,6 @@ export default class App extends Vue {
 
 	created() {
 		if (AppModule.isElectron) {
-			//
 			// AppModule.changeOverlay(true);
 		}
 	}
@@ -572,6 +570,7 @@ export default class App extends Vue {
 // 			margin-left: 1rem;
 // 		}
 // 	}
+//
 // 	.navbar-collapse {
 // 		.navbar-nav {
 // 			display: flex;
@@ -661,6 +660,7 @@ export default class App extends Vue {
 // 		}
 // 	}
 // }
+//
 // .toolbar-title {
 // 	text-shadow: 1px 1px 2px darkred, -1px -1px 2px lightpink;
 // 	font-size: 1.5rem;

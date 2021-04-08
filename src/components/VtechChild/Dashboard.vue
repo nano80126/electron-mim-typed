@@ -41,7 +41,7 @@
 						<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
 							<v-chip class="mt-n3 flow-chip d-flex justify-center">
 								<span>氮氣流量</span>
-								<span class="mx-3">{{ flowN2 }}</span>
+								<span class="mx-3 text-right" style="width: 30px;">{{ flowN2 }}</span>
 								<v-icon small :color="flowN2 != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
 							</v-chip>
 						</v-sheet>
@@ -51,7 +51,7 @@
 						<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
 							<v-chip class="mt-n3 flow-chip d-flex justify-center">
 								<span>氬氣流量</span>
-								<span class="mx-3">{{ flowAr }}</span>
+								<span class="mx-3 text-right" style="width: 30px;">{{ flowAr }}</span>
 								<v-icon small :color="flowAr != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
 							</v-chip>
 						</v-sheet>
@@ -318,8 +318,8 @@ import { AppModule, Colors } from '@/store/modules/app';
 import { Component, Vue } from 'vue-property-decorator';
 
 import stepName from '@/json/vtech/stepName.json';
-// import stepState from '@/json/vtech/stepState.json';
-import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg } from '@/types/renderer';
+import stepState from '@/json/vtech/stepState.json';
+import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg, IwsSerialMsg } from '@/types/renderer';
 import { VtechModule } from '@/store/modules/vtech';
 import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_vtech';
 
@@ -394,10 +394,11 @@ export default class VtechDashboard extends Vue {
 
 	beforeDestroy() {
 		if (AppModule.isElectron) {
-			// remove serial event
+			// 移除 serial 事件
 			this.$ipcRenderer.removeAllListeners(EsocketOn.SERIAL);
 		} else {
-			// nothing to do,
+			// 反註冊 vtech serial 事件
+			this.$root.$off('vtechSerial');
 		}
 	}
 
@@ -416,16 +417,18 @@ export default class VtechDashboard extends Vue {
 		this.centerTemp = this.HexArrToVal(serial, [5, 4]);
 		this.bottomTemp = this.HexArrToVal(serial, [7, 6]);
 		//
-		this.furnacePres = (-(0xffff - this.HexArrToVal(serial, [9, 8])) - 1) / 10;
-		this.tubePres = (-(0xffff - this.HexArrToVal(serial, [11, 10])) - 1) / 10;
+		const fPres = this.HexArrToVal(serial, [9, 8]); // 有溢位問題
+		this.furnacePres = fPres > 32768 ? (-(0xffff - fPres) - 1) / 10 : fPres / 10;
+		const tPres = this.HexArrToVal(serial, [11, 10]); // 有溢位問題
+		this.tubePres = tPres > 32768 ? (-(0xffff - tPres) - 1) / 10 : tPres / 10;
 		this.vacuum = this.HexArrToVal(serial, [31, 30, 29, 28]) / 100;
 		//
-		this.flowN2 = this.HexArrToVal(serial, [13, 12]);
-		this.flowAr = this.HexArrToVal(serial, [15, 14]);
+		this.flowN2 = this.HexArrToVal(serial, [13, 12]) / 10;
+		this.flowAr = this.HexArrToVal(serial, [15, 14]) / 10;
 		//
 		this.leaveTime = this.HexArrToVal(serial, [17, 16]);
 		this.workNowName = stepName[this.HexArrToVal(serial, [19, 18])];
-		this.workNowState = (this.HexArrToVal(serial, [20]) & 0b1).toString(); // M12
+		this.workNowState = stepState[this.HexArrToVal(serial, [20]) & 0b1]; // M12
 		//
 		this.waitTime = this.HexArrToVal(serial, [23, 22]);
 	}
@@ -433,6 +436,15 @@ export default class VtechDashboard extends Vue {
 	// 新增 ws 訊息事件
 	private addMsgEvent() {
 		//
+		this.$root.$on('vtechSerial', (data: IwsSerialMsg) => {
+			this.serialToData(this.$lodash.drop(data.serial, 11));
+
+			if (data.alarm) {
+				this.$root.$emit('alarmOn');
+			} else {
+				this.$root.$emit('alarmOff');
+			}
+		});
 	}
 
 	/**廣播所有客戶端 */

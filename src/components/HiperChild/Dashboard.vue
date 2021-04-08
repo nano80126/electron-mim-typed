@@ -40,15 +40,16 @@
 					<v-sheet height="8px" color="grey darken-2" elevation="2" style="position: relative;">
 						<v-chip class="mt-n3 flow-chip d-flex justify-center">
 							<span>氣體流量</span>
-							<span class="mx-3">{{ flow }}</span>
+							<span class="mx-3 text-right" style="width: 30px;">{{ flow }}</span>
 							<v-icon small :color="flow != 0 ? 'info' : 'grey'">fas fa-water</v-icon>
 						</v-chip>
 					</v-sheet>
 				</div>
 
-				<div class="mt-auto text-center" style="position: absolute; bottom: 0; color: blue; height: 300px;">
+				<!-- <div class="mt-auto text-center" 
+				style="position: absolute; bottom: 0; color: blue; height: 300px;">
 					(保留)工藝狀態用，需另外加CSS
-				</div>
+				</div> -->
 			</v-col>
 			<!-- h-100 -->
 			<v-col cols="auto" class="d-flex flex-column">
@@ -320,10 +321,11 @@ export default class HiperDashboard extends Vue {
 
 	beforeDestroy() {
 		if (AppModule.isElectron) {
-			// remove serial event
+			// 移除 serial 事件
 			this.$ipcRenderer.removeAllListeners(EsocketOn.SERIAL);
 		} else {
-			// nothing to do,
+			// 反註冊 hiper serial 事件
+			this.$root.$off('hiperSerial');
 		}
 	}
 
@@ -360,7 +362,6 @@ export default class HiperDashboard extends Vue {
 	private addMsgEvent() {
 		//
 		this.$root.$on('hiperSerial', (data: IwsSerialMsg) => {
-			console.log(data, 'hiperSerial');
 			this.serialToData(this.$lodash.drop(data.serial, 9));
 
 			if (data.alarm) {
