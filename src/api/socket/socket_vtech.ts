@@ -207,11 +207,11 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				for (let bit = 0; bit < 32; bit++) {
 					if (err1 != 0)
 						if (((err1 >> bit) & 0b1) === 0b1) {
-							errMsg1 += `\n${M700}`;
+							errMsg1 += `\n${M700[bit]}`;
 						}
 					if (err2 != 0)
 						if (((err1 >> bit) & 0b1) === 0b1) {
-							errMsg2 += `\n${M732}`;
+							errMsg2 += `\n${M732[bit]}`;
 						}
 				}
 

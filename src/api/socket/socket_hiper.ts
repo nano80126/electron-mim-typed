@@ -11,7 +11,7 @@ import { getLogger } from 'log4js';
 // 設備工序狀態 & 工序名稱
 import stepName from '@/json/hiper/stepName.json';
 import stepState from '@/json/hiper/stepState.json';
-import { r30028, r30030, r30032 } from '@/json/hiper/errros';
+import { R30028, R30030, R30032 } from '@/json/hiper/errros';
 
 // 自定義引入
 import {
@@ -218,16 +218,16 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 						for (let bit = 0; bit < 32; bit++) {
 							if (err1 != 0)
 								if (((err1 >> bit) & 0b1) === 0b1) {
-									errMsg1 += `\n${r30028[bit]}`;
+									errMsg1 += `\n${R30028[bit]}`;
 								}
 							if (err2 != 0) {
 								if (((err2 >> bit) & 0b1) === 0b1) {
-									errMsg2 += `\n${r30030[bit]}`;
+									errMsg2 += `\n${R30030[bit]}`;
 								}
 							}
 							if (err3 != 0) {
 								if (((err3 >> bit) & 0b1) === 0b1) {
-									errMsg3 += `\n${r30032[bit]}`;
+									errMsg3 += `\n${R30032[bit]}`;
 								}
 							}
 						}
