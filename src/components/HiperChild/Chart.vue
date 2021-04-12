@@ -155,7 +155,6 @@ export default class HiperChart extends Vue implements ChartComponent {
 
 		// setTimeout(() => {
 		this.$nextTick(async () => {
-			// console.log((e.target as HTMLInputElement).value);
 			// (e.target as HTMLInputElement).value = '';
 			this.dragging = false;
 			//

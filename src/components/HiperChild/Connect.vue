@@ -166,9 +166,6 @@ export default class HiperConnect extends Vue {
 					HiperModule.changeHiperSampling(args.sampling);
 				});
 			}
-
-			console.log(this.$ipcRenderer.eventNames());
-			console.log(this.$store);
 		}
 	}
 
@@ -254,7 +251,7 @@ export default class HiperConnect extends Vue {
 
 		this.$ipcRenderer.invoke(EsocketInvoke.SAMPLE, { sampling: bool }).then(res => {
 			//
-			console.log('sample', bool == res.sampling);
+			console.info(`%csample ${bool == res.sampling}`, 'color: #2196f3');
 		});
 	}
 

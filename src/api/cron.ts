@@ -11,7 +11,11 @@ import { message } from '@/api/line';
 
 const log = getLogger('app');
 
-log.info('Start daily notification of furnace');
+///
+/// 每日 17:30, 22:30 觸發通知
+///
+
+log.info('Start daily routine of LINE Notify to inform furnace status');
 new CronJob(
 	'0 30 17,22 * * 0-6',
 	() => {
@@ -34,7 +38,7 @@ new CronJob(
 			.then(res => {
 				// mainWin.send
 				mainWin?.send('notifyRes', res.data);
-				log.info('Daily notification');
+				log.info('Daily routine LINE Notify triggered');
 			})
 			.catch(err => {
 				// mainWin.send
@@ -44,7 +48,7 @@ new CronJob(
 					message: err.message
 				});
 				// append to log
-				log.warn(`${err.code} ${err.message}`);
+				log.error(`${err.code} ${err.message}`);
 			});
 	},
 	null,

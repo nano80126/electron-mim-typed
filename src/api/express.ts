@@ -134,6 +134,7 @@ wsServer.on('connection', (socket, req) => {
 				case EwsCommand.ALARMRESPONSE:
 					//
 					if (data.furnace == EwsFurnaceType.HIPER) {
+						// HIPER 燒結爐
 						if (hiperClient && hiperClient.connected) {
 							const arr = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
 							hiperClient.write(Buffer.from(arr));
@@ -151,9 +152,10 @@ wsServer.on('connection', (socket, req) => {
 								text: 'HIPER furnace is not connected'
 							};
 							socket.send(JSON.stringify(cmdRes));
-							hiperLog.warn('Hiper farnace is not connected');
+							hiperLog.warn('HIPER farnace is not connected');
 						}
 					} else if (data.furnace == EwsFurnaceType.VTECH) {
+						// VTECH 燒結爐
 						// vtech 不支援此功能
 						const cmdRes: IwsCommandResMessage = {
 							channel: EwsChannel.COMMANDRES,
@@ -167,6 +169,7 @@ wsServer.on('connection', (socket, req) => {
 				case EwsCommand.ALARMRESET:
 					//
 					if (data.furnace == EwsFurnaceType.HIPER) {
+						// HIPER 燒結爐
 						if (hiperClient && hiperClient.connected) {
 							const arr = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
 							hiperClient.write(Buffer.from(arr));
@@ -186,7 +189,8 @@ wsServer.on('connection', (socket, req) => {
 							socket.send(JSON.stringify(cmdRes));
 							hiperLog.warn('HIPER farnace is not connected');
 						}
-					} else {
+					} else if (data.furnace == EwsFurnaceType.VTECH) {
+						// VTECH 燒結爐
 						if (vtechClient && vtechClient.connected) {
 							const arr = [0x00];
 							vtechClient.write(Buffer.from(arr));

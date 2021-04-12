@@ -41,45 +41,38 @@ Revoke POST https://notify-api.line.me/api/revoke
 ### Use mongodb to save steps
 
 ### To do list 
+    * [ ] 登入以操作回應和重置警報
+    * [ ] 使用mongoDB紀錄工藝與組態 (ex. IP, port)
+    * [ ] LINE NOTIFY, Web socket廣播功能移動至總覽頁面
+    * [ ] 重寫報警時改變顏色邏輯
 
-* [*] Redirect if wrong path or refresh
-* [x] Save IP and port in hipermodule if connected
-* [x] Divide socket api for two furnace
-* [ ] Login for response and reset alarm 
-* [x] Use Web Worker to deal data
-* [x] vtech farnace 
-* [x] Add alarm audio 
-* [ ] Add mongoDB for recording work step history 
-* [x] Add enum between ipcMain and ipcRenderer (invoke and handle done ex. connect, disconnect, sample)
-* [x] Vtech Connect.vue 返回
-* [ ] Make sure no duplicated mutation exist in hiper and vtech module
-* [x] Add comment of modbus tcp return
-* [x] Add error json of HIPER
-* [ ] Move broadcast, line notify to overall page 
-* [ ] Rewrite changing background color logic 
 
-## bugs
-* [ ] Progress is not full when uploading csv
-* [ ] log4js not create log files in logs
+### Bugs
+    * 若爐子處於未啟動狀態，無法開啟自動連線與取樣
 
-## Test list 
-* [ ] Test connect 
-    * electron
-    * web
-* [ ] Test disconnect
-    * electron
-    * web
-* [ ] Test reconnect
-    * electron
-    * web
-* [ ] Test Data
-    * electron
-    * web
-* [ ] Daily notify
-* [ ] Error response
-    * electron
-    * web
-* [ ] Error reset
-    * electron
-    * web
+
+### 爐子報警後通知，尚未測試冷卻時間
+
+
+### log 分類
+    * INFO: 通知
+        * 開啟每日通知
+        * 觸發每日通知
+        * 燒結爐連線成功
+        * 手動回應報警
+        * 手動重置報警
+        * 新客戶端連線
+    * WARNING
+        * 燒結爐連線中斷
+        * 燒結爐無回應
+        * 燒結爐連線失敗
+        * 遠端下達回應或重置命令時，燒結爐沒有連線
+    * ERROR
+        * 每日通知失敗
+        * 報警通知失敗
+        * Web socket server發生錯誤
+
+
+
+### 
 

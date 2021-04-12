@@ -112,9 +112,15 @@
 					<v-tooltip right transition="scroll-x-transition" open-delay="300">
 						<template v-slot:activator="{ attrs, on }">
 							<v-list-item to="/hiper" exact v-bind="attrs" v-on="on">
-								<v-list-item-content>
-									<v-icon small>fas fa-tag</v-icon>
+								<v-list-item-content style="position: relative;">
+									<v-icon small>fas fa-fire-alt</v-icon>
 									<!-- <img src="./assets/HIPER.png" width="32" /> -->
+									<span
+										class="subtitle-2 font-weight-black primary--text"
+										style="position:absolute; right:5%; bottom: 5%;"
+									>
+										H
+									</span>
 								</v-list-item-content>
 							</v-list-item>
 						</template>
@@ -124,13 +130,19 @@
 					<v-tooltip right transition="scroll-x-transition" open-delay="300">
 						<template v-slot:activator="{ attrs, on }">
 							<v-list-item to="/vtech" exact v-bind="attrs" v-on="on">
-								<v-list-item-content>
-									<v-icon small>fas fa-tag</v-icon>
+								<v-list-item-content style="position: relative;">
+									<v-icon small>fas fa-fire-alt</v-icon>
 									<!-- <v-img src="./assets/VTECH.png"></v-img> -->
+									<span
+										class="subtitle-2 font-weight-black primary--text"
+										style="position:absolute; right:5%; bottom: 5%;"
+									>
+										V
+									</span>
 								</v-list-item-content>
 							</v-list-item>
 						</template>
-						<span>vTech</span>
+						<span>宏倫</span>
 					</v-tooltip>
 				</v-list>
 

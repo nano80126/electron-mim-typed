@@ -125,10 +125,6 @@ export default class VtechConnect extends Vue {
 		if (AppModule.isElectron) {
 			if (VtechModule.ip != '') this.ip = VtechModule.ip;
 			if (VtechModule.port != 0) this.port = VtechModule.port;
-
-			console.log(VtechModule);
-			console.log(VtechModule.ip);
-			console.log(VtechModule.port);
 		}
 	}
 
@@ -170,8 +166,6 @@ export default class VtechConnect extends Vue {
 					VtechModule.changeVtechSampling(args.sampling);
 				});
 			}
-
-			console.log(this.$ipcRenderer.eventNames());
 		}
 	}
 
@@ -257,7 +251,7 @@ export default class VtechConnect extends Vue {
 
 		this.$ipcRenderer.invoke(EsocketInvoke.SAMPLE, { sampling: bool }).then(res => {
 			//
-			console.log('sample', bool == res.sampling);
+			console.info(`%csample ${bool == res.sampling}`, 'color: #2196f3');
 		});
 	}
 

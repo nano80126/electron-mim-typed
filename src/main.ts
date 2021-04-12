@@ -32,8 +32,9 @@ import { HiperModule } from './store/modules/hiper';
 import '@/style.scss';
 import { VtechModule } from './store/modules/vtech';
 
-const { VUE_APP_ADDRESS, VUE_APP_PORT } = process.env;
-const wsUrl = `ws://${VUE_APP_ADDRESS}:${VUE_APP_PORT}`;
+const { VUE_APP_PORT } = process.env;
+const ip = process.env.NODE_ENV === 'development' ? process.env.VUE_APP_DEV_ADDRESS : process.env.VUE_APP_ADDRESS;
+const wsUrl = `ws://${ip}:${VUE_APP_PORT}`;
 
 /// ///
 Object.defineProperties(Vue.prototype, {
@@ -160,10 +161,6 @@ new Vue({
 				} else {
 					console.info(`%c${JSON.stringify(args)}`, 'color: #4CAF50');
 				}
-			});
-
-			this.$ipcRenderer.on('test', (e, args) => {
-				console.log('test', args);
 			});
 		} else {
 			// IN BROWSER ENV

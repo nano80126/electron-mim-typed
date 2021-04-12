@@ -33,12 +33,10 @@ import { wsServer } from '@/api/express';
 // const appPath = app.getAppPath();
 const log = getLogger('hiper');
 
-// log.info('create new log for test, 測試新log');
-// // // // // // // // // // // // // // //
-
 /**宣告 client */
 let tcpClient: FSocket;
 
+/**搬移至cron.ts */
 // log.info('Start daily notification of Hiper furnace');
 // new CronJob(
 // 	'0 30 17,22 * * 0-6',
@@ -72,13 +70,10 @@ let tcpClient: FSocket;
 // 	true
 // );
 
-ipcMain.on('data', (e, args) => {
-	console.log(args);
-	e.sender.send('reply', 'this is a reply msg');
-});
-
+/**待刪 */
 // ipcMain.on('data', (e, args) => {
-// 	console.log(123);
+// 	console.log(args);
+// 	e.sender.send('reply', 'this is a reply msg');
 // });
 
 // reconnect at each 5 minutes if disconnect
@@ -93,10 +88,8 @@ const cronReconn = new CronJob(
 					family: 4
 				});
 			} catch (err) {
-				log.info(`${err.message}, code: ${err.code}`);
-				// console.error(err);
+				log.warn(`${err.message}, code: ${err.code}`);
 			}
-			console.log('Try to reconnect');
 		}
 	},
 	null,
@@ -235,6 +228,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 						// 合併訊息 + 錯誤(如果有)
 						const msg =
 							'\n伺服器狀態: 正常' +
+							'\n\n『 恆普 』' +
 							`\n工藝狀態: ${tcpClient.stepState}` +
 							`\n工藝名稱: ${tcpClient.stepName}` +
 							'\n警告: 報警產生' +
@@ -252,12 +246,13 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 									code: err.code,
 									message: err.message
 								});
-								// console.warn();
-								log.warn(`${err.messaage}, code: ${err.code}`);
+								// 通知失敗，紀錄LOG
+								log.error(`${err.messaage}, code: ${err.code}`);
 							});
 
 						tcpClient.coolState = true;
 						tcpClient.coolTimer = setTimeout(() => {
+							// 等待 15 分鐘
 							tcpClient.coolState = false;
 						}, 15 * 60 * 1000);
 					}
@@ -277,9 +272,10 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					});
 				} else {
 					// 正常狀態
-					tcpClient.coolState = false;
-					// reset cooldown timer
-					clearTimeout(tcpClient.coolTimer as NodeJS.Timeout);
+					// Clear cooldown state
+					// tcpClient.coolState = false;
+					// // CLear cooldown timer
+					// clearTimeout(tcpClient.coolTimer as NodeJS.Timeout);
 
 					// 回傳 renderer
 					e.sender.send(EsocketHiperSend.SERIAL, { serial: strArr, alarm: false });
@@ -309,7 +305,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 		// 連線失敗事件
 		tcpClient.on('error', (err: NodeJS.ErrnoException) => {
 			console.log(`${err.name} ${err.message}`);
-			log.error(`${err.name}: ${err.message}`);
+			log.warn(`${err.name}: ${err.message}`);
 
 			clearTimeout(connTimeout); // 清除連線逾時
 
@@ -344,10 +340,10 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 
 					if (!tcpClient.handleDisc) {
 						// 發出訊息
-						message(`\n伺服器狀態: 正常\n警告: 燒結爐連線中斷\nCode: ${err.code}`)
+						message(`\n伺服器狀態: 正常\n\n『 恆普 』\n警告: 燒結爐連線中斷\nCode: ${err.code}`)
 							.then(res => {
 								e.sender.send('notifyRes', res.data);
-								// console.log();
+								// 連線中斷，紀錄LOG
 								log.warn('燒結爐連線中斷。');
 							})
 							.catch((err: NodeJS.ErrnoException) => {
@@ -356,7 +352,8 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 									code: err.code,
 									message: err.message
 								});
-								log.warn(`${err.message}, code: ${err.code}`);
+								// 通知失敗，紀錄LOG
+								log.error(`${err.message}, code: ${err.code}`);
 							});
 
 						// 啟動重連機制 (僅被斷線情況啟動)
@@ -368,8 +365,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 								try {
 									tcpClient.connect({ host: ip, port: port, family: 4 });
 								} catch (err) {
-									// console.log(err);
-									log.error(`${err.message}, code: ${err.code}`);
+									log.warn(`${err.message}, code: ${err.code}`);
 								}
 							}, 5000);
 						}
@@ -434,9 +430,10 @@ const doSample = function(e: IpcMainInvokeEvent) {
 			console.log(tcpClient.samplingTimeoutCount);
 
 			if (tcpClient.samplingTimeoutCount >= 3) {
-				message(`\n伺服器狀態: 正常\n警告: 燒結爐無回應`)
+				message(`\n伺服器狀態: 正常\n\n『 恆普 』\n警告: 燒結爐無回應`)
 					.then(res => {
 						e.sender.send('notifyRes', res.data);
+						log.warn('燒結爐無回應');
 					})
 					.catch(err => {
 						e.sender.send('notifyRes', {
@@ -445,7 +442,8 @@ const doSample = function(e: IpcMainInvokeEvent) {
 							message: err.message,
 							errno: err.errno
 						});
-						log.warn('燒結爐無回應。');
+						// 通知失敗，紀錄LOG
+						log.error(`${err.message}, code: ${err.code}`);
 					});
 
 				tcpClient.samplingTimeoutCount = 0;
@@ -505,8 +503,7 @@ ipcMain.handle(EsocketHiperHandle.SAMPLE, (e, args) => {
 
 /**處理警報回應命令 */
 ipcMain.handle(EsocketHiperHandle.ALARMRES, () => {
-	log.info('handle alarm response');
-	console.log('handle alarm response');
+	log.info('Manual response alarm');
 	if (tcpClient && tcpClient.writable) {
 		// 報警應答
 		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
@@ -526,7 +523,7 @@ ipcMain.handle(EsocketHiperHandle.ALARMRES, () => {
 
 /**處理警報重置命令 */
 ipcMain.handle(EsocketHiperHandle.ALARMRST, () => {
-	log.info('handle alarm reset');
+	log.info('Manual reset alarm');
 	if (tcpClient && tcpClient.writable) {
 		// 報警重置
 		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
