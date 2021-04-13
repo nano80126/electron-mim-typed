@@ -45,6 +45,7 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [ ] 使用mongoDB紀錄工藝與組態 (ex. IP, port)
     * [ ] LINE NOTIFY, Web socket廣播功能移動至總覽頁面
     * [ ] 重寫報警時改變顏色邏輯
+    * [ ] 宏崙爐溫線圖(等待檔案提供)
 
 
 ### Bugs

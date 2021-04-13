@@ -568,7 +568,7 @@ ipcMain.handle(EsocketVtechHandle.ALARMRST, () => {
 		// 	tcpClient.write(Buffer.from(arrW));
 		// }, 1500);
 
-		// 報警重置
+		// 報警重置 // 待測試
 		const cmd = [0x01, 0x14, 0x01, 0x00]; // cmd, subcmd
 		const addr = [0x09, 0x00, 0x00, 0x90, 0x01, 0x00, 0x1]; // addr, device code, nb, data
 
@@ -579,8 +579,14 @@ ipcMain.handle(EsocketVtechHandle.ALARMRST, () => {
 		const head = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, leng[0], leng[1], 0x01, 0x00];
 
 		const buf = head.concat(cmd, addr);
+		tcpClient.write(Buffer.from(buf));
 
-		console.log(buf);
+		setTimeout(() => {
+			const addr2 = [0x09, 0x00, 0x00, 0x90, 0x00, 0x01, 0x00, 0x0]; // addr, device code, nb, data
+
+			const buf2 = head.concat(cmd, addr2);
+			tcpClient.write(Buffer.from(buf2));
+		}, 3000);
 		return { response: false, reset: true };
 	} else {
 		return { error: 'Vtech furnace is not connected' };
