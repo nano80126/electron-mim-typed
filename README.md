@@ -4,7 +4,12 @@ MIM Sintering furnace server
 
 Using Modbus TCP to get equipment status
 
-Addreess: 192.168.3.18:502
+
+HIPER:
+    Address: 192.168.3.18:502
+
+VTECH:
+    Address: 192.168.3.39:1028
 
 ## Feature
 
