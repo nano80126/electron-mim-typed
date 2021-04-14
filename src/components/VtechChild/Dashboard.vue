@@ -414,20 +414,20 @@ export default class VtechDashboard extends Vue {
 		this.topTemp = this.HexArrToVal(serial, [3, 2]);
 		this.centerTemp = this.HexArrToVal(serial, [5, 4]);
 		this.bottomTemp = this.HexArrToVal(serial, [7, 6]);
-		//
+		// //
 		const fPres = this.HexArrToVal(serial, [9, 8]); // 有溢位問題
 		this.furnacePres = fPres > 32768 ? (-(0xffff - fPres) - 1) / 10 : fPres / 10;
 		const tPres = this.HexArrToVal(serial, [11, 10]); // 有溢位問題
 		this.tubePres = tPres > 32768 ? (-(0xffff - tPres) - 1) / 10 : tPres / 10;
 		this.vacuum = this.HexArrToVal(serial, [31, 30, 29, 28]) / 100;
-		//
+		// //
 		this.flowN2 = this.HexArrToVal(serial, [13, 12]) / 10;
 		this.flowAr = this.HexArrToVal(serial, [15, 14]) / 10;
-		//
+		// //
 		this.leaveTime = this.HexArrToVal(serial, [17, 16]);
 		this.workNowName = stepName[this.HexArrToVal(serial, [19, 18])];
 		this.workNowState = stepState[this.HexArrToVal(serial, [20]) & 0b1]; // M12
-		//
+		// //
 		this.waitTime = this.HexArrToVal(serial, [23, 22]);
 	}
 

@@ -76,7 +76,7 @@ let tcpClient: FSocket;
 // 	e.sender.send('reply', 'this is a reply msg');
 // });
 
-// reconnect at each 5 minutes if disconnect
+/**reconnect at each 5 minutes if disconnect */
 const cronReconn = new CronJob(
 	'0 */5 * * * 0-6',
 	() => {
@@ -102,8 +102,6 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 	const port = args.port as number;
 	const interval = args.interval as number;
 	const reconnect = args.reconnect as boolean;
-
-	console.log(args);
 
 	tcpClient = new FSocket();
 	// Object.assign(tcpClient, furnace);
@@ -200,7 +198,6 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					if (!tcpClient.coolState) {
 						// 若不在冷卻中
 
-						console.log(arr[55], arr[59], arr[63]);
 						// // // 處理錯誤 // // //
 						let errMsg1 = '';
 						let errMsg2 = '';
@@ -209,16 +206,16 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 						const err2 = arr[59] + (arr[60] << 8) + (arr[61] << 16) + (arr[62] << 24); // 報警 2 // 30030
 						const err3 = arr[63] + (arr[64] << 8) + (arr[65] << 16) + (arr[66] << 24); // 報警 3 // 30032
 						for (let bit = 0; bit < 32; bit++) {
-							if (err1 != 0)
+							if (Number.isInteger(err1) && err1 > 0)
 								if (((err1 >> bit) & 0b1) === 0b1) {
 									errMsg1 += `\n${R30028[bit]}`;
 								}
-							if (err2 != 0) {
+							if (Number.isInteger(err2) && err2 > 0) {
 								if (((err2 >> bit) & 0b1) === 0b1) {
 									errMsg2 += `\n${R30030[bit]}`;
 								}
 							}
-							if (err3 != 0) {
+							if (Number.isInteger(err3) && err3 > 0) {
 								if (((err3 >> bit) & 0b1) === 0b1) {
 									errMsg3 += `\n${R30032[bit]}`;
 								}
@@ -456,9 +453,8 @@ const doSample = function(e: IpcMainInvokeEvent) {
 
 		const slave = [0x01]; // addr of slave
 		const fnCode = [0x04]; // function code
-		const addr = [0x00, 0x00]; // addr of start register
-		const data = [0x00, 0x22]; // data length
-		const cmd = slave.concat(fnCode, addr, data); // concat above for calculate length
+		const addr = [0x00, 0x00, 0x00, 0x22]; // addr of start register & data length
+		const cmd = slave.concat(fnCode, addr); // concat above for calculate length
 
 		const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
 
@@ -506,14 +502,26 @@ ipcMain.handle(EsocketHiperHandle.ALARMRES, () => {
 	log.info('Manual response alarm');
 	if (tcpClient && tcpClient.writable) {
 		// 報警應答
-		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
-		tcpClient.write(Buffer.from(arrW));
+		const slave = [0x01]; // addr of slave
+		const fnCode = [0x05]; // function code // write coil
+		const addr = [0x00, 0x01]; // addr of start register
+		const data = [0xff, 0x00]; // data
+		const cmd = slave.concat(fnCode, addr, data);
 
+		const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
+
+		const buf = head.concat(cmd);
+		// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
+		tcpClient.write(Buffer.from(buf));
 		// 等待 1500 ms
 		setTimeout(() => {
 			// 關閉應答
-			const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
-			tcpClient.write(Buffer.from(arrW));
+			const data2 = [0x00, 0x00];
+			const cmd2 = slave.concat(fnCode, addr, data2);
+
+			const buf2 = head.concat(cmd2);
+			// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
+			tcpClient.write(Buffer.from(buf2));
 		}, 1500);
 		return { response: true, reset: false };
 	} else {
@@ -526,13 +534,26 @@ ipcMain.handle(EsocketHiperHandle.ALARMRST, () => {
 	log.info('Manual reset alarm');
 	if (tcpClient && tcpClient.writable) {
 		// 報警重置
-		const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
-		tcpClient.write(Buffer.from(arrW));
+		const slave = [0x01]; // addr of slave
+		const fnCode = [0x05]; // function code // write coil
+		const addr = [0x00, 0x02]; // addr of start register
+		const data = [0xff, 0x00]; // data
+		const cmd = slave.concat(fnCode, addr, data);
+
+		const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
+
+		const buf = head.concat(cmd);
+		// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
+		tcpClient.write(Buffer.from(buf));
 
 		setTimeout(() => {
 			// 關閉報警重置
-			const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0x00, 0x00];
-			tcpClient.write(Buffer.from(arrW));
+			const data2 = [0x00, 0x00];
+			const cmd2 = slave.concat(fnCode, addr, data2);
+
+			const buf2 = head.concat(cmd2);
+			// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0x00, 0x00];
+			tcpClient.write(Buffer.from(buf2));
 		}, 1500);
 		return { response: false, reset: true };
 	} else {

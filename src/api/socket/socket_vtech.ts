@@ -76,7 +76,7 @@ let tcpClient: FSocket;
 // 	e.sender.send('reply', 'this is a reply msg');
 // });
 
-// reconnect at each 5 minutes if disconnect
+/**reconnect at each 5 minutes if disconnect */
 const cronReconn = new CronJob(
 	'0 */5 * * * 0-6',
 	() => {
@@ -102,8 +102,6 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 	const port = args.port as number;
 	const interval = args.interval as number;
 	const reconnect = args.reconnect as boolean;
-
-	console.log(args);
 
 	tcpClient = new FSocket();
 	// Object.assign(tcpClient, furnace);
@@ -203,19 +201,19 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				const err2 = arr[36] + (arr[37] << 8) + (arr[38] << 16) + (arr[39] << 24); // 報警 2 // M7XX
 
 				for (let bit = 0; bit < 32; bit++) {
-					if (err1 != 0)
+					if (Number.isInteger(err1) && err1 > 0)
 						if (((err1 >> bit) & 0b1) === 0b1) {
 							errMsg1 += `\n${M700[bit]}`;
 						}
-					if (err2 != 0)
+					if (Number.isInteger(err2) && err2 > 0)
 						if (((err1 >> bit) & 0b1) === 0b1) {
 							errMsg2 += `\n${M732[bit]}`;
 						}
 				}
 
 				// 報警狀態
-				// if (arr[49] != 0 && arr[49] <= 5) {
-				if (err1 !== 0 || err2 !== 0) {
+				// err 為整數且大於 0
+				if (errMsg1 !== '' || errMsg2 !== '') {
 					// 先確認是否在冷卻
 					if (!tcpClient.coolState) {
 						// 若不在冷卻中
@@ -573,7 +571,7 @@ ipcMain.handle(EsocketVtechHandle.ALARMRST, () => {
 		const addr = [0x09, 0x00, 0x00, 0x90, 0x01, 0x00, 0x1]; // addr, device code, nb, data
 
 		const l = 2 + cmd.length + addr.length;
-		const leng = [l & 0xff, (l & 0xff) >> 8];
+		const leng = [l & 0xff, (l & 0xff00) >> 8];
 
 		// 副標頭(2 bytes) + 網路編號(1 byte) + PC 編號(1 byte) + 請求目標模組IO編號(2 bytes) + 請求資料長度(2 bytes) + 監視計時器(2 bytes)
 		const head = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, leng[0], leng[1], 0x01, 0x00];
@@ -582,11 +580,11 @@ ipcMain.handle(EsocketVtechHandle.ALARMRST, () => {
 		tcpClient.write(Buffer.from(buf));
 
 		setTimeout(() => {
-			const addr2 = [0x09, 0x00, 0x00, 0x90, 0x00, 0x01, 0x00, 0x0]; // addr, device code, nb, data
+			const addr2 = [0x09, 0x00, 0x00, 0x90, 0x01, 0x00, 0x0]; // addr, device code, nb, data
 
 			const buf2 = head.concat(cmd, addr2);
 			tcpClient.write(Buffer.from(buf2));
-		}, 3000);
+		}, 1500);
 		return { response: false, reset: true };
 	} else {
 		return { error: 'Vtech furnace is not connected' };

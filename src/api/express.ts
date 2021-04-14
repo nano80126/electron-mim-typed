@@ -192,13 +192,23 @@ wsServer.on('connection', (socket, req) => {
 					} else if (data.furnace == EwsFurnaceType.VTECH) {
 						// VTECH 燒結爐
 						if (vtechClient && vtechClient.connected) {
-							const arr = [0x00];
-							vtechClient.write(Buffer.from(arr));
+							// const arr = [0x00];
+							const cmd = [0x01, 0x14, 0x01, 0x00];
+							const addr = [0x09, 0x00, 0x00, 0x90, 0x01, 0x00, 0x1];
+							const l = 2 + cmd.length + addr.length;
+							const leng = [l & 0xff, (l & 0xff00) >> 8];
+
+							// 副標頭(2 bytes) + 網路編號(1 byte) + PC 編號(1 byte) + 請求目標模組IO編號(2 bytes) + 請求資料長度(2 bytes) + 監視計時器(2 bytes)
+							const head = [0x50, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00, leng[0], leng[1], 0x01, 0x00];
+
+							const buf = head.concat(cmd, addr);
+							vtechClient.write(Buffer.from(buf));
 							setTimeout(() => {
 								// 關閉重置 // 等待 1.5 秒
-								///
-								const arr = [0x00];
-								vtechClient.write(Buffer.from(arr));
+								const addr2 = [0x09, 0x00, 0x00, 0x90, 0x01, 0x00, 0x0];
+
+								const buf2 = head.concat(cmd, addr2);
+								vtechClient.write(Buffer.from(buf2));
 							}, 1500);
 						} else {
 							//

@@ -102,12 +102,14 @@
 						<template v-slot:activator="{ attrs, on }">
 							<v-list-item to="/overall" exact v-bind="attrs" v-on="on">
 								<v-list-item-content>
-									<v-icon small>fas fa-tag</v-icon>
+									<v-icon small>fas fa-desktop</v-icon>
 								</v-list-item-content>
 							</v-list-item>
 						</template>
 						<span>總體</span>
 					</v-tooltip>
+
+					<v-divider class="mx-3"></v-divider>
 
 					<v-tooltip right transition="scroll-x-transition" open-delay="300">
 						<template v-slot:activator="{ attrs, on }">

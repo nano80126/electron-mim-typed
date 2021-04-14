@@ -42,11 +42,12 @@ Revoke POST https://notify-api.line.me/api/revoke
 
 ### To do list 
     * [ ] 登入以操作回應和重置警報
-    * [ ] 使用mongoDB紀錄工藝與組態 (ex. IP, port)
+    * [ ] 使用 mongoDB 紀錄工藝與組態 (ex. IP, port)
     * [ ] LINE NOTIFY, Web socket廣播功能移動至總覽頁面
     * [ ] 重寫報警時改變顏色邏輯
     * [ ] 宏崙爐溫線圖(等待檔案提供)
-
+    * [*] 宏崙燒結爐Web socket下達重置警報命令
+    * [ ] Line Notify 註冊頁面
 
 ### Bugs
     * 若爐子處於未啟動狀態，無法開啟自動連線與取樣

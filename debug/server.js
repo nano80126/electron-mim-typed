@@ -16,7 +16,7 @@ listener
 		console.log(`port ${port} has been connected`);
 
 		socket.on('data', data => {
-			console.log(data);
+			console.log(Array.from(data));
 
 			socket.write(Buffer.from([0x00, 0x01, 0x02]));
 		});
@@ -41,7 +41,7 @@ listener2
 		console.log(`port ${port2} has been connected`);
 
 		socket.on('data', data => {
-			console.log(data);
+			console.log(Array.from(data));
 
 			socket.write(Buffer.from([0x00, 0x01, 0x02]));
 		});
