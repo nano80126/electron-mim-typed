@@ -11,6 +11,7 @@ HIPER:
 VTECH:
     Address: 192.168.3.39:1028
 
+
 ## Feature
 
 * Connect equipment width electron
@@ -53,9 +54,11 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [ ] 宏崙爐溫線圖(等待檔案提供)
     * [*] 宏崙燒結爐Web socket下達重置警報命令
     * [ ] Line Notify 註冊頁面
+    * [ ] 新增ERROR CODE
 
 ### Bugs
     * 若爐子處於未啟動狀態，無法開啟自動連線與取樣
+    * VTECH 爐第一次連線會 TIMEOUT
 
 
 ### 爐子報警後通知，尚未測試冷卻時間
