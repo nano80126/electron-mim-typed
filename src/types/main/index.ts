@@ -95,6 +95,7 @@ export interface IwsCommandResMessage extends IwsMessage {
 export enum EsocketHiperHandle {
 	CONNECT = 'conn-hiper',
 	DISCONNECT = 'disc-hiper',
+	ALTERRECONNECT = 'alter-reconnect-hiper',
 	SAMPLE = 'sample-hiper',
 	ALARMRES = 'alarm-res-hiper',
 	ALARMRST = 'alarm-rst-hiper'
@@ -113,6 +114,7 @@ export enum EsocketHiperSend {
 export enum EsocketVtechHandle {
 	CONNECT = 'conn-vtech',
 	DISCONNECT = 'disc-vtech',
+	ALTERRECONNECT = 'alter-reconnect-vtech',
 	SAMPLE = 'sample-vtech',
 	ALARMRES = 'alarm-res-vtech',
 	ALARMRST = 'alarm-rst-vtech'

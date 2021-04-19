@@ -41,28 +41,29 @@ Revoke POST https://notify-api.line.me/api/revoke
 
 ### Check .env variable can be used in node environment even if it is not VUE_APP_XXX format
 
+<!-- ### Update to electron-11 -->
 
-### Update to electron-11
-
-### Use mongodb to save steps
+<!-- ### Use mongodb to save steps -->
 
 ### To do list 
+    * [x] 設備未開機也可以重連 
     * [ ] 登入以操作回應和重置警報
     * [ ] 使用 mongoDB 紀錄工藝與組態 (ex. IP, port)
     * [ ] LINE NOTIFY, Web socket廣播功能移動至總覽頁面
     * [ ] 重寫報警時改變顏色邏輯
     * [ ] 宏崙爐溫線圖(等待檔案提供)
-    * [*] 宏崙燒結爐Web socket下達重置警報命令
+    * [x] 宏崙燒結爐Web socket下達重置警報命令
     * [ ] Line Notify 註冊頁面
     * [ ] 新增ERROR CODE
 
 ### Bugs
     * 若爐子處於未啟動狀態，無法開啟自動連線與取樣
     * VTECH 爐第一次連線會 TIMEOUT
+    * VTECH 可能需要更換網路線
+    * VTECH LOG 紀錄有異常
 
 
 ### 爐子報警後通知，尚未測試冷卻時間
-
 
 ### log 分類
     * INFO: 通知

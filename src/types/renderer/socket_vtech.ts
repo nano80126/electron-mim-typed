@@ -5,6 +5,7 @@
 export enum EsocketInvoke {
 	CONNECT = 'conn-vtech',
 	DISCONNECT = 'disc-vtech',
+	ALTERRECONNECT = 'alter-reconnect-vtech',
 	SAMPLE = 'sample-vtech',
 	ALARMRES = 'alarm-res-vtech',
 	ALARMRST = 'alarm-rst-vtech'

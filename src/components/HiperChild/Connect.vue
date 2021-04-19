@@ -183,6 +183,9 @@ export default class HiperConnect extends Vue {
 
 	set reconnect(bool: boolean) {
 		HiperModule.changeHiperReconnect(bool);
+		this.$ipcRenderer.invoke(EsocketInvoke.ALTERRECONNECT, bool).then(res => {
+			console.info(`%cAlter reconnection: ${res}`, 'color: #4CAF50;');
+		});
 	}
 
 	get sampling() {

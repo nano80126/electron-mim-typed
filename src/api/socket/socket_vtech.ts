@@ -105,6 +105,14 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 
 	tcpClient = new FSocket();
 	// Object.assign(tcpClient, furnace);
+
+	// 初始化
+	tcpClient.handleDisc = false;
+	tcpClient.connected = false;
+	tcpClient.reconnect = reconnect;
+	tcpClient.ip = ip;
+	tcpClient.port = port;
+	tcpClient.interval = interval;
 	tcpClient.cron = cronReconn;
 
 	tcpClient.on('close', () => {
@@ -136,13 +144,17 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 			// Object.assign(tcpClient.furnace, {
 			// 	//
 			// });
-			// // // // 新增
-			tcpClient.handleDisc = false;
-			tcpClient.connected = true;
-			tcpClient.reconnect = reconnect;
-			tcpClient.ip = ip;
-			tcpClient.port = port;
-			tcpClient.interval = interval;
+			// // // // 新增 // 多餘待刪
+			// tcpClient.handleDisc = false;
+			tcpClient.connected = true; // 設定已連線
+			// tcpClient.reconnect = reconnect;
+			// tcpClient.ip = ip;
+			// tcpClient.port = port;
+			// tcpClient.interval = interval;
+			//
+
+			// // // // If cron is running, stop it.
+			if (tcpClient.cron?.running) tcpClient.cron.stop();
 			//
 
 			// response connection successful
@@ -308,6 +320,12 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 						connected: false,
 						error: { message: err.message, code: err.code }
 					});
+
+					// 啟動重連機制 (沒開機也可以啟動)
+					if (tcpClient.cron && !tcpClient.cron.running) {
+						tcpClient.cron.start();
+					}
+
 					tcpClient.destroy(); // 確保沒有資料傳輸且關閉連線
 					break;
 				case 'ECONNRESET': // 被斷線
@@ -349,15 +367,19 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 						if (tcpClient.cron) tcpClient.cron.start();
 
 						// 5 秒後重連
-						if (tcpClient.reconnect) {
-							setTimeout(() => {
-								try {
-									tcpClient.connect({ host: ip, port: port, family: 4 });
-								} catch (err) {
-									log.warn(`${err.message}, code: ${err.code}`);
-								}
-							}, 5000);
-						}
+						// if (tcpClient.reconnect) {
+						// 	setTimeout(() => {
+						// 		try {
+						// 			tcpClient.connect({ host: ip, port: port, family: 4 });
+						// 		} catch (err) {
+						// 			log.warn(`${err.message}, code: ${err.code}`);
+						// 		}
+						// 	}, 5000);
+						// }
+						setTimeout(() => {
+							// trigger tick function immediatelly
+							if (tcpClient.cron) tcpClient.cron.fireOnTick();
+						}, 5000);
 					}
 					tcpClient.destroy(); // 確保沒有資料傳輸且關閉連線
 					//
@@ -404,6 +426,17 @@ ipcMain.handle(EsocketVtechHandle.DISCONNECT, async () => {
 	});
 
 	return promise;
+});
+
+ipcMain.handle(EsocketVtechHandle.ALTERRECONNECT, (e, args) => {
+	const reconnect = args as boolean;
+	if (tcpClient) {
+		tcpClient.reconnect = reconnect;
+		return tcpClient.reconnect;
+	} else {
+		// client 不存在，回傳 null
+		return null;
+	}
 });
 
 // 執行取樣
@@ -553,7 +586,7 @@ ipcMain.handle(EsocketVtechHandle.ALARMRES, () => {
 	}
 });
 
-/**處理警報重製命令 */
+/**處理警報重置命令 */
 ipcMain.handle(EsocketVtechHandle.ALARMRST, () => {
 	log.info('Manual reset alarm');
 	if (tcpClient && tcpClient.writable) {

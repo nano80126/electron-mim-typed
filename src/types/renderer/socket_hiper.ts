@@ -5,6 +5,7 @@
 export enum EsocketInvoke {
 	CONNECT = 'conn-hiper',
 	DISCONNECT = 'disc-hiper',
+	ALTERRECONNECT = 'alter-reconnect-hiper',
 	SAMPLE = 'sample-hiper',
 	ALARMRES = 'alarm-res-hiper',
 	ALARMRST = 'alarm-rst-hiper'

@@ -105,6 +105,14 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 
 	tcpClient = new FSocket();
 	// Object.assign(tcpClient, furnace);
+
+	// 初始化
+	tcpClient.handleDisc = false;
+	tcpClient.connected = false;
+	tcpClient.reconnect = reconnect;
+	tcpClient.ip = ip;
+	tcpClient.port = port;
+	tcpClient.interval = interval;
 	tcpClient.cron = cronReconn;
 
 	tcpClient.on('close', () => {
@@ -136,15 +144,16 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 			// Object.assign(tcpClient.furnace, {
 			// 	//
 			// });
-			// // // // 新增
-			tcpClient.handleDisc = false;
+			// // // // 新增 // 多餘待刪
+			// tcpClient.handleDisc = false;
 			tcpClient.connected = true;
-			tcpClient.reconnect = reconnect;
-			tcpClient.ip = ip;
-			tcpClient.port = port;
-			tcpClient.interval = interval;
+			// tcpClient.reconnect = reconnect;
+			// tcpClient.ip = ip;
+			// tcpClient.port = port;
+			// tcpClient.interval = interval;
 			//
-			// // // // 若 cron 執行中，則停止
+
+			// // // // If cron is running, stop it.
 			if (tcpClient.cron?.running) tcpClient.cron.stop();
 			//
 
@@ -316,6 +325,12 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 						connected: false,
 						error: { message: err.message, code: err.code }
 					});
+
+					// 啟動重連機制 (沒開機也可以啟動)
+					if (tcpClient.cron && !tcpClient.cron.running) {
+						tcpClient.cron.start();
+					}
+
 					tcpClient.destroy(); // 確保沒有資料傳輸且關閉連線
 					break;
 				case 'ECONNRESET': // 被斷線
@@ -354,23 +369,30 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 							});
 
 						// 啟動重連機制 (僅被斷線情況啟動)
-						if (tcpClient.cron) tcpClient.cron.start();
+						if (tcpClient.cron && !tcpClient.cron.running) {
+							tcpClient.cron.start();
+						}
 
 						// 5 秒後重連
-						if (tcpClient.reconnect) {
-							setTimeout(() => {
-								try {
-									tcpClient.connect({ host: ip, port: port, family: 4 });
-								} catch (err) {
-									log.warn(`${err.message}, code: ${err.code}`);
-								}
-							}, 5000);
-						}
+						// if (tcpClient.reconnect) {
+						// 	setTimeout(() => {
+						// 		try {
+						// 			tcpClient.connect({ host: ip, port: port, family: 4 });
+						// 		} catch (err) {
+						// 			log.warn(`${err.message}, code: ${err.code}`);
+						// 		}
+						// 	}, 5000);
+						// }
+						setTimeout(() => {
+							// trigger tick function immediately
+							if (tcpClient.cron) tcpClient.cron.fireOnTick();
+						}, 5000);
 					}
 					tcpClient.destroy(); // 確保沒有資料傳輸且關閉連線
 					//
 					break;
 				default:
+					console.log('4');
 					// console.error(`${err.code} ${err}`);
 					log.error(`${err.message}, code: ${err.code}`);
 					break;
@@ -380,7 +402,6 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				connected: false,
 				error: { message: err.message, code: err.code }
 			});
-
 			//
 			// on error event end
 			//
@@ -415,6 +436,18 @@ ipcMain.handle(EsocketHiperHandle.DISCONNECT, async () => {
 	});
 
 	return promise;
+});
+
+// 處理變更重連請求
+ipcMain.handle(EsocketHiperHandle.ALTERRECONNECT, (e, args) => {
+	const reconnect = args as boolean;
+	if (tcpClient) {
+		tcpClient.reconnect = reconnect;
+		return tcpClient.reconnect;
+	} else {
+		// client 不存在，回傳 null
+		return null;
+	}
 });
 
 // 執行取樣
