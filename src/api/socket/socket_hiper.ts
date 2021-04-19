@@ -457,8 +457,6 @@ const doSample = function(e: IpcMainInvokeEvent) {
 		tcpClient.samplingTimeoutTimer = setTimeout(() => {
 			tcpClient.samplingTimeoutCount++;
 
-			console.log(tcpClient.samplingTimeoutCount);
-
 			if (tcpClient.samplingTimeoutCount >= 3) {
 				message(`\n伺服器狀態: 正常\n\n『 恆普 』\n警告: 燒結爐無回應`)
 					.then(res => {

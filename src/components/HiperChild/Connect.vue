@@ -18,7 +18,7 @@
 					</v-text-field>
 					<v-text-field v-model="interval" :rules="intervalRules" required>
 						<template v-slot:label>
-							<span class="font-weight-bold cyan--text text--darken-2">Sampling interval(ms)</span>
+							<span class="font-weight-bold cyan--text text--darken-2">取樣間隔(ms)</span>
 						</template>
 					</v-text-field>
 				</v-form>
@@ -31,8 +31,8 @@
 					hide-details
 				>
 					<template v-slot:label>
-						<span class="font-weight-bold ml-2 cyan--text text--darken-2">
-							Auto reconnect
+						<span class="font-weight-bold ml-1 mt-1 cyan--text text--darken-2">
+							自動重連
 						</span>
 					</template>
 				</v-checkbox>
