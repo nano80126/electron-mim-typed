@@ -11,30 +11,30 @@ const listener2 = net.createServer();
 // 	console.log('Server start at port: 3000.');
 // });
 
-listener
-	.on('connection', socket => {
-		console.log(`port ${port} has been connected`);
+// listener
+// 	.on('connection', socket => {
+// 		console.log(`port ${port} has been connected`);
 
-		socket.on('data', data => {
-			console.log(Array.from(data));
+// 		socket.on('data', data => {
+// 			console.log(Array.from(data));
 
-			socket.write(Buffer.from([0x00, 0x01, 0x02]));
-		});
+// 			socket.write(Buffer.from([0x00, 0x01, 0x02]));
+// 		});
 
-		socket.on('error', e => {
-			console.log(e);
-		});
+// 		socket.on('error', e => {
+// 			console.log(e);
+// 		});
 
-		socket.on('close', () => {
-			console.log('socket disconnected');
-		});
-	})
-	.on('close', () => {
-		console.log('Server closed');
-	})
-	.listen(port, () => {
-		console.log(`Server start at port: ${port}.`);
-	});
+// 		socket.on('close', () => {
+// 			console.log('socket disconnected');
+// 		});
+// 	})
+// 	.on('close', () => {
+// 		console.log('Server closed');
+// 	})
+// 	.listen(port, () => {
+// 		console.log(`Server start at port: ${port}.`);
+// 	});
 
 listener2
 	.on('connection', socket => {

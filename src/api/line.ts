@@ -3,6 +3,7 @@ import qs from 'qs';
 
 const token =
 	process.env.NODE_ENV == 'development' ? process.env.VUE_APP_LINE_DEV_TOKEN : process.env.VUE_APP_LINE_TOKEN;
+// process.env.NODE_ENV == 'development' ? process.env.VUE_APP_LINE_DEV_TOKEN : process.env.VUE_APP_LINE_TOKEN;
 
 export function message(msg: string) {
 	return axios.post(

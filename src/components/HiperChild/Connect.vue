@@ -163,6 +163,7 @@ export default class HiperConnect extends Vue {
 				console.info(`%cRegister ${EsocketOn.SAMPLINGCHANGED}`, 'color: #2196f3');
 				// 改變 sampling，自動重連後使用
 				this.$ipcRenderer.on(EsocketOn.SAMPLINGCHANGED, (e, args) => {
+					console.info(`%cSampling changed: ${args.sampling}`, 'color: #2196f3;');
 					HiperModule.changeHiperSampling(args.sampling);
 				});
 			}

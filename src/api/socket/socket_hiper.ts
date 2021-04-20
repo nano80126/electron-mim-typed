@@ -121,8 +121,6 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 		tcpClient.removeAllListeners('data');
 		tcpClient.connected = false;
 		tcpClient.destroy();
-		//
-		console.log(tcpClient.eventNames());
 	});
 
 	tcpClient.connect({ host: ip, port: port, family: 4 });
@@ -138,7 +136,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 		// 連線成功事件
 		tcpClient.on('connect', () => {
 			console.log(`Connect to ${ip}:${port}`);
-			log.info(`Connect to ${ip}:${port}`);
+			log.info(`Connect to Furnace(${ip}:${port})`);
 
 			clearTimeout(connTimeout); // 清除連線逾時
 			// Object.assign(tcpClient.furnace, {
@@ -154,7 +152,9 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 			//
 
 			// // // // If cron is running, stop it.
-			if (tcpClient.cron?.running) tcpClient.cron.stop();
+			if (tcpClient.cron && tcpClient.cron.running) {
+				tcpClient.cron.stop();
+			}
 			//
 
 			// response connection successful
@@ -356,7 +356,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 							.then(res => {
 								e.sender.send('notifyRes', res.data);
 								// 連線中斷，紀錄LOG
-								log.warn('燒結爐連線中斷。');
+								log.warn(`Furnace disconnected, CODE: ${err.code}`);
 							})
 							.catch((err: NodeJS.ErrnoException) => {
 								e.sender.send('notifyRes', {
@@ -461,7 +461,7 @@ const doSample = function(e: IpcMainInvokeEvent) {
 				message(`\n伺服器狀態: 正常\n\n『 恆普 』\n警告: 燒結爐無回應`)
 					.then(res => {
 						e.sender.send('notifyRes', res.data);
-						log.warn('燒結爐無回應');
+						log.warn('Furnace no response');
 					})
 					.catch(err => {
 						e.sender.send('notifyRes', {
