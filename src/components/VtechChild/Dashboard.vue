@@ -388,6 +388,10 @@ export default class VtechDashboard extends Vue {
 				this.addMsgEvent();
 			}
 		}
+
+		console.log(this);
+		console.log(this.$ipcRenderer.eventNames());
+		console.log(this.$root.$ipcRenderer.eventNames());
 	}
 
 	beforeDestroy() {
