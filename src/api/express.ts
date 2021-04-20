@@ -49,33 +49,43 @@ app.use((req, res, next) => {
 	next();
 });
 
-router.get('/', (req, res) => {
-	res.sendFile(path.resolve(frontPath, 'index.html'));
-});
+router
+	.get('/', (req, res) => {
+		res.sendFile(path.resolve(frontPath, 'index.html'));
+	})
+	.get('/root', (req, res) => {
+		res.send(frontPath);
+	})
+	.get('/:route', (req, res) => {
+		console.log(req.params);
 
-// router.get('/electron', (req, res) => {
-// 	res.sendFile(path.resolve(__dirname, 'index.html'));
+		// 重轉向首頁
+		if (/.ico$/.test(req.params.route)) {
+			res.sendStatus(404);
+		} else {
+			res.redirect(303, '/');
+		}
+	});
+
+// router.get('/root', (req, res) => {
+// 	res.send(frontPath);
 // });
 
-router.get('/root', (req, res) => {
-	res.send(frontPath);
-});
+// router.get('/:route', (req, res) => {
+// 	console.log(req.params);
 
-router.get('/:route', (req, res) => {
-	console.log(req.params);
-
-	// 重轉向首頁
-	if (/.ico$/.test(req.params.route)) {
-		res.sendStatus(404);
-	} else {
-		res.redirect(303, '/');
-	}
-});
+// 	// 重轉向首頁
+// 	if (/.ico$/.test(req.params.route)) {
+// 		res.sendStatus(404);
+// 	} else {
+// 		res.redirect(303, '/');
+// 	}
+// });
 
 /// /// ///
-router.get('/panel', (req, res) => {
-	res.sendFile(path.resolve(frontPath, 'panel.html'));
-});
+// router.get('/panel', (req, res) => {
+// 	res.sendFile(path.resolve(frontPath, 'panel.html'));
+// });
 
 // router.get('*', (req, res) => {
 // 	console.log(123);

@@ -31,7 +31,7 @@
 					hide-details
 				>
 					<template v-slot:label>
-						<span class="font-weight-bold ml-1 mt-1 cyan--text text--darken-2">
+						<span class="font-weight-bold ml-1 cyan--text text--darken-2" style="margin-top: 2px;">
 							自動重連
 						</span>
 					</template>

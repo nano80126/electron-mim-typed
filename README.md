@@ -55,13 +55,16 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [x] 宏崙燒結爐Web socket下達重置警報命令
     * [ ] Line Notify 註冊頁面
     * [ ] 新增ERROR CODE
+    * [x] 手動模式不會通知
+    * [ ] 自動開始取樣
+ 
+### 總覽頁面設計
 
 ### Bugs
     * 若爐子處於未啟動狀態，無法開啟自動連線與取樣
     * VTECH 爐第一次連線會 TIMEOUT
     * VTECH 可能需要更換網路線
     * VTECH LOG 紀錄有異常
-
 
 ### 爐子報警後通知，尚未測試冷卻時間
 

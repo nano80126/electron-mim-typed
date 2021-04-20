@@ -229,28 +229,31 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 					// 先確認是否在冷卻
 					if (!tcpClient.coolState) {
 						// 若不在冷卻中
-						const msg =
-							'\n伺服器狀態: 正常' +
-							'\n\n『 宏倫 』' +
-							`\n工藝狀態: ${tcpClient.stepState}` +
-							`\n工藝名稱: ${tcpClient.stepName}` +
-							'\n警告: 報警產生' +
-							(errMsg1 != '' ? errMsg1 : '') +
-							(errMsg2 != '' ? errMsg2 : '');
+						if (tcpClient.stepState == '自動狀態') {
+							// 若為自動狀態，才通知
+							const msg =
+								'\n伺服器狀態: 正常' +
+								'\n\n『 宏倫 』' +
+								`\n工藝狀態: ${tcpClient.stepState}` +
+								`\n工藝名稱: ${tcpClient.stepName}` +
+								'\n警告: 報警產生' +
+								(errMsg1 != '' ? errMsg1 : '') +
+								(errMsg2 != '' ? errMsg2 : '');
 
-						message(msg)
-							.then(res => {
-								e.sender.send('notifyRes', res.data);
-							})
-							.catch(err => {
-								e.sender.send('notifyRes', {
-									error: true,
-									code: err.code,
-									message: err.message
+							message(msg)
+								.then(res => {
+									e.sender.send('notifyRes', res.data);
+								})
+								.catch(err => {
+									e.sender.send('notifyRes', {
+										error: true,
+										code: err.code,
+										message: err.message
+									});
+									// 通知失敗，紀錄LOG
+									log.error(`${err.messaage}, code: ${err.code}`);
 								});
-								// 通知失敗，紀錄LOG
-								log.error(`${err.messaage}, code: ${err.code}`);
-							});
+						}
 
 						tcpClient.coolState = true;
 						tcpClient.coolTimer = setTimeout(() => {
