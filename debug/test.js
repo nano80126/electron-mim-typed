@@ -36,6 +36,21 @@
 
 // console.timeEnd('start');
 
-const a = (0x4 << 16) + (136 << 8) + 77;
+// const moment = require('moment');
 
-console.log(a);
+const d1 = '2412/04/16 17:30';
+const d2 = 'GT2K_LOG';
+
+const reg = new RegExp(/^[1-9]{2,4}\/\d{2}\/\d{2} \d{2}:\d{2}$/);
+
+console.log(reg.test(d1));
+console.log(reg.test(d2));
+
+// const a = moment('21/04/16 17:30', 'YY/MM/DD HH:mm');
+// const b = moment('21/04/16 17:05', 'YY/MM/DD HH:mm');
+
+// console.log(moment('21/04/16 17:30', 'YY/MM/DD HH:mm'));
+
+// const a = (0x4 << 16) + (136 << 8) + 77;
+
+// console.log(a);

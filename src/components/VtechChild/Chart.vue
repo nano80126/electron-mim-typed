@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import Highcharts, { Chart } from 'highcharts';
+import Highcharts, { Chart, SeriesOptionsType } from 'highcharts';
 
 import { AppModule } from '@/store/modules/app';
 import { Component, Vue } from 'vue-property-decorator';
@@ -121,8 +121,11 @@ export default class HiperChart extends Vue implements ChartComponent {
 	private dragging = false;
 	/**chart 資料 */
 	private series: {
-		[key: string]: number;
+		datetime: number;
+		data: number[]; // 12點溫度
 	}[] = [];
+
+	private names: string[] = [];
 	/**chart 物件 */
 	private chart: Chart | null = null;
 	/**顯示 menu */
@@ -163,12 +166,11 @@ export default class HiperChart extends Vue implements ChartComponent {
 			reader.addEventListener(
 				'load',
 				readData => {
-					Worker.analyzeCSV(readData.target?.result as string, 'hiper')
+					Worker.analyzeCSV(readData.target?.result as string, 'vtech')
 						// .then((res: { type: string; series: { [key: string]: number }[] }) => {
 						.then(res => {
 							this.series = res.series;
-
-							console.log(this.series);
+							this.names = res.names;
 						})
 						.finally(() => {
 							(e.target as HTMLInputElement).value = '';
@@ -178,43 +180,43 @@ export default class HiperChart extends Vue implements ChartComponent {
 				{ once: true }
 			);
 			// reader.readAsBinaryString(this.file as File);
-			reader.readAsText(this.file as File);
+			reader.readAsText(this.file as File, 'Shift-JIS');
 		});
 	}
 
-	/**處理資料 */
-	private dataDeal(fileEvent: Event) {
-		this.series = [];
-		const reader = new FileReader();
-		reader.onload = e => {
-			const txt = e.target?.result as string;
-			const lines = txt.split('\n');
+	/**處理資料 (已轉移至 web worker 處理)*/
+	// private dataDeal(fileEvent: Event) {
+	// 	this.series = [];
+	// 	const reader = new FileReader();
+	// 	reader.onload = e => {
+	// 		const txt = e.target?.result as string;
+	// 		const lines = txt.split('\n');
 
-			for (let i = 0; i < lines.length; i++) {
-				const items = lines[i].split(',');
+	// 		for (let i = 0; i < lines.length; i++) {
+	// 			const items = lines[i].split(',');
 
-				if (items.length >= 9) {
-					const m = this.$moment(items[0], 'YYYY/MM/DD HH:mm:ss');
-					if (m.isValid()) {
-						this.series.push({
-							datetime: m.valueOf(),
-							PG: parseInt(items[1]) / 100,
-							UpperTemp: parseInt(items[2]) / 10,
-							LowerTemp: parseInt(items[3]) / 10,
-							Flow: parseInt(items[4]) / 10,
-							PTVO: parseInt(items[5]) / 10,
-							PTVT: parseInt(items[6]) / 10,
-							PTVI: parseInt(items[7]) / 10,
-							Other: parseInt(items[8]) / 10
-						});
-					}
-				}
-				(fileEvent.target as HTMLInputElement).value = '';
-				AppModule.changeOverlay(false);
-			}
-		};
-		reader.readAsText(this.file as File);
-	}
+	// 			if (items.length >= 9) {
+	// 				const m = this.$moment(items[0], 'YYYY/MM/DD HH:mm:ss');
+	// 				if (m.isValid()) {
+	// 					this.series.push({
+	// 						datetime: m.valueOf(),
+	// 						PG: parseInt(items[1]) / 100,
+	// 						UpperTemp: parseInt(items[2]) / 10,
+	// 						LowerTemp: parseInt(items[3]) / 10,
+	// 						Flow: parseInt(items[4]) / 10,
+	// 						PTVO: parseInt(items[5]) / 10,
+	// 						PTVT: parseInt(items[6]) / 10,
+	// 						PTVI: parseInt(items[7]) / 10,
+	// 						Other: parseInt(items[8]) / 10
+	// 					});
+	// 				}
+	// 			}
+	// 			(fileEvent.target as HTMLInputElement).value = '';
+	// 			AppModule.changeOverlay(false);
+	// 		}
+	// 	};
+	// 	reader.readAsText(this.file as File);
+	// }
 
 	/**重置 Zoom */
 	private resetZoom() {
@@ -222,31 +224,39 @@ export default class HiperChart extends Vue implements ChartComponent {
 	}
 
 	private drawChart() {
-		const Obj: { [key: string]: [number, number][] } = {
-			PG: [],
-			upperTemp: [],
-			lowerTemp: [],
-			flow: [],
-			PTVO: [],
-			PTVT: [],
-			PTVI: [],
-			other: []
-		};
+		// const Obj: { [key: string]: [number, number][] } = {
+		// 	PG: [],
+		// 	upperTemp: [],
+		// 	lowerTemp: [],
+		// 	flow: [],
+		// 	PTVO: [],
+		// 	PTVT: [],
+		// 	PTVI: [],
+		// 	other: []
+		// };
 
 		const l = this.series.length;
 		const inc = Math.ceil(l / 800);
+		//
+		const obj: [[number, number][]] = [[]];
 		for (let i = 0; i < l; i += inc) {
 			const item = this.series[i];
 			const ts = item.datetime;
-			Obj.PG.push([ts, item.PG]);
-			Obj.upperTemp.push([ts, item.UpperTemp]);
-			Obj.lowerTemp.push([ts, item.LowerTemp]);
-			Obj.flow.push([ts, item.Flow]);
-			Obj.PTVO.push([ts, item.PTVO]);
-			Obj.PTVT.push([ts, item.PTVT]);
-			Obj.PTVI.push([ts, item.PTVI]);
-			Obj.other.push([ts, item.Other]);
+			for (let j = 0; j < item.data.length; j++) {
+				if (obj[j] == undefined) obj[j] = [];
+				obj[j].push([ts, item.data[j]]);
+			}
 		}
+
+		const objSeries = obj.map((o, idx) => {
+			return {
+				type: 'line',
+				name: this.names[idx],
+				data: obj[idx],
+				lineWidth: 1,
+				yAxis: 0
+			};
+		});
 
 		this.chart = Highcharts.chart('container', {
 			boost: {
@@ -302,42 +312,29 @@ export default class HiperChart extends Vue implements ChartComponent {
 							//
 							const l = data.length;
 							const inc = Math.ceil(l / 800); // 進位
-							// const Obj = {
-							const PG = [];
-							const upperTemp = [];
-							const lowerTemp = [];
-							const flow = [];
-							const PTVO = [];
-							const PTVT = [];
-							const PTVI = [];
-							const other = [];
-							// };
+							//
+							const obj: [[number, number][]] = [[]];
 							for (let i = 0; i < l; i += inc) {
 								const item = data[i];
 								const ts = item.datetime;
-								PG.push([ts, item.PG]);
-								upperTemp.push([ts, item.UpperTemp]);
-								lowerTemp.push([ts, item.LowerTemp]);
-								flow.push([ts, item.Flow]);
-								PTVO.push([ts, item.PTVO]);
-								PTVT.push([ts, item.PTVT]);
-								PTVI.push([ts, item.PTVI]);
-								other.push([ts, item.Other]);
+
+								for (let j = 0; j < item.data.length; j++) {
+									if (obj[j] == undefined) obj[j] = [];
+									obj[j].push([ts, item.data[j]]);
+								}
 							}
+							const objSeries = obj.map((o, idx) => {
+								return {
+									type: 'line',
+									name: this.names[idx],
+									data: obj[idx],
+									lineWidth: 1,
+									yAxis: 0
+								};
+							});
 
 							//
-							((e.target as unknown) as Chart).update({
-								series: [
-									{ type: 'line', data: upperTemp },
-									{ type: 'line', data: lowerTemp },
-									{ type: 'line', data: PG },
-									{ type: 'line', data: PTVO },
-									{ type: 'line', data: PTVT },
-									{ type: 'line', data: PTVI },
-									{ type: 'line', data: flow },
-									{ type: 'line', data: other }
-								]
-							});
+							((e.target as unknown) as Chart).update({ series: objSeries as SeriesOptionsType[] });
 							// e.target.showResetZoom();
 						} else {
 							//
@@ -345,39 +342,26 @@ export default class HiperChart extends Vue implements ChartComponent {
 							const l = series.length;
 							const inc = Math.ceil(l / 800);
 							//
-							const PG = [];
-							const upperTemp = [];
-							const lowerTemp = [];
-							const flow = [];
-							const PTVO = [];
-							const PTVT = [];
-							const PTVI = [];
-							const other = [];
+							const obj: [[number, number][]] = [[]];
 							for (let i = 0; i < l; i += inc) {
 								const item = series[i];
-								// const ts = this.$moment(item.datetime).valueOf();
 								const ts = item.datetime;
-								PG.push([ts, item.PG]);
-								upperTemp.push([ts, item.UpperTemp]);
-								lowerTemp.push([ts, item.LowerTemp]);
-								flow.push([ts, item.Flow]);
-								PTVO.push([ts, item.PTVO]);
-								PTVT.push([ts, item.PTVT]);
-								PTVI.push([ts, item.PTVI]);
-								other.push([ts, item.Other]);
+								for (let j = 0; j < item.data.length; j++) {
+									if (obj[j] == undefined) obj[j] = [];
+									obj[j].push([ts, item.data[j]]);
+								}
 							}
-							((e.target as unknown) as Chart).update({
-								series: [
-									{ type: 'line', data: upperTemp },
-									{ type: 'line', data: lowerTemp },
-									{ type: 'line', data: PG },
-									{ type: 'line', data: PTVO },
-									{ type: 'line', data: PTVT },
-									{ type: 'line', data: PTVI },
-									{ type: 'line', data: flow },
-									{ type: 'line', data: other }
-								]
+							const objSeries = obj.map((o, idx) => {
+								return {
+									type: 'line',
+									name: this.names[idx],
+									data: obj[idx],
+									lineWidth: 1,
+									yAxis: 0
+								};
 							});
+
+							((e.target as unknown) as Chart).update({ series: objSeries as SeriesOptionsType[] });
 						}
 						return undefined;
 					}
@@ -432,13 +416,13 @@ export default class HiperChart extends Vue implements ChartComponent {
 					tickColor: 'darkcyan',
 					tickWidth: 1,
 					tickAmount: 11,
-					tickInterval: 12,
+					// tickInterval: 12,
 					// max: 1200,
 					// min: 0,
 					title: {
 						align: 'high',
 						textAlign: 'center',
-						text: 'KPa',
+						text: 'Kpa',
 						x: 20,
 						y: -10,
 						rotation: 0,
@@ -578,16 +562,17 @@ export default class HiperChart extends Vue implements ChartComponent {
 					}
 				}
 			},
-			series: [
-				{ type: 'line', name: '上部溫度', data: Obj.upperTemp, lineWidth: 1, yAxis: 2, color: 'red' },
-				{ type: 'line', name: '下部溫度', data: Obj.lowerTemp, lineWidth: 1, yAxis: 2, color: 'purple' },
-				{ type: 'line', name: '真空度', data: Obj.PG, lineWidth: 1, yAxis: 1, color: 'green' },
-				{ type: 'line', name: '爐內壓力', data: Obj.PTVO, lineWidth: 1, yAxis: 0, color: 'darkcyan' },
-				{ type: 'line', name: '脫脂管道壓力', data: Obj.PTVT, lineWidth: 1, yAxis: 0, color: 'orange' },
-				{ type: 'line', name: '分壓管道壓力', data: Obj.PTVI, lineWidth: 1, yAxis: 0, color: 'gray' },
-				{ type: 'line', name: '氣體流量', data: Obj.flow, lineWidth: 1, yAxis: 3, color: 'blue' },
-				{ type: 'line', name: '保留', data: Obj.other, lineWidth: 1, yAxis: 3, color: 'black' }
-			],
+			// series: [
+			// 	{ type: 'line', name: this.names[0], data: Obj[0], lineWidth: 1, yAxis: 0, color: 'red' },
+			// 	{ type: 'line', name: this.names[1], data: Obj[1], lineWidth: 1, yAxis: 0, color: 'purple' }
+			// 	// { type: 'line', name: '真空度', data: Obj[2], lineWidth: 1, yAxis: 1, color: 'green' },
+			// 	// { type: 'line', name: '爐內壓力', data: Obj[3], lineWidth: 1, yAxis: 0, color: 'darkcyan' },
+			// 	// { type: 'line', name: '脫脂管道壓力', data: Obj[4], lineWidth: 1, yAxis: 0, color: 'orange' },
+			// 	// { type: 'line', name: '分壓管道壓力', data: Obj[5], lineWidth: 1, yAxis: 0, color: 'gray' },
+			// 	// { type: 'line', name: '氣體流量', data: Obj[6], lineWidth: 1, yAxis: 3, color: 'blue' },
+			// 	// { type: 'line', name: this.names[7], data: Obj[7], lineWidth: 1, yAxis: 3, color: 'black' }
+			// ],
+			series: objSeries as SeriesOptionsType[],
 			credits: {
 				enabled: false
 			}

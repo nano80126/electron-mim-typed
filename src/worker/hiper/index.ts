@@ -2,6 +2,7 @@ import registerPromiseWorker from 'promise-worker/register';
 import moment from 'moment';
 
 registerPromiseWorker(msg => {
+	console.log('hiper', msg);
 	if (msg.type === 'csv') {
 		const array: { [key: string]: number }[] = [];
 		const txt = msg.data;
