@@ -166,7 +166,8 @@ export default class HiperChart extends Vue implements ChartComponent {
 			reader.addEventListener(
 				'load',
 				readData => {
-					Worker.analyzeCSV(readData.target?.result as string, 'vtech')
+					const msgObj = { furnace: 'vtech', data: readData.target?.result as string };
+					Worker.analyzeCSV(msgObj)
 						// .then((res: { type: string; series: { [key: string]: number }[] }) => {
 						.then(res => {
 							this.series = res.series;
@@ -249,12 +250,35 @@ export default class HiperChart extends Vue implements ChartComponent {
 		}
 
 		const objSeries = obj.map((o, idx) => {
+			let yaxis;
+			if (this.names.length == 8) {
+				switch (idx) {
+					case 0:
+					case 1:
+						yaxis = 2;
+						break;
+					case 2: // 爐內
+					case 3: // 管道
+					case 4: // 蠟管
+						yaxis = 0;
+						break;
+					case 5:
+						yaxis = 1;
+						break;
+					default:
+						yaxis = 3;
+						break;
+				}
+			} else if (this.names.length == 12) {
+				yaxis = 2;
+			}
+
 			return {
 				type: 'line',
 				name: this.names[idx],
 				data: obj[idx],
 				lineWidth: 1,
-				yAxis: 0
+				yAxis: yaxis
 			};
 		});
 
@@ -324,12 +348,35 @@ export default class HiperChart extends Vue implements ChartComponent {
 								}
 							}
 							const objSeries = obj.map((o, idx) => {
+								let yaxis;
+								if (this.names.length == 8) {
+									switch (idx) {
+										case 0:
+										case 1:
+											yaxis = 2;
+											break;
+										case 2: // 爐內
+										case 3: // 管道
+										case 4: // 蠟管
+											yaxis = 0;
+											break;
+										case 5:
+											yaxis = 1;
+											break;
+										default:
+											yaxis = 3;
+											break;
+									}
+								} else if (this.names.length == 12) {
+									yaxis = 2;
+								}
+
 								return {
 									type: 'line',
 									name: this.names[idx],
 									data: obj[idx],
 									lineWidth: 1,
-									yAxis: 0
+									yAxis: yaxis
 								};
 							});
 
@@ -352,12 +399,35 @@ export default class HiperChart extends Vue implements ChartComponent {
 								}
 							}
 							const objSeries = obj.map((o, idx) => {
+								let yaxis;
+								if (this.names.length == 8) {
+									switch (idx) {
+										case 0:
+										case 1:
+											yaxis = 2;
+											break;
+										case 2: // 爐內
+										case 3: // 管道
+										case 4: // 蠟管
+											yaxis = 0;
+											break;
+										case 5:
+											yaxis = 1;
+											break;
+										default:
+											yaxis = 3;
+											break;
+									}
+								} else if (this.names.length == 12) {
+									yaxis = 2;
+								}
+
 								return {
 									type: 'line',
 									name: this.names[idx],
 									data: obj[idx],
 									lineWidth: 1,
-									yAxis: 0
+									yAxis: yaxis
 								};
 							});
 

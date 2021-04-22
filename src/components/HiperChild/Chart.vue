@@ -163,12 +163,11 @@ export default class HiperChart extends Vue implements ChartComponent {
 			reader.addEventListener(
 				'load',
 				readData => {
-					Worker.analyzeCSV(readData.target?.result as string, 'hiper')
+					const msgObj = { furnace: 'hiper', data: readData.target?.result as string };
+					Worker.analyzeCSV(msgObj)
 						// .then((res: { type: string; series: { [key: string]: number }[] }) => {
 						.then(res => {
 							this.series = res.series;
-
-							console.log(this.series);
 						})
 						.finally(() => {
 							(e.target as HTMLInputElement).value = '';
