@@ -10,8 +10,6 @@ const hiperPromiseWorker = new PromiseWorker(worker);
 // const vtechWorker = new VtechWorker();
 // const vtechPromiseWorker = new PromiseWorker2(vtechWorker);
 
-console.log(hiperPromiseWorker);
-
 // Leave for example
 // const send = (msg: string) => {
 // 	return promiseWorker.postMessage({
