@@ -475,8 +475,10 @@ const doSample = function(e: IpcMainInvokeEvent) {
 					});
 
 				tcpClient.samplingTimeoutCount = 0;
-				clearInterval(tcpClient.sampler as NodeJS.Timer);
-				tcpClient.sampler = undefined;
+				clearInterval(tcpClient.sampler as NodeJS.Timer); // 停止取樣sampler
+				tcpClient.sampler = undefined; // 刪除取樣sampler
+				// 取樣三次無回應，改變取樣狀態
+				e.sender.send(EsocketHiperSend.SAMPLINGCHANGED, { sampling: false });
 			}
 		}, (tcpClient.interval as number) * 0.5);
 
@@ -493,8 +495,8 @@ const doSample = function(e: IpcMainInvokeEvent) {
 		tcpClient.write(Buffer.from(buf));
 	} else {
 		tcpClient.samplingState = false; // set sample state off
-		clearInterval(tcpClient.sampler as NodeJS.Timer);
-		tcpClient.sampler = undefined;
+		clearInterval(tcpClient.sampler as NodeJS.Timer); // 停止取樣sampler
+		tcpClient.sampler = undefined; // 刪除取樣sampler
 		// 無法連線，改變取樣狀態
 		e.sender.send(EsocketHiperSend.SAMPLINGCHANGED, { sampling: false });
 	}
@@ -522,7 +524,7 @@ ipcMain.handle(EsocketHiperHandle.SAMPLE, (e, args) => {
 		if (tcpClient.sampler) {
 			tcpClient.samplingTimeoutCount = 0;
 			clearInterval(tcpClient.sampler); // 停止取樣sampler
-			tcpClient.sampler = undefined;
+			tcpClient.sampler = undefined; // 刪除取樣sampler
 		}
 	}
 	return { sampling: sampling };

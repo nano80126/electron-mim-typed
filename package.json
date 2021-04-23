@@ -1,6 +1,6 @@
 {
 	"name": "electron-mim",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"private": true,
 	"description": "mim sintering furnace electron-app",
 	"author": "keliduan",
