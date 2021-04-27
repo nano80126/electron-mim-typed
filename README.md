@@ -58,6 +58,7 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [x] 手動模式不會通知
     * [ ] 自動開始取樣
     * [ ] 刪除 Vtech 取樣多餘程式碼
+    * [ ] 移除背景警示警報，改為其他方法
  
 ### 總覽頁面設計
 
@@ -67,6 +68,7 @@ Revoke POST https://notify-api.line.me/api/revoke
     * VTECH 可能需要更換網路線
     * VTECH LOG 紀錄有異常
     * 開始取樣按鈕不會自動復歸 (持續發生，發現原因修復後待觀察)
+    * 警報重置後，報警有可能沒重置
 
 ### 爐子報警後通知，尚未測試冷卻時間
 

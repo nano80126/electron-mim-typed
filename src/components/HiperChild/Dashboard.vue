@@ -316,8 +316,6 @@ export default class HiperDashboard extends Vue {
 				this.addMsgEvent();
 			}
 		}
-		console.info(this.$ipcRenderer.eventNames());
-		console.info(this.$root.$ipcRenderer.eventNames());
 	}
 
 	beforeDestroy() {

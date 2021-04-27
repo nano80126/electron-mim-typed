@@ -230,6 +230,9 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 								}
 							}
 						}
+						log.error(err1);
+						log.error(err2);
+						log.error(err3);
 
 						// 合併訊息 + 錯誤(如果有)
 						const msg =
