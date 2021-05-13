@@ -207,6 +207,7 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				// console.log(tcpClient.stepName);
 				// console.log(tcpClient.stepState);
 
+				// 列出報警
 				let errMsg1 = '';
 				let errMsg2 = '';
 				const err1 = arr[32] + (arr[33] << 8) + (arr[34] << 16) + (arr[35] << 24); // 報警 1 // M700

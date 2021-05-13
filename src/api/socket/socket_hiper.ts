@@ -201,69 +201,173 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				tcpClient.stepName = stepName[arr[67]];
 				tcpClient.stepState = stepState[arr[49]];
 
-				// 報警狀態
-				if (arr[49] !== 0 && arr[49] <= 5) {
-					// 先確認是否在冷卻
-					if (!tcpClient.coolState) {
-						// 若不在冷卻中
+				console.log(tcpClient.stepName);
+				console.log(tcpClient.stepState);
 
-						// // // 處理錯誤 // // //
-						let errMsg1 = '';
-						let errMsg2 = '';
-						let errMsg3 = '';
-						const err1 = arr[55] + (arr[56] << 8) + (arr[57] << 16) + (arr[58] << 24); // 報警 1 // 30028
-						const err2 = arr[59] + (arr[60] << 8) + (arr[61] << 16) + (arr[62] << 24); // 報警 2 // 30030
-						const err3 = arr[63] + (arr[64] << 8) + (arr[65] << 16) + (arr[66] << 24); // 報警 3 // 30032
-						for (let bit = 0; bit < 32; bit++) {
-							if (Number.isInteger(err1) && err1 > 0)
-								if (((err1 >> bit) & 0b1) === 0b1) {
-									errMsg1 += `\n${R30028[bit]}`;
-								}
-							if (Number.isInteger(err2) && err2 > 0) {
-								if (((err2 >> bit) & 0b1) === 0b1) {
-									errMsg2 += `\n${R30030[bit]}`;
-								}
-							}
-							if (Number.isInteger(err3) && err3 > 0) {
-								if (((err3 >> bit) & 0b1) === 0b1) {
-									errMsg3 += `\n${R30032[bit]}`;
-								}
-							}
+				// 列出報警
+				let errMsg1 = '';
+				let errMsg2 = '';
+				let errMsg3 = '';
+				const err1 = arr[55] + (arr[56] << 8) + (arr[57] << 16) + (arr[58] << 24); // 報警 1 // 30028
+				const err2 = arr[59] + (arr[60] << 8) + (arr[61] << 16) + (arr[62] << 24); // 報警 2 // 30030
+				const err3 = arr[63] + (arr[64] << 8) + (arr[65] << 16) + (arr[66] << 24); // 報警 3 // 30032
+
+				for (let bit = 0; bit < 32; bit++) {
+					if (Number.isInteger(err1) && err1 > 0)
+						if (((err1 >> bit) & 0b1) === 0b1) {
+							errMsg1 += `\n${R30028[bit]}`;
 						}
-						log.error(err1);
-						log.error(err2);
-						log.error(err3);
+					if (Number.isInteger(err2) && err2 > 0) {
+						if (((err2 >> bit) & 0b1) === 0b1) {
+							errMsg2 += `\n${R30030[bit]}`;
+						}
+					}
+					if (Number.isInteger(err3) && err3 > 0) {
+						if (((err3 >> bit) & 0b1) === 0b1) {
+							errMsg3 += `\n${R30032[bit]}`;
+						}
+					}
+				}
 
-						// 合併訊息 + 錯誤(如果有)
-						const msg =
-							'\n伺服器狀態: 正常' +
-							'\n\n『 恆普 』' +
-							`\n工藝狀態: ${tcpClient.stepState}` +
-							`\n工藝名稱: ${tcpClient.stepName}` +
-							'\n警告: 報警產生' +
-							(errMsg1 != '' ? errMsg1 : '') +
-							(errMsg2 != '' ? errMsg2 : '') +
-							(errMsg3 != '' ? errMsg3 : '');
+				if (errMsg1 !== '' || errMsg2 !== '' || errMsg3 !== ' ') {
+					// 報警狀態
+					// }
+					// if (arr[49] !== 0 && arr[49] <= 5) {
 
-						message(msg)
-							.then(res => {
-								e.sender.send('notifyRes', res.data);
-							})
-							.catch(err => {
-								e.sender.send('notifyRes', {
-									error: true,
-									code: err.code,
-									message: err.message
+					/** */
+					log.error(err1);
+					log.error(err2);
+					log.error(err3);
+					/** */
+
+					// 若不在冷卻中
+
+					// // // 處理錯誤 // // //
+					//#region 保留 待刪
+					// let errMsg1 = '';
+					// let errMsg2 = '';
+					// let errMsg3 = '';
+					// const err1 = arr[55] + (arr[56] << 8) + (arr[57] << 16) + (arr[58] << 24); // 報警 1 // 30028
+					// const err2 = arr[59] + (arr[60] << 8) + (arr[61] << 16) + (arr[62] << 24); // 報警 2 // 30030
+					// const err3 = arr[63] + (arr[64] << 8) + (arr[65] << 16) + (arr[66] << 24); // 報警 3 // 30032
+					// for (let bit = 0; bit < 32; bit++) {
+					// 	if (Number.isInteger(err1) && err1 > 0)
+					// 		if (((err1 >> bit) & 0b1) === 0b1) {
+					// 			errMsg1 += `\n${R30028[bit]}`;
+					// 		}
+					// 	if (Number.isInteger(err2) && err2 > 0) {
+					// 		if (((err2 >> bit) & 0b1) === 0b1) {
+					// 			errMsg2 += `\n${R30030[bit]}`;
+					// 		}
+					// 	}
+					// 	if (Number.isInteger(err3) && err3 > 0) {
+					// 		if (((err3 >> bit) & 0b1) === 0b1) {
+					// 			errMsg3 += `\n${R30032[bit]}`;
+					// 		}
+					// 	}
+					// }
+					//#endregion
+
+					// 確認是否為 F ~ B 等級警報，需人員手動排除
+					if (arr[49] !== 0 && arr[49] <= 5) {
+						// 確認是否在冷卻
+						if (!tcpClient.coolState) {
+							// 合併訊息 + 錯誤(如果有)
+							const msg =
+								'\n伺服器狀態: 正常' +
+								'\n\n『 恆普 』' +
+								`\n工藝狀態: ${tcpClient.stepState}` +
+								`\n工藝名稱: ${tcpClient.stepName}` +
+								'\n警告: 報警產生' +
+								(errMsg1 != '' ? errMsg1 : '') +
+								(errMsg2 != '' ? errMsg2 : '') +
+								(errMsg3 != '' ? errMsg3 : '') +
+								'處置方式: 等待人員排除';
+
+							message(msg)
+								.then(res => {
+									e.sender.send('notifyRes', res.data);
+								})
+								.catch(err => {
+									e.sender.send('notifyRes', {
+										error: true,
+										code: err.code,
+										message: err.message
+									});
+									// 通知失敗，紀錄LOG
+									log.error(`${err.messaage}, code: ${err.code}`);
 								});
-								// 通知失敗，紀錄LOG
-								log.error(`${err.messaage}, code: ${err.code}`);
-							});
 
-						tcpClient.coolState = true;
-						tcpClient.coolTimer = setTimeout(() => {
-							// 等待 15 分鐘
-							tcpClient.coolState = false;
-						}, 15 * 60 * 1000);
+							tcpClient.coolState = true;
+							tcpClient.coolTimer = setTimeout(() => {
+								// 等待 15 分鐘
+								tcpClient.coolState = false;
+							}, 15 * 60 * 1000);
+						}
+					} else {
+						// 確認是否再冷卻
+						if (!tcpClient.resetCoolState) {
+							const msg =
+								'\n伺服器狀態: 正常' +
+								'\n\n『 恆普 』' +
+								`\n工藝狀態: ${tcpClient.stepState}` +
+								`\n工藝名稱: ${tcpClient.stepName}` +
+								'\n警告: 報警產生' +
+								(errMsg1 != '' ? errMsg1 : '') +
+								(errMsg2 != '' ? errMsg2 : '') +
+								(errMsg3 != '' ? errMsg3 : '') +
+								'處置方式: 自動復歸';
+
+							message(msg)
+								.then(res => {
+									e.sender.send('notifyRes', res.data);
+								})
+								.catch(err => {
+									e.sender.send('notifyRes', {
+										error: true,
+										code: err.code,
+										message: err.message
+									});
+									// 通知失敗，紀錄log
+									log.error(`${err.message}, code: ${err.code}`);
+								});
+
+							/// 新增報警自動 reset
+							/// tcpClient.write
+							///
+
+							tcpClient.resetCoolState = true;
+							tcpClient.resetCoolTimer = setTimeout(() => {
+								// 等待 30 分鐘
+								tcpClient.resetCoolState = false;
+							}, 30 * 60 * 1000);
+						} else {
+							//
+							const msg =
+								'\n伺服器狀態: 正常' +
+								'\n\n『 恆普 』' +
+								`\n工藝狀態: ${tcpClient.stepState}` +
+								`\n工藝名稱: ${tcpClient.stepName}` +
+								'\n警告: 報警產生' +
+								(errMsg1 != '' ? errMsg1 : '') +
+								(errMsg2 != '' ? errMsg2 : '') +
+								(errMsg3 != '' ? errMsg3 : '') +
+								'處置方式: 等待人員確認';
+
+							message(msg)
+								.then(res => {
+									e.sender.send('notifyRes', res.data);
+								})
+								.catch(err => {
+									e.sender.send('notifyRes', {
+										error: true,
+										code: err.code,
+										message: err.message
+									});
+									// 通知失敗，紀錄log
+									log.error(`${err.message}, code: ${err.code}`);
+								});
+						}
 					}
 
 					// 回傳 renderer， 有報警
@@ -533,64 +637,115 @@ ipcMain.handle(EsocketHiperHandle.SAMPLE, (e, args) => {
 	return { sampling: sampling };
 });
 
+function AlarmResponse() {
+	const slave = [0x01]; // addr of slave
+	const fnCode = [0x05]; // function code // write coil
+	const addr = [0x00, 0x01]; // addr of start register
+	const data = [0xff, 0x00]; // data
+	const cmd = slave.concat(fnCode, addr, data);
+
+	const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
+
+	const buf = head.concat(cmd);
+	// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
+	tcpClient.write(Buffer.from(buf));
+	// 等待 1500 ms
+	setTimeout(() => {
+		// 關閉應答
+		const data2 = [0x00, 0x00];
+		const cmd2 = slave.concat(fnCode, addr, data2);
+
+		const buf2 = head.concat(cmd2);
+		// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
+		tcpClient.write(Buffer.from(buf2));
+	}, 1500);
+}
+
 /**處理警報回應命令 */
 ipcMain.handle(EsocketHiperHandle.ALARMRES, () => {
 	log.info('Manual response alarm');
 	if (tcpClient && tcpClient.writable) {
 		// 報警應答
-		const slave = [0x01]; // addr of slave
-		const fnCode = [0x05]; // function code // write coil
-		const addr = [0x00, 0x01]; // addr of start register
-		const data = [0xff, 0x00]; // data
-		const cmd = slave.concat(fnCode, addr, data);
+		AlarmResponse();
+		// const slave = [0x01]; // addr of slave
+		// const fnCode = [0x05]; // function code // write coil
+		// const addr = [0x00, 0x01]; // addr of start register
+		// const data = [0xff, 0x00]; // data
+		// const cmd = slave.concat(fnCode, addr, data);
 
-		const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
+		// const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
 
-		const buf = head.concat(cmd);
-		// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
-		tcpClient.write(Buffer.from(buf));
-		// 等待 1500 ms
-		setTimeout(() => {
-			// 關閉應答
-			const data2 = [0x00, 0x00];
-			const cmd2 = slave.concat(fnCode, addr, data2);
+		// const buf = head.concat(cmd);
+		// // const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0xff, 0x00];
+		// tcpClient.write(Buffer.from(buf));
+		// // 等待 1500 ms
+		// setTimeout(() => {
+		// 	// 關閉應答
+		// 	const data2 = [0x00, 0x00];
+		// 	const cmd2 = slave.concat(fnCode, addr, data2);
 
-			const buf2 = head.concat(cmd2);
-			// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
-			tcpClient.write(Buffer.from(buf2));
-		}, 1500);
+		// 	const buf2 = head.concat(cmd2);
+		// 	// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x01, 0x00, 0x00];
+		// 	tcpClient.write(Buffer.from(buf2));
+		// }, 1500);
 		return { response: true, reset: false };
 	} else {
 		return { error: 'Hiper furnace is not connected' };
 	}
 });
 
+// 報警重置 function
+function AlarmReset() {
+	const slave = [0x01]; // addr of slave
+	const fnCode = [0x05]; // function code // write coil
+	const addr = [0x00, 0x02]; // addr of start register
+	const data = [0xff, 0x00]; // data
+	const cmd = slave.concat(fnCode, addr, data);
+
+	const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
+
+	const buf = head.concat(cmd);
+	// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
+	tcpClient.write(Buffer.from(buf));
+
+	setTimeout(() => {
+		// 關閉報警重置
+		const data2 = [0x00, 0x00];
+		const cmd2 = slave.concat(fnCode, addr, data2);
+
+		const buf2 = head.concat(cmd2);
+		// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0x00, 0x00];
+		tcpClient.write(Buffer.from(buf2));
+	}, 1500);
+}
+
 /**處理警報重置命令 */
 ipcMain.handle(EsocketHiperHandle.ALARMRST, () => {
 	log.info('Manual reset alarm');
 	if (tcpClient && tcpClient.writable) {
 		// 報警重置
-		const slave = [0x01]; // addr of slave
-		const fnCode = [0x05]; // function code // write coil
-		const addr = [0x00, 0x02]; // addr of start register
-		const data = [0xff, 0x00]; // data
-		const cmd = slave.concat(fnCode, addr, data);
+		AlarmReset();
+		// const slave = [0x01]; // addr of slave
+		// const fnCode = [0x05]; // function code // write coil
+		// const addr = [0x00, 0x02]; // addr of start register
+		// const data = [0xff, 0x00]; // data
+		// const cmd = slave.concat(fnCode, addr, data);
 
-		const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
+		// const head = [0x00, 0x00, 0x00, 0x00, 0x00, cmd.length];
 
-		const buf = head.concat(cmd);
-		// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
-		tcpClient.write(Buffer.from(buf));
+		// const buf = head.concat(cmd);
+		// // const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0xff, 0x00];
+		// tcpClient.write(Buffer.from(buf));
 
-		setTimeout(() => {
-			// 關閉報警重置
-			const data2 = [0x00, 0x00];
-			const cmd2 = slave.concat(fnCode, addr, data2);
+		// setTimeout(() => {
+		// 	// 關閉報警重置
+		// 	const data2 = [0x00, 0x00];
+		// 	const cmd2 = slave.concat(fnCode, addr, data2);
 
-			const buf2 = head.concat(cmd2);
-			// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0x00, 0x00];
-			tcpClient.write(Buffer.from(buf2));
-		}, 1500);
+		// 	const buf2 = head.concat(cmd2);
+		// 	// const arrW = [0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x01, 0x05, 0x00, 0x02, 0x00, 0x00];
+		// 	tcpClient.write(Buffer.from(buf2));
+		// }, 1500);
 		return { response: false, reset: true };
 	} else {
 		return { error: 'Hiper furnace is not connected' };

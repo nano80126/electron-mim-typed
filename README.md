@@ -57,7 +57,7 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [ ] 新增ERROR CODE
     * [x] 手動模式不會通知
     * [ ] 自動開始取樣
-    * [ ] 刪除 Vtech 取樣多餘程式碼
+    * [x] 刪除 Vtech 取樣多餘程式碼
     * [ ] 移除背景警示警報，改為其他方法
  
 ### 總覽頁面設計

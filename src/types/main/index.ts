@@ -20,10 +20,14 @@ export class FSocket extends net.Socket {
 	stepName?: string;
 	/**當前工序狀態 */
 	stepState?: string;
-	/**LINE 通知CD */
+	/**LINE 通知 CD 狀態*/
 	coolState = false;
-	/**冷卻計時器 */
+	/**LINE 通知間隔冷卻計時器 */
 	coolTimer?: NodeJS.Timeout;
+	/**自動復歸 CD 狀態 */
+	resetCoolState = false;
+	/**自動復歸 冷卻計時器 */
+	resetCoolTimer?: NodeJS.Timeout;
 	//
 	/**取樣器 */
 	sampler?: NodeJS.Timeout; // interval
