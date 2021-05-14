@@ -201,8 +201,8 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				tcpClient.stepName = stepName[arr[67]];
 				tcpClient.stepState = stepState[arr[49]];
 
-				console.log(tcpClient.stepName);
-				console.log(tcpClient.stepState);
+				// console.log(tcpClient.stepName);
+				// console.log(tcpClient.stepState);
 
 				// 列出報警
 				let errMsg1 = '';
@@ -229,15 +229,15 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					}
 				}
 
-				if (errMsg1 !== '' || errMsg2 !== '' || errMsg3 !== ' ') {
+				if (errMsg1 !== '' || errMsg2 !== '' || errMsg3 !== '') {
 					// 報警狀態
 					// }
 					// if (arr[49] !== 0 && arr[49] <= 5) {
 
 					/** */
-					log.error(err1);
-					log.error(err2);
-					log.error(err3);
+					log.error(err1 + ' , ' + err2 + ' , ' + err3);
+					// log.error(err2);
+					// log.error(err3);
 					/** */
 
 					// 若不在冷卻中
@@ -282,7 +282,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 								(errMsg1 != '' ? errMsg1 : '') +
 								(errMsg2 != '' ? errMsg2 : '') +
 								(errMsg3 != '' ? errMsg3 : '') +
-								'處置方式: 等待人員排除';
+								'\n處置方式: 等待人員排除';
 
 							message(msg)
 								.then(res => {
@@ -316,7 +316,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 								(errMsg1 != '' ? errMsg1 : '') +
 								(errMsg2 != '' ? errMsg2 : '') +
 								(errMsg3 != '' ? errMsg3 : '') +
-								'處置方式: 自動復歸';
+								'\n處置方式: 自動復歸';
 
 							message(msg)
 								.then(res => {
@@ -333,7 +333,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 								});
 
 							/// 新增報警自動 reset
-							/// tcpClient.write
+							AlarmReset();
 							///
 
 							tcpClient.resetCoolState = true;
@@ -352,7 +352,7 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 								(errMsg1 != '' ? errMsg1 : '') +
 								(errMsg2 != '' ? errMsg2 : '') +
 								(errMsg3 != '' ? errMsg3 : '') +
-								'處置方式: 等待人員確認';
+								'\n處置方式: 等待人員確認';
 
 							message(msg)
 								.then(res => {
@@ -637,6 +637,7 @@ ipcMain.handle(EsocketHiperHandle.SAMPLE, (e, args) => {
 	return { sampling: sampling };
 });
 
+/**報警回應 function */
 function AlarmResponse() {
 	const slave = [0x01]; // addr of slave
 	const fnCode = [0x05]; // function code // write coil

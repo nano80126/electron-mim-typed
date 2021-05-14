@@ -39,6 +39,14 @@ Status GET https://notify-api.line.me/api/status
 Revoke POST https://notify-api.line.me/api/revoke
 
 
+### 自動復歸
+
+非影響程式運作之警報，每 30 分鐘自動復歸
+
+### 自動連線
+
+斷線後每 5 分鐘嘗試重新連線
+
 ### Check .env variable can be used in node environment even if it is not VUE_APP_XXX format
 
 <!-- ### Update to electron-11 -->

@@ -228,8 +228,8 @@ ipcMain.handle(EsocketVtechHandle.CONNECT, async (e, args) => {
 				// err 為整數且大於 0
 				if (errMsg1 !== '' || errMsg2 !== '') {
 					/** */
-					log.error(err1);
-					log.error(err2);
+					log.error(err1 + ' , ' + err2);
+					// log.error(err2);
 					/** */
 
 					// 先確認是否在冷卻
