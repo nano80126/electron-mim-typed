@@ -151,34 +151,39 @@ export default class HiperChart extends Vue implements ChartComponent {
 		AppModule.changeOverlay(true);
 
 		const files = (e.target as HTMLInputElement).files as FileList;
-		if (files?.length > 0) this.file = files[0];
+		if (files?.length > 0) {
+			this.file = files[0];
 
-		// setTimeout(() => {
-		this.$nextTick(async () => {
-			// (e.target as HTMLInputElement).value = '';
-			this.dragging = false;
-			//
-			const reader = new FileReader();
-			// const str = await new Promise(resolve => {
-			reader.addEventListener(
-				'load',
-				readData => {
-					const msgObj = { furnace: 'hiper', data: readData.target?.result as string };
-					Worker.analyzeCSV(msgObj)
-						// .then((res: { type: string; series: { [key: string]: number }[] }) => {
-						.then(res => {
-							this.series = res.series;
-						})
-						.finally(() => {
-							(e.target as HTMLInputElement).value = '';
-							AppModule.changeOverlay(false);
-						});
-				},
-				{ once: true }
-			);
-			// reader.readAsBinaryString(this.file as File);
-			reader.readAsText(this.file as File);
-		});
+			const split = this.file?.name.split('.');
+			const ext = split[split?.length - 1].toLowerCase();
+
+			// setTimeout(() => {
+			this.$nextTick(async () => {
+				// (e.target as HTMLInputElement).value = '';
+				this.dragging = false;
+				//
+				const reader = new FileReader();
+				// const str = await new Promise(resolve => {
+				reader.addEventListener(
+					'load',
+					readData => {
+						const msgObj = { furnace: 'hiper', data: readData.target?.result as string, extension: ext };
+						Worker.analyzeCSV(msgObj)
+							// .then((res: { type: string; series: { [key: string]: number }[] }) => {
+							.then(res => {
+								this.series = res.series;
+							})
+							.finally(() => {
+								(e.target as HTMLInputElement).value = '';
+								AppModule.changeOverlay(false);
+							});
+					},
+					{ once: true }
+				);
+				// reader.readAsBinaryString(this.file as File);
+				reader.readAsText(this.file as File);
+			});
+		}
 	}
 
 	/**處理資料 */
@@ -389,7 +394,8 @@ export default class HiperChart extends Vue implements ChartComponent {
 				y: 25,
 				style: {
 					fontSize: '28px',
-					fontWeight: '900'
+					fontWeight: '900',
+					fontFamily: '微軟正黑體'
 				}
 			},
 			subtitle: {

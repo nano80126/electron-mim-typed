@@ -1,11 +1,11 @@
 import PromiseWorker from 'promise-worker';
-import HiperWorker from 'worker-loader!./func.ts';
+import HiperWorker from 'worker-loader!./worker.ts';
 // import VtechWorker from 'worker-loader!./vtech/';
 
 // const promiseWorker = new PromiseWorker(worker);
 
 const worker = new HiperWorker();
-const hiperPromiseWorker = new PromiseWorker(worker);
+const promiseWorker = new PromiseWorker(worker);
 
 // const vtechWorker = new VtechWorker();
 // const vtechPromiseWorker = new PromiseWorker2(vtechWorker);
@@ -19,9 +19,11 @@ const hiperPromiseWorker = new PromiseWorker(worker);
 // };
 
 // // const analyzeCSV = async (file: File) => {
-const analyzeCSV = (obj: { furnace: string; data: string }) => {
-	return hiperPromiseWorker.postMessage({
-		type: 'csv',
+const analyzeCSV = (obj: { furnace: string; data: string; extension: string }) => {
+	console.log(obj);
+
+	return promiseWorker.postMessage({
+		type: obj.extension,
 		furnace: obj.furnace,
 		data: obj.data
 	});

@@ -12,10 +12,10 @@
 						<div class="uploadBtn" @drag="onChange">
 							<v-icon small>fas fa-upload</v-icon>
 							<span class="ml-2">
-								{{ (file && file.name) || '上傳CSV' }}
+								{{ (file && file.name) || '上傳CSV, TXT' }}
 							</span>
 						</div>
-						<input ref="file" type="file" @change="onChange" title accept=".csv" />
+						<input ref="file" type="file" @change="onChange" title accept=".csv,.txt" />
 					</div>
 
 					<v-divider vertical class="mx-2" />
@@ -154,35 +154,43 @@ export default class HiperChart extends Vue implements ChartComponent {
 		AppModule.changeOverlay(true);
 
 		const files = (e.target as HTMLInputElement).files as FileList;
-		if (files?.length > 0) this.file = files[0];
+		if (files?.length > 0) {
+			this.file = files[0];
 
-		// setTimeout(() => {
-		this.$nextTick(async () => {
-			// (e.target as HTMLInputElement).value = '';
-			this.dragging = false;
-			//
-			const reader = new FileReader();
-			// const str = await new Promise(resolve => {
-			reader.addEventListener(
-				'load',
-				readData => {
-					const msgObj = { furnace: 'vtech', data: readData.target?.result as string };
-					Worker.analyzeCSV(msgObj)
-						// .then((res: { type: string; series: { [key: string]: number }[] }) => {
-						.then(res => {
-							this.series = res.series;
-							this.names = res.names;
-						})
-						.finally(() => {
-							(e.target as HTMLInputElement).value = '';
-							AppModule.changeOverlay(false);
-						});
-				},
-				{ once: true }
-			);
-			// reader.readAsBinaryString(this.file as File);
-			reader.readAsText(this.file as File, 'Shift-JIS');
-		});
+			const split = this.file?.name.split('.');
+			const ext = split[split?.length - 1].toLowerCase();
+
+			// setTimeout(() => {
+			this.$nextTick(async () => {
+				// (e.target as HTMLInputElement).value = '';
+				this.dragging = false;
+				//
+				const reader = new FileReader();
+				// const str = await new Promise(resolve => {
+				reader.addEventListener(
+					'load',
+					readData => {
+						const msgObj = { furnace: 'vtech', data: readData.target?.result as string, extension: ext };
+						Worker.analyzeCSV(msgObj)
+							// .then((res: { type: string; series: { [key: string]: number }[] }) => {
+							.then(res => {
+								this.series = res.series;
+								this.names = res.names;
+
+								console.log(this.names);
+								console.log(this.series);
+							})
+							.finally(() => {
+								(e.target as HTMLInputElement).value = '';
+								AppModule.changeOverlay(false);
+							});
+					},
+					{ once: true }
+				);
+				// reader.readAsBinaryString(this.file as File);
+				reader.readAsText(this.file as File, 'Shift-JIS');
+			});
+		}
 	}
 
 	/**處理資料 (已轉移至 web worker 處理)*/
@@ -281,6 +289,8 @@ export default class HiperChart extends Vue implements ChartComponent {
 				yAxis: yaxis
 			};
 		});
+
+		console.log(objSeries);
 
 		this.chart = Highcharts.chart('container', {
 			boost: {
@@ -444,7 +454,8 @@ export default class HiperChart extends Vue implements ChartComponent {
 				y: 25,
 				style: {
 					fontSize: '28px',
-					fontWeight: '900'
+					fontWeight: '900',
+					fontFamily: '微軟正黑體'
 				}
 			},
 			subtitle: {
@@ -481,9 +492,9 @@ export default class HiperChart extends Vue implements ChartComponent {
 			},
 			yAxis: [
 				{
-					lineColor: 'darkcyan',
+					// lineColor: 'darkcyan',
 					lineWidth: 1,
-					tickColor: 'darkcyan',
+					// tickColor: 'darkcyan',
 					tickWidth: 1,
 					tickAmount: 11,
 					// tickInterval: 12,
@@ -504,9 +515,9 @@ export default class HiperChart extends Vue implements ChartComponent {
 					}
 				},
 				{
-					lineColor: 'green',
+					// lineColor: 'green',
 					lineWidth: 1,
-					tickColor: 'green',
+					// tickColor: 'green',
 					tickWidth: 1,
 					tickAmount: 11,
 					tickInterval: 140 * 1000,
@@ -526,9 +537,9 @@ export default class HiperChart extends Vue implements ChartComponent {
 				},
 				{
 					opposite: true,
-					lineColor: 'red',
+					// lineColor: 'red',
 					lineWidth: 1,
-					tickColor: 'red',
+					// tickColor: 'red',
 					tickWidth: 1,
 					tickAmount: 11,
 					tickInterval: 180,
@@ -548,9 +559,9 @@ export default class HiperChart extends Vue implements ChartComponent {
 				},
 				{
 					opposite: true,
-					lineColor: 'blue',
+					// lineColor: 'blue',
 					lineWidth: 1,
-					tickColor: 'blue',
+					// tickColor: 'blue',
 					tickWidth: 1,
 					tickAmount: 11,
 					tickInterval: 110,

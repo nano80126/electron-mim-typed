@@ -41,7 +41,7 @@ Revoke POST https://notify-api.line.me/api/revoke
 
 ### 自動復歸
 
-非影響程式運作之警報，每 30 分鐘自動復歸
+非影響程式運作之警報，每 15 分鐘自動復歸
 
 ### 自動連線
 
@@ -67,8 +67,19 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [ ] 自動開始取樣
     * [x] 刪除 Vtech 取樣多餘程式碼
     * [ ] 移除背景警示警報，改為其他方法
+    * [ ] 確認恆普報警對應的 bit
+    * [ ] 爐溫曲線圖，使用TXT
+    * [ ] 
  
+
+### 新增 MONGODB
+
+
+
 ### 總覽頁面設計
+
+
+
 
 ### Bugs
     * 若爐子處於未啟動狀態，無法啟動開始取樣

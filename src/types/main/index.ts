@@ -24,6 +24,10 @@ export class FSocket extends net.Socket {
 	coolState = false;
 	/**LINE 通知間隔冷卻計時器 */
 	coolTimer?: NodeJS.Timeout;
+	/**LINE 通知 CD 狀態 2 (恆普用，但不限定恆普)*/
+	coolState2 = false;
+	/**LINE 通知間隔冷卻計時器 2 (恆普使用，但不限定恆普)*/
+	coolTimer2?: NodeJS.Timeout;
 	/**自動復歸 CD 狀態 */
 	resetCoolState = false;
 	/**自動復歸 冷卻計時器 */

@@ -229,18 +229,12 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					}
 				}
 
+				// 報警狀態
 				if (errMsg1 !== '' || errMsg2 !== '' || errMsg3 !== '') {
 					// 報警狀態
-					// }
-					// if (arr[49] !== 0 && arr[49] <= 5) {
-
 					/** */
 					log.error(err1 + ' , ' + err2 + ' , ' + err3);
-					// log.error(err2);
-					// log.error(err3);
 					/** */
-
-					// 若不在冷卻中
 
 					// // // 處理錯誤 // // //
 					//#region 保留 待刪
@@ -305,18 +299,20 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 							}, 15 * 60 * 1000);
 						}
 					} else {
-						// 確認是否再冷卻
+						// 合併訊息 + 錯誤(如果有)
+						let msg =
+							'\n伺服器狀態: 正常' +
+							'\n\n『 恆普 』' +
+							`\n工藝狀態: ${tcpClient.stepState}` +
+							`\n工藝名稱: ${tcpClient.stepName}` +
+							'\n警告: 報警產生' +
+							(errMsg1 != '' ? errMsg1 : '') +
+							(errMsg2 != '' ? errMsg2 : '') +
+							(errMsg3 != '' ? errMsg3 : '');
+
 						if (!tcpClient.resetCoolState) {
-							const msg =
-								'\n伺服器狀態: 正常' +
-								'\n\n『 恆普 』' +
-								`\n工藝狀態: ${tcpClient.stepState}` +
-								`\n工藝名稱: ${tcpClient.stepName}` +
-								'\n警告: 報警產生' +
-								(errMsg1 != '' ? errMsg1 : '') +
-								(errMsg2 != '' ? errMsg2 : '') +
-								(errMsg3 != '' ? errMsg3 : '') +
-								'\n處置方式: 自動復歸';
+							// 確認自動復歸是否在冷卻
+							msg += '\n處置方式: 自動復歸';
 
 							message(msg)
 								.then(res => {
@@ -332,41 +328,39 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 									log.error(`${err.message}, code: ${err.code}`);
 								});
 
-							/// 新增報警自動 reset
+							/// 自動 reset 報警
 							AlarmReset();
 							///
-
 							tcpClient.resetCoolState = true;
 							tcpClient.resetCoolTimer = setTimeout(() => {
 								// 等待 30 分鐘
 								tcpClient.resetCoolState = false;
-							}, 30 * 60 * 1000);
+							}, 10 * 60 * 1000);
 						} else {
 							//
-							const msg =
-								'\n伺服器狀態: 正常' +
-								'\n\n『 恆普 』' +
-								`\n工藝狀態: ${tcpClient.stepState}` +
-								`\n工藝名稱: ${tcpClient.stepName}` +
-								'\n警告: 報警產生' +
-								(errMsg1 != '' ? errMsg1 : '') +
-								(errMsg2 != '' ? errMsg2 : '') +
-								(errMsg3 != '' ? errMsg3 : '') +
-								'\n處置方式: 等待人員確認';
+							msg += '\n處置方式: 等待人員確認';
 
-							message(msg)
-								.then(res => {
-									e.sender.send('notifyRes', res.data);
-								})
-								.catch(err => {
-									e.sender.send('notifyRes', {
-										error: true,
-										code: err.code,
-										message: err.message
+							if (!tcpClient.coolState2) {
+								message(msg)
+									.then(res => {
+										e.sender.send('notifyRes', res.data);
+									})
+									.catch(err => {
+										e.sender.send('notifyRes', {
+											error: true,
+											code: err.code,
+											message: err.message
+										});
+										// 通知失敗，紀錄log
+										log.error(`${err.message}, code: ${err.code}`);
 									});
-									// 通知失敗，紀錄log
-									log.error(`${err.message}, code: ${err.code}`);
-								});
+
+								tcpClient.coolState2 = true;
+								tcpClient.coolTimer2 = setTimeout(() => {
+									// 等待15分鐘
+									tcpClient.coolState2 = false;
+								}, 15 * 60 * 1000);
+							}
 						}
 					}
 
@@ -499,7 +493,6 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					//
 					break;
 				default:
-					console.log('4');
 					// console.error(`${err.code} ${err}`);
 					log.error(`${err.message}, code: ${err.code}`);
 					break;
