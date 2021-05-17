@@ -20,8 +20,6 @@ const promiseWorker = new PromiseWorker(worker);
 
 // // const analyzeCSV = async (file: File) => {
 const analyzeCSV = (obj: { furnace: string; data: string; extension: string }) => {
-	console.log(obj);
-
 	return promiseWorker.postMessage({
 		type: obj.extension,
 		furnace: obj.furnace,

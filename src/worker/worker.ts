@@ -64,7 +64,6 @@ registerPromiseWorker(msg => {
 					} else {
 						continue;
 					}
-					console.log(dateType);
 				}
 
 				// if (items.length >= 9) {
@@ -81,8 +80,6 @@ registerPromiseWorker(msg => {
 				}
 				// }
 			}
-
-			console.log(array);
 
 			return { type: 'csv', names, series: array };
 		}

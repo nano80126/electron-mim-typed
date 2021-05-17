@@ -208,9 +208,9 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 				let errMsg1 = '';
 				let errMsg2 = '';
 				let errMsg3 = '';
-				const err1 = arr[55] + (arr[56] << 8) + (arr[57] << 16) + (arr[58] << 24); // 報警 1 // 30028
-				const err2 = arr[59] + (arr[60] << 8) + (arr[61] << 16) + (arr[62] << 24); // 報警 2 // 30030
-				const err3 = arr[63] + (arr[64] << 8) + (arr[65] << 16) + (arr[66] << 24); // 報警 3 // 30032
+				const err1 = (arr[54] << 8) + arr[55] + (arr[56] << 24) + (arr[59] << 16); // 報警 1 // 30028
+				const err2 = (arr[58] << 8) + arr[59] + (arr[60] << 24) + (arr[61] << 16); // 報警 2 // 30030
+				const err3 = (arr[62] << 8) + arr[63] + (arr[64] << 24) + (arr[65] << 16); // 報警 3 // 30032
 
 				for (let bit = 0; bit < 32; bit++) {
 					if (Number.isInteger(err1) && err1 > 0)
@@ -234,6 +234,9 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 					// 報警狀態
 					/** */
 					log.error(err1 + ' , ' + err2 + ' , ' + err3);
+					log.error(arr[54] + ',' + arr[55] + ',' + arr[56] + ',' + arr[59]);
+					log.error(arr[58] + ',' + arr[59] + ',' + arr[60] + ',' + arr[61]);
+					log.error(arr[62] + ',' + arr[63] + ',' + arr[64] + ',' + arr[65]);
 					/** */
 
 					// // // 處理錯誤 // // //
