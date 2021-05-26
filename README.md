@@ -69,11 +69,9 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [ ] 移除背景警示警報，改為其他方法
     * [ ] 確認恆普報警對應的 bit
     * [ ] 爐溫曲線圖，使用TXT
-    * [ ] 
+    * [ ] 刪除非本專案之多餘檔案
  
-
 ### 新增 MONGODB
-
 
 
 ### 總覽頁面設計
