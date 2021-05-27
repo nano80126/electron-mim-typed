@@ -20,10 +20,6 @@ VTECH:
 
 * Line Notify when alarm occurred
 
-## Migrate to typescript
-
-* Lots of things wait for change
-
 ### Line Notify
 
 Document [Line Notify](https://notify-bot.line.me/doc/en/)
@@ -38,6 +34,7 @@ Status GET https://notify-api.line.me/api/status
  
 Revoke POST https://notify-api.line.me/api/revoke
 
+### yarn audit will report lots of vulnerabilities
 
 ### 自動復歸
 
@@ -46,12 +43,6 @@ Revoke POST https://notify-api.line.me/api/revoke
 ### 自動連線
 
 斷線後每 5 分鐘嘗試重新連線
-
-### Check .env variable can be used in node environment even if it is not VUE_APP_XXX format
-
-<!-- ### Update to electron-11 -->
-
-<!-- ### Use mongodb to save steps -->
 
 ### To do list 
     * [x] 設備未開機也可以重連 
@@ -75,8 +66,6 @@ Revoke POST https://notify-api.line.me/api/revoke
 
 
 ### 總覽頁面設計
-
-
 
 
 ### Bugs
@@ -106,8 +95,6 @@ Revoke POST https://notify-api.line.me/api/revoke
         * 每日通知失敗
         * 報警通知失敗
         * Web socket server發生錯誤
-
-
 
 ### 
 
