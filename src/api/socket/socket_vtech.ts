@@ -22,7 +22,7 @@ import {
 	FSocket,
 	IwsConnectedMessasge,
 	IwsSerialMessage
-} from '@/types/main';
+} from '@/types';
 import { message } from '@/api/line';
 import { wsServer } from '@/api/express';
 // import {  clearInterval } from 'timers';

@@ -47,8 +47,6 @@ import media from '@/components/Search/Media.vue';
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { AppModule } from '@/store/modules/app';
 
-import { IlyricsObjSearched } from '@/types/renderer';
-
 @Component({
 	components: {
 		lyricMedia: media
@@ -57,8 +55,6 @@ import { IlyricsObjSearched } from '@/types/renderer';
 export default class App extends Vue {
 	/**show after mounted */
 	private SHOW = false;
-	/**歌詞物件 */
-	private lyricsObj: IlyricsObjSearched | null = null;
 	/**當前使用語言 */
 	private language = this.$i18n.locale;
 
@@ -81,24 +77,6 @@ export default class App extends Vue {
 	}
 
 	created() {
-		this.$ipcRenderer.on('lyricObj', (e, args) => {
-			this.lyricsObj = null;
-			this.$nextTick(() => {
-				setTimeout(() => {
-					this.lyricsObj = {
-						obj: Object.freeze({
-							artist: args.artist,
-							title: args.song,
-							lyricsKey: args.key,
-							lyricsUrl: args.url,
-							lyrics: ''
-						}),
-						exist: true
-					};
-				}, args.delay);
-			});
-		});
-
 		this.$ipcRenderer.on('syncLanguage', (e, locale) => {
 			this.language = locale;
 		});

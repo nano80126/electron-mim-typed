@@ -16,7 +16,7 @@ import {
 	IwsCommandResMessage,
 	IwsConnectedMessasge,
 	IwsOpenMessage
-} from '@/types/main';
+} from '@/types';
 import { ipcMain } from 'electron';
 
 const appLog = getLogger('app');

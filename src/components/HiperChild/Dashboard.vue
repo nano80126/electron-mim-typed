@@ -255,7 +255,7 @@ import stepName from '@/json/hiper/stepName.json';
 import stepState from '@/json/hiper/stepState.json';
 import { HiperModule } from '@/store/modules/hiper';
 import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg, IwsSerialMsg } from '@/types/renderer';
-import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_hiper';
+import { EsocketInvoke, EsocketOn } from '@/types/socket_hiper';
 
 @Component({})
 export default class HiperDashboard extends Vue {

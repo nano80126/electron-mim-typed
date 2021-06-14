@@ -87,7 +87,7 @@
 <script lang="ts">
 import { AppModule } from '@/store/modules/app';
 import { VtechModule } from '@/store/modules/vtech';
-import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_vtech';
+import { EsocketInvoke, EsocketOn } from '@/types/socket_vtech';
 import { Component, Emit, Vue } from 'vue-property-decorator';
 
 @Component({})

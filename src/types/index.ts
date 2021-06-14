@@ -45,6 +45,29 @@ export class FSocket extends net.Socket {
 	samplingTimeoutCount = 0;
 }
 
+export interface IfurnaceStatus {
+	/**設定溫度 */
+	setTemp: number;
+	/**上部溫度 */
+	topTemp: number;
+	/**下部溫度 */
+	bottomTemp: number;
+	/**爐內壓力 */
+	pressure: number;
+	/**爐內真空 */
+	vacuum: number;
+	/**氣體流量 */
+	flow: number;
+	/**剩餘時間 */
+	leaveTime: number;
+	/**當前工藝名稱 */
+	workNowName: string;
+	/**當前工藝狀態 */
+	workNowState: string;
+	/**等待時間 */
+	waitTime: number;
+}
+
 export enum EwsChannel {
 	OPEN = 0,
 	CONNECT = 1,
@@ -109,6 +132,7 @@ export enum EsocketHiperHandle {
 	ALARMRST = 'alarm-rst-hiper'
 }
 
+/**socket channel send to renderer of Hiper  */
 export enum EsocketHiperSend {
 	CONNECTIONERROR = 'conn-error-hiper',
 	CONNECTIONSUCCESS = 'conn-success-hiper',
@@ -128,57 +152,10 @@ export enum EsocketVtechHandle {
 	ALARMRST = 'alarm-rst-vtech'
 }
 
+/**socket channel send to renderer of Vtech  */
 export enum EsocketVtechSend {
 	CONNECTIONERROR = 'conn-error-vtech',
 	CONNECTIONSUCCESS = 'conn-success-vtech',
 	SAMPLINGCHANGED = 'sampling-changed-vtech',
 	SERIAL = 'serial-vtech'
-}
-
-// export
-///
-
-//
-//
-// 以下待刪
-//
-//
-
-/**interface of text config  */
-export interface ItextConfig {
-	mainColor: string;
-	subColor: string;
-	textAlign: string;
-}
-
-/**interface of text config and start window position */
-export interface Iconfig {
-	x?: number;
-	y?: number;
-}
-
-/**interface of song list crawled */
-export interface IlistCrawled {
-	id: number;
-	artist: string;
-	title: string;
-	lyricsUrl: string;
-	lyricsFront: string;
-}
-
-/**interface of lyrics object crawled */
-export interface IlyricsObjCrawled {
-	artist: string;
-	title: string;
-	lyricsUrl: string;
-	lyricsKey: string;
-	lyrics: string;
-}
-
-/**interface of lyrics object pass through main process */
-export interface IchannelLyricsObj {
-	artist: string;
-	title: string;
-	lyricsKey: string;
-	lyricsUrl: string;
 }

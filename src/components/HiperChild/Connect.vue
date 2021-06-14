@@ -87,7 +87,7 @@
 <script lang="ts">
 import { AppModule } from '@/store/modules/app';
 import { HiperModule } from '@/store/modules/hiper';
-import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_hiper';
+import { EsocketInvoke, EsocketOn } from '@/types/socket_hiper';
 import { Component, Emit, Vue } from 'vue-property-decorator';
 
 @Component({})

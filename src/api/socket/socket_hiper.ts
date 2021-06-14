@@ -20,9 +20,10 @@ import {
 	EwsChannel,
 	EwsFurnaceType,
 	FSocket,
+	IfurnaceStatus,
 	IwsConnectedMessasge,
 	IwsSerialMessage
-} from '@/types/main';
+} from '@/types';
 import { message } from '@/api/line';
 import { wsServer } from '@/api/express';
 // import {  clearInterval } from 'timers';
@@ -35,6 +36,9 @@ const log = getLogger('hiper');
 
 /**宣告 client */
 let tcpClient: FSocket;
+
+/**宣告爐子狀態 */
+let furnace: IfurnaceStatus;
 
 /**搬移至cron.ts */
 // log.info('Start daily notification of Hiper furnace');
@@ -199,7 +203,9 @@ ipcMain.handle(EsocketHiperHandle.CONNECT, async (e, args) => {
 
 				const arr = drop(strArr, 9); // 移除多餘 header
 				tcpClient.stepName = stepName[arr[67]];
+				furnace.workNowName = stepName[arr[67]];
 				tcpClient.stepState = stepState[arr[49]];
+				furnace.workNowState = stepState[arr[49]];
 
 				// console.log(tcpClient.stepName);
 				// console.log(tcpClient.stepState);
@@ -753,4 +759,4 @@ ipcMain.handle(EsocketHiperHandle.ALARMRST, () => {
 // 	return this.toString(16).padStart(2, '0');
 // };
 
-export { tcpClient as hiperClient };
+export { tcpClient as hiperClient, furnace as hiperFurnace };

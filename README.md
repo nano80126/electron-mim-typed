@@ -4,13 +4,11 @@ MIM Sintering furnace server
 
 Using Modbus TCP to get equipment status
 
-
 HIPER:
     Address: 192.168.3.18:502
 
 VTECH:
     Address: 192.168.3.39:1028
-
 
 ## Feature
 
@@ -61,6 +59,7 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [ ] 確認恆普報警對應的 bit
     * [ ] 爐溫曲線圖，使用TXT
     * [ ] 刪除非本專案之多餘檔案
+    * [ ] 恆普燒結爐手動狀態不報警
  
 ### 新增 MONGODB
 
@@ -95,6 +94,5 @@ Revoke POST https://notify-api.line.me/api/revoke
         * 每日通知失敗
         * 報警通知失敗
         * Web socket server發生錯誤
-
 ### 
 

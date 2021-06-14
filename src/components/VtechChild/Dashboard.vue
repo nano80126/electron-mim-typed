@@ -321,7 +321,7 @@ import stepName from '@/json/vtech/stepName.json';
 import stepState from '@/json/vtech/stepState.json';
 import { EwsChannel, EwsFurnaceType, EwsCommand, IwsCmdMsg, IwsSerialMsg } from '@/types/renderer';
 import { VtechModule } from '@/store/modules/vtech';
-import { EsocketInvoke, EsocketOn } from '@/types/renderer/socket_vtech';
+import { EsocketInvoke, EsocketOn } from '@/types/socket_vtech';
 
 @Component({})
 export default class VtechDashboard extends Vue {

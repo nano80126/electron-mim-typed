@@ -22,12 +22,10 @@ import './api/cron';
 import { message } from '@/api/line';
 // import './api/sharp';
 
-import { registerHotkey, unregisterAllHotKey } from './api/shortcut';
+import { registerHotkey, unregisterAllHotKey } from './api/hotkey';
 // import { config, saveConfig } from './api/fs';
 // import { mongoCLient } from './api/mongo';
 
-// custom types
-import { IchannelLyricsObj } from '@/types/main';
 // import './api/mongo';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -38,10 +36,9 @@ let tray: Tray | null = null;
 // windows
 let win: BrowserWindow | null = null;
 let mainWin: Electron.webContents | null;
-let child: BrowserWindow | null = null;
-let childCloseTimer: NodeJS.Timeout | null = null;
+const child: BrowserWindow | null = null;
+// const childCloseTimer: NodeJS.Timeout | null = null;
 //
-const locale: string | undefined = process.env.VUE_APP_I18N_LOCALE;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }]);
@@ -71,9 +68,7 @@ function createWindow() {
 		minHeight: 720,
 		height: 900,
 		///
-		// x: (config as Iconfig).x || 30,
 		x: 30,
-		// y: (config as Iconfig).y || 40,
 		y: 40,
 		// frame: false,
 		// opacity: 0.5,
@@ -91,75 +86,6 @@ function createWindow() {
 	if (process.env.NODE_ENV == 'production') win.removeMenu();
 	// win.setMenu(mainMenu);
 	// Menu.setApplicationMenu(mainMenu);
-
-	win.webContents.on('new-window', (event, url, frameName, disposition, options) => {
-		event.preventDefault();
-
-		// preserved for line panel
-		if (frameName === 'editPanel') {
-			const { artist, title, lyricsKey, lyricsUrl } = options as IchannelLyricsObj;
-
-			if (!child) {
-				child = new BrowserWindow({
-					title: 'Panel',
-					backgroundColor: '#212121',
-					///
-					width: 640,
-					height: 840,
-					///
-					parent: win as BrowserWindow,
-					center: true,
-					modal: true,
-					show: false,
-					autoHideMenuBar: true,
-					frame: false,
-					resizable: false,
-					webPreferences: {
-						nodeIntegration: true
-					}
-				});
-				if (process.env.NODE_ENV == 'production') child.removeMenu(); // 移除 menu
-				child.loadURL(url);
-
-				// if (process.env.WEBPACK_DEV_SERVER_URL) {
-				// 	child.loadURL(url.replace(/(#\/)/, ''));
-				// } else {
-				// 	child.loadURL('http://localhost:4000' + url);
-				// }
-			} else {
-				child.webContents.send('lyricObj', {
-					artist: artist,
-					song: title,
-					key: lyricsKey,
-					url: lyricsUrl,
-					delay: 500
-				});
-				/**同步語言 */
-				child.webContents.send('syncLanguage', locale);
-				if (!child.isVisible()) child.show();
-				if (childCloseTimer) clearTimeout(childCloseTimer);
-			}
-
-			child.on('ready-to-show', () => {
-				child?.webContents.send('lyricObj', {
-					artist: artist,
-					song: title,
-					key: lyricsKey,
-					url: lyricsUrl,
-					delay: 0
-				});
-				/**同步語言 */
-				child?.webContents.send('syncLanguage', locale);
-				child?.show();
-				/**重置timer */
-				if (childCloseTimer) clearTimeout(childCloseTimer);
-			});
-
-			child.on('close', () => {
-				child = null;
-			});
-		}
-	});
 
 	if (process.env.WEBPACK_DEV_SERVER_URL) {
 		// Load the url of the dev server if in development mode
@@ -294,13 +220,13 @@ ipcMain.on('windowHide', () => {
 	win?.hide();
 });
 
-ipcMain.on('panelHide', () => {
-	child?.hide();
-	// 10 分鐘後關閉 child
-	childCloseTimer = setTimeout(() => {
-		child?.close();
-	}, 1000 * 60 * 10);
-});
+// ipcMain.on('panelHide', () => {
+// 	child?.hide();
+// 	// 10 分鐘後關閉 child
+// 	childCloseTimer = setTimeout(() => {
+// 		child?.close();
+// 	}, 1000 * 60 * 10);
+// });
 
 ipcMain.on('windowWidth', (e, args) => {
 	if (win?.isMaximized()) win?.restore();
