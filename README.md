@@ -48,7 +48,7 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [ ] 使用 mongoDB 紀錄工藝與組態 (ex. IP, port)
     * [ ] LINE NOTIFY, Web socket廣播功能移動至總覽頁面
     * [ ] 重寫報警時改變顏色邏輯
-    * [ ] 宏崙爐溫線圖(等待檔案提供)
+    * [x] 宏崙爐溫線圖(等待檔案提供)
     * [x] 宏崙燒結爐Web socket下達重置警報命令
     * [ ] Line Notify 註冊頁面
     * [ ] 新增ERROR CODE
@@ -56,11 +56,13 @@ Revoke POST https://notify-api.line.me/api/revoke
     * [ ] 自動開始取樣
     * [x] 刪除 Vtech 取樣多餘程式碼
     * [ ] 移除背景警示警報，改為其他方法
-    * [ ] 確認恆普報警對應的 bit
-    * [ ] 爐溫曲線圖，使用TXT
+    * [x] 確認恆普報警對應的 bit
+    * [x] 爐溫曲線圖，使用TXT
     * [ ] 刪除非本專案之多餘檔案
     * [ ] 恆普燒結爐手動狀態不報警
- 
+    * [ ] 自動模式邏輯
+        * 重開機後自動連線 (包含重連設定)
+    
 ### 新增 MONGODB
 
 
