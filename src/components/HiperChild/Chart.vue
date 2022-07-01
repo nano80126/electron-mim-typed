@@ -84,6 +84,20 @@
 				<v-divider />
 				<v-list-item dense class="subtitle-2">
 					<v-list-item-content>
+						<span class="ml-3 mr-8">日期</span>
+					</v-list-item-content>
+					<v-list-item-icon>{{ menuDate }}</v-list-item-icon>
+				</v-list-item>
+
+				<v-list-item dense class="subtitle-2">
+					<v-list-item-content>
+						<span class="ml-3 mr-8">時間</span>
+					</v-list-item-content>
+					<v-list-item-icon>{{ menuTime }}</v-list-item-icon>
+				</v-list-item>
+
+				<v-list-item dense class="subtitle-2">
+					<v-list-item-content>
 						<span class="ml-3 mr-8">上部溫度</span>
 					</v-list-item-content>
 					<v-list-item-icon>{{ menuUppertemp }} ℃</v-list-item-icon>
@@ -116,27 +130,32 @@ export interface ChartComponent {
 @Component({})
 export default class HiperChart extends Vue implements ChartComponent {
 	/**曲線圖CSV */
-	private file: File | null = null;
+	public file: File | null = null;
 	/**是否 dragin */
-	private dragging = false;
+	public dragging = false;
 	/**chart 資料 */
 	private series: {
 		[key: string]: number;
 	}[] = [];
 	/**chart 物件 */
-	private chart: Chart | null = null;
+	public chart: Chart | null = null;
 	/**顯示 menu */
 	public showMenu = false;
 	/**menu X 座標 */
-	private menuX = 0;
+	public menuX = 0;
 	/**menu Y 座標 */
-	private menuY = 0;
+	public menuY = 0;
 	/**顯示上部溫度 */
-	private menuUppertemp = 0;
+	public menuUppertemp = 0;
 	/**顯示下部溫度 */
-	private menuLowertemp = 0;
+	public menuLowertemp = 0;
+	/**顯示日期 */
+	public menuDate = '';
+	/**顯示時間 */
+	public menuTime = '';
+
 	/** */
-	private plotH = 0;
+	public plotH = 0;
 
 	mounted() {
 		//
@@ -147,7 +166,7 @@ export default class HiperChart extends Vue implements ChartComponent {
 	}
 
 	/**input file change event */
-	private onChange(e: Event) {
+	public onChange(e: Event) {
 		AppModule.changeOverlay(true);
 
 		const files = (e.target as HTMLInputElement).files as FileList;
@@ -221,11 +240,11 @@ export default class HiperChart extends Vue implements ChartComponent {
 	}
 
 	/**重置 Zoom */
-	private resetZoom() {
+	public resetZoom() {
 		(this.chart as Chart).zoomOut();
 	}
 
-	private drawChart() {
+	public drawChart() {
 		const Obj: { [key: string]: [number, number][] } = {
 			PG: [],
 			upperTemp: [],
@@ -570,6 +589,8 @@ export default class HiperChart extends Vue implements ChartComponent {
 								this.menuY = e.y;
 								this.menuUppertemp = this.chart?.series[0].data[index].y as number;
 								this.menuLowertemp = this.chart?.series[1].data[index].y as number;
+								this.menuDate = this.$moment(this.chart?.series[0].data[index].x).format('yyyy/MM/DD');
+								this.menuTime = this.$moment(this.chart?.series[0].data[index].x).format('HH:mm:ss');
 								this.$nextTick(() => {
 									this.showMenu = true;
 								});

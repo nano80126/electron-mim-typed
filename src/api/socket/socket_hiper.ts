@@ -92,7 +92,7 @@ const cronReconn = new CronJob(
 					family: 4
 				});
 			} catch (err) {
-				log.warn(`${err.message}, code: ${err.code}`);
+				log.warn(`${(err as Error).message}, code: ${err.code}`);
 			}
 		}
 	},
