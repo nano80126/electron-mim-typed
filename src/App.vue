@@ -382,7 +382,7 @@ import { AppModule, Colors } from './store/modules/app';
 @Component({})
 export default class App extends Vue {
 	/**Show after mounted */
-	private SHOW = false;
+	private SHOW = true;
 
 	/**是否顯示menu */
 	private menu = false;

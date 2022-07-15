@@ -5,14 +5,16 @@ import { app } from 'electron';
 const { NODE_ENV } = process.env;
 const logPath =
 	NODE_ENV == 'development'
-		? path.resolve(app.getPath('documents'), 'electron-min/logs')
+		? path.resolve(app.getPath('documents'), 'electron-mim/logs')
 		: path.resolve(app.getPath('exe'), '../logs');
+
+// console.log(logPath);
 
 try {
 	require('fs').mkdirSync(logPath);
 } catch (e) {
 	if (e.code != 'EEXIST') {
-		console.error(`Unable to create log durectory, code: ${e.code}`);
+		console.error(`Unable to create log directory, code: ${e.code}`);
 		process.exit(1);
 	}
 }

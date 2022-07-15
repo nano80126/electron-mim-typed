@@ -84,6 +84,20 @@
 				<v-divider />
 				<v-list-item dense class="subtitle-2">
 					<v-list-item-content>
+						<span class="ml-3 mr-8">日期</span>
+					</v-list-item-content>
+					<v-list-item-icon>{{ menuDate }}</v-list-item-icon>
+				</v-list-item>
+
+				<v-list-item dense class="subtitle-2">
+					<v-list-item-content>
+						<span class="ml-3 mr-8">時間</span>
+					</v-list-item-content>
+					<v-list-item-icon>{{ menuTime }}</v-list-item-icon>
+				</v-list-item>
+
+				<v-list-item dense class="subtitle-2">
+					<v-list-item-content>
 						<span class="ml-3 mr-8">上部溫度</span>
 					</v-list-item-content>
 					<v-list-item-icon>{{ menuUppertemp }} ℃</v-list-item-icon>
@@ -138,6 +152,11 @@ export default class HiperChart extends Vue implements ChartComponent {
 	private menuUppertemp = 0;
 	/**顯示下部溫度 */
 	private menuLowertemp = 0;
+	/**顯示日期 */
+	private menuDate = '';
+	/**顯示時間 */
+	private menuTime = '';
+
 	/** */
 	private plotH = 0;
 
@@ -177,8 +196,8 @@ export default class HiperChart extends Vue implements ChartComponent {
 								this.series = res.series;
 								this.names = res.names;
 
-								console.log(this.names);
-								console.log(this.series);
+								// console.log(this.names);
+								// console.log(this.series);
 							})
 							.finally(() => {
 								(e.target as HTMLInputElement).value = '';
@@ -290,7 +309,7 @@ export default class HiperChart extends Vue implements ChartComponent {
 			};
 		});
 
-		console.log(objSeries);
+		// console.log(objSeries);
 
 		this.chart = Highcharts.chart('container', {
 			boost: {
@@ -630,6 +649,8 @@ export default class HiperChart extends Vue implements ChartComponent {
 								this.menuY = e.y;
 								this.menuUppertemp = this.chart?.series[0].data[index].y as number;
 								this.menuLowertemp = this.chart?.series[1].data[index].y as number;
+								this.menuDate = this.$moment(this.chart?.series[0].data[index].x).format('yyyy/MM/DD');
+								this.menuTime = this.$moment(this.chart?.series[0].data[index].x).format('HH:mm:ss');
 								this.$nextTick(() => {
 									this.showMenu = true;
 								});

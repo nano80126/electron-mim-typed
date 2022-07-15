@@ -183,8 +183,8 @@ new Vue({
 						const wsMsg = JSON.parse(msg.data) as IwsMsg;
 						let openMsg;
 
-						// console.log(msg);
-						// console.log(wsMsg);
+						// console.info(msg);
+						// console.info(wsMsg);
 
 						switch (wsMsg.channel) {
 							case EwsChannel.OPEN:
