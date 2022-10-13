@@ -14,7 +14,7 @@ Using Modbus TCP protocol to get equipment status
 
 ## Small function
 
-* Auto reset alarm if it not in a da
+* Auto reset alarm which not affect process
 
 * Auto reconnect to equipment each five minutes if the connection is broken
 
