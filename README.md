@@ -4,6 +4,9 @@ MIM Sintering furnace server
 
 Using Modbus TCP protocol to get equipment status
 
+
+![image] (https://github.com/nano80126/electron-mim-typed/blob/master/furnance%20dashboard.png)
+
 ## Summary
 
 * Connect equipment with Node.js net module and build into electron application
