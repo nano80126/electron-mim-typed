@@ -5,7 +5,9 @@ MIM Sintering furnace server
 Using Modbus TCP protocol to get equipment status
 
 
-![image] (https://github.com/nano80126/electron-mim-typed/blob/master/furnance%20dashboard.png)
+![image](https://github.com/nano80126/electron-mim-typed/blob/master/dashboard.png)
+
+![image](https://github.com/nano80126/electron-mim-typed/blob/master/chart.png)
 
 ## Summary
 
