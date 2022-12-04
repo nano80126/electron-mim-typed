@@ -30,6 +30,6 @@ Using Modbus TCP protocol to get equipment status
 * TypeScript
 * Socket
 * WebSocket
-* L
+* Line Notify
 
 detail is in package.json
